@@ -81,3 +81,7 @@ print(paste0("NOTE: output files: ", paste0(data_backup_dir, "taibnet_marine_spe
 print(paste0("........ TaiBNET fetch end: ",as.POSIXct(Sys.time()), " ........"))
 sink()
 closeAllConnections()
+
+## backup to newest_version file
+processx::run("cp", c(paste0(data_backup_dir, "taibnet_marine_species_",data_backup_date,".csv"),
+                      paste0(data_backup_dir, "taibnet_marine_species.csv")))
