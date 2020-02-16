@@ -12,7 +12,7 @@ data_backup_dir <- "data/"  #### write data backup file of fetched TaiBNET marin
 data_backup_date <- Sys.Date()
 Log_file <- "./taibnet_fetch.log" ######## write warning message to a log file if use Rscript to run this script. 
 sink(Log_file)
-print(paste0("........ TaiBNET fetch process start at: ",as.POSIXct(Sys.time())," ........"))
+print(paste0("........ TaiBNET fetch marine sp start at: ",as.POSIXct(Sys.time())," ........"))
 
 
 tbls <- html_nodes(webx, "table")
@@ -85,3 +85,5 @@ closeAllConnections()
 ## backup to newest_version file
 processx::run("cp", c(paste0(data_backup_dir, "taibnet_marine_species_",data_backup_date,".csv"),
                       paste0(data_backup_dir, "taibnet_marine_species.csv")))
+
+
