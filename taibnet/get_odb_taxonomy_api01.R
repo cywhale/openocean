@@ -13,7 +13,7 @@ resp <- POST(
 dj <- setDT(fromJSON(rawToChar(resp$content)))
 
 ## Just check if all marine sp crawled is consistent with this data ##
-
+data_backup_dir <- "data/" 
 if (file.exists(paste0(data_backup_dir, "taibnet_marine_species.csv"))) {
   mdt <- fread(paste0(data_backup_dir, "taibnet_marine_species.csv"))
   print(paste0("Marine sp: ", nrow(mdt), " and species in copepod data, ODB: ", nrow(dj[rank=="species",])))
