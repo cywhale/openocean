@@ -14,6 +14,7 @@ Log_file <- "./taibnet_fetch.log" ######## write warning message to a log file i
 sink(Log_file)
 print(paste0("........ TaiBNET fetch marine sp start at: ",as.POSIXct(Sys.time())," ........"))
 
+trimx <- function(x) gsub("^[^a-zA-Z]+|[^a-zA-Z]+$", "", gsub("^\\s+|\\s+$", "", x)) # trim leading and trailing space, leaving only alphabets in scientific name crawled
 
 tbls <- html_nodes(webx, "table")
 # head(tbls)
@@ -75,6 +76,7 @@ if (any(which(is.na(new_head)))) {
 }
 
 setnames(tdx, 1:ncol(tdx), new_head)
+tdx[,sciname:=trimx(sciname)]
 fwrite(tdx, file=paste0(data_backup_dir, "taibnet_marine_species_",data_backup_date,".csv"))
 
 print(paste0("NOTE: output files: ", paste0(data_backup_dir, "taibnet_marine_species_",data_backup_date,".csv")))
