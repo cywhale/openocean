@@ -1,0 +1,7 @@
+[1] "........ TaiBNET fetch all sp start at: 2020-02-16 12:48:14 ........"
+[1] "Enable update file of taiBNET header format for species checklist..."
+[1] "Header file update: 物種名錄 txt 檔欄位說明.pdf (2020-01-10更新) at data/taibnet_all_checklist_columns_def.csv"
+[1] "物種名錄 txt 檔 (2020-01-09更新；有效學名 60132 筆，同種異名 94338 筆，合計 154470 筆)"
+[1] "Got file: data/TaiwanSpecies20200109.txt with rows: 154470 and cols: 38"
+[1] "Original description of taiBNET about this data: 物種名錄 txt 檔 (2020-01-09更新；有效學名 60132 筆，同種異名 94338 筆，合計 154470 筆)"
+[1] "........ TaiBNET fetch all sp end: 2020-02-16 12:48:27 ........"
