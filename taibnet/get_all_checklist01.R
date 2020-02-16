@@ -7,8 +7,6 @@ library(rvest)
 library(curl)
 library(tabulizer)
 
-#### NOTE: current marine species is 13,937 in TaiBNET, so set a max 20000 will show only one page in query
-#### that's, taibnet_marine.php?pz=20000 means
 data_backup_dir <- "data/"  #### write data backup file of fetched TaiBNET marine species checklist
 base<- "http://taibnet.sinica.edu.tw"
 url <- "http://taibnet.sinica.edu.tw/chi/download_pre.php"
