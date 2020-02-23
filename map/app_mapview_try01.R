@@ -21,7 +21,7 @@ pts <- st_as_sf(df1, coords = c("x", "y"), crs = 4326, remove=FALSE)
   #st_cast("POINT") %>% st_sf(df1, crs = 4326)
 colt <- colour_values(pts$id%%4, include_alpha = FALSE)
 
-br <- st_read("D:/backup/env/MEOW_PPOW_2007_2012/01_Data/WCMC-036-MEOW-PPOW-2007-2012-NoCoast.shp") %>%
+br <- st_read("WCMC-036-MEOW-PPOW-2007-2012-NoCoast.shp") %>%
   st_as_sf(crs=4326)
 
 m <- mapview(br, zcol = c("PROVINC"), legend = FALSE, layer.name = "bio_provinces",
