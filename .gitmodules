@@ -1,0 +1,3 @@
+[submodule "ThreeGeoJSON"]
+	path = ThreeGeoJSON
+	url = https://github.com/jdomingu/ThreeGeoJSON
