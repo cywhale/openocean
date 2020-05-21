@@ -1,3 +1,6 @@
 [submodule "ThreeGeoJSON"]
 	path = ThreeGeoJSON
 	url = https://github.com/jdomingu/ThreeGeoJSON
+[submodule "sau-node"]
+	path = sau-node
+	url = https://github.com/SeaAroundUs/sau-node.git
