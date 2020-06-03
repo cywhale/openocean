@@ -20,9 +20,6 @@ module.exports = async function(fastify, opts) {
   })
 */
   // Add your API endpoints here
-  fastify.get('/', async (req, res) => {
-    res.send('Site Under Construction...')
-  })
 
   fastify.get('/api/time', async (req, res) => {
     return { time: new Date().toISOString() }
