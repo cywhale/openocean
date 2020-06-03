@@ -1,0 +1,30 @@
+{
+  "name": "node_eco",
+  "version": "1.0.0",
+  "description": "global eco project",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap test/**/*.test.js",
+    "start": "fastify start -l info src/server/server.js",
+    "dev": "fastify start -w -l info -P src/server/server.js"
+  },
+  "repository": "https://github.com/cywhale/openocean/node_eco",
+  "author": "cywhale",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^2.14.1",
+    "fastify-autoload": "^1.0.0",
+    "fastify-cli": "^1.5.0",
+    "fastify-plugin": "^1.5.0",
+    "fastify-static": "^2.7.0",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.1.0",
+    "nodemon": "^2.0.4",
+    "tap": "^12.5.3"
+  }
+}

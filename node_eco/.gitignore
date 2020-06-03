@@ -1,0 +1,15 @@
+#ignore node_modules
+node_modules
+pub
+ver_bak
+coverage
+data
+temp
+tmp
+nohup.out
+.vscode
+*.bak
+*~
+.DS_Store
+.credentials.*
+.eslintrc.*
