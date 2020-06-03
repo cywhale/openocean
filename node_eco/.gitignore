@@ -9,6 +9,7 @@ tmp
 nohup.out
 .vscode
 *.bak
+*.swp
 *~
 .DS_Store
 .credentials.*
