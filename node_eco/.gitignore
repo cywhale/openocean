@@ -12,4 +12,5 @@ nohup.out
 *~
 .DS_Store
 .credentials.*
+.config.*
 .eslintrc.*
