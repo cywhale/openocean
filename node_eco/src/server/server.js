@@ -1,15 +1,15 @@
 'use strict'
 
 const fastify = require('fastify');
-const AutoLoad = require('fastify-autoload');
+//const AutoLoad = require('fastify-autoload');
 const path = require('path');
 const nconf= require('nconf');
 const srv_routes = require('./routines/srv_routes');
+const mongoose = require('mongoose')
+const mongoConnector = require('./mongo/db');
 
 const startServer = (opts) => {
-    const { logSeverity, port } = opts;
-    console.log(logSeverity);
-    console.log(parseInt(port));
+    const { env, logSeverity, port, mongo_uri } = opts;
     // create the server
     const server = fastify({
       logger: { level: logSeverity }
@@ -17,6 +17,10 @@ const startServer = (opts) => {
 
     // register the plugins, routes
 /*
+    server.register(AutoLoad, {
+      dir: path.join(__dirname, '../..', 'plugins'),
+      options: Object.assign({}, opts)
+    });
     server.register(AutoLoad, {
         dir: path.join(__dirname, 'api', 'routes')
     });
@@ -28,16 +32,8 @@ const startServer = (opts) => {
       root: path.join(__dirname, '..', 'ui'),
     });
 
-    server.register(AutoLoad, {
-      dir: path.join(__dirname, '../..', 'plugins'),
-      options: Object.assign({}, opts)
-    });
-/*
-    server.register(AutoLoad, {
-      dir: path.join(__dirname, 'routines'),
-      //options: Object.assign({}, opts)
-    });
-*/
+    server.register(mongoConnector, {uri: mongo_uri});
+
     srv_routes.forEach((route, index) => {
         server.route(route)
     })

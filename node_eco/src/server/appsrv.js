@@ -8,11 +8,14 @@ const appsrv = async () => {
   try {
     await loadSettings({ configPath });
     //Read config required for starting the server
+    let env = nconf.get('env')
     let srvOpts = {
+        env: env,
         logSeverity: nconf.get('apps.logSeverity'),
-        port: nconf.get('apps.port')
+        port: nconf.get('apps.port'),
+        mongo_uri: nconf.get('mongo.connectionString.'+env)
     };
-    console.log(srvOpts);
+    if (env == 'dev') console.log(srvOpts);
     server.startServer(srvOpts); //start server
   } catch (err) {
     throw boom.boomify(err)
@@ -20,4 +23,3 @@ const appsrv = async () => {
 };
 
 appsrv();
-
