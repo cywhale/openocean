@@ -1,4 +1,4 @@
-const srv_ctrl = require('./srv_ctrl');
+const srv_ctrl = require('../controllers/srv_ctrl');
 
 const srv_routes = [{
     method: 'GET',

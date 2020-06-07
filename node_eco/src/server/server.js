@@ -4,11 +4,11 @@ const fastify = require('fastify');
 //const AutoLoad = require('fastify-autoload');
 const path = require('path');
 const nconf= require('nconf');
-const srv_routes = require('./routines/srv_routes');
+const srv_routes = require('./routes/srv_routes');
 const mongoose = require('mongoose')
-const mongoConnector = require('./mongo/db');
+const mongoConnector = require('./db/mongoconn');
 
-const startServer = (opts) => {
+const startServer = async (opts) => {
     const { env, logSeverity, port, mongo_uri } = opts;
     // create the server
     const server = fastify({
@@ -22,19 +22,19 @@ const startServer = (opts) => {
       options: Object.assign({}, opts)
     });
     server.register(AutoLoad, {
-        dir: path.join(__dirname, 'api', 'routes')
+      dir: path.join(__dirname, 'api', 'routes')
     });
     server.register(jwt, {
-        secret: nconf.get('secrets.jwt'),
+      secret: nconf.get('secrets.jwt'),
     });
 */
-    server.register(require('fastify-static'), {
+    await server.register(require('fastify-static'), {
       root: path.join(__dirname, '..', 'ui'),
     });
 
-    server.register(mongoConnector, {uri: mongo_uri});
+    await server.register(mongoConnector, {uri: mongo_uri});
 
-    srv_routes.forEach((route, index) => {
+    await srv_routes.forEach((route, index) => {
         server.route(route)
     })
 

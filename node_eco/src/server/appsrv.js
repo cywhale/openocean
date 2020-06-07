@@ -2,7 +2,7 @@ const nconf = require('nconf');
 const boom = require('boom')
 const server = require('./server');
 const configPath = process.env.APP_SETTINGS_FILE_PATH;
-const { loadSettings } = require('./routines/srv_config');
+const { loadSettings } = require('./config/srv_config');
 
 const appsrv = async () => {
   try {
