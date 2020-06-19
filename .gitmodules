@@ -4,3 +4,6 @@
 [submodule "sau-node"]
 	path = sau-node
 	url = https://github.com/SeaAroundUs/sau-node.git
+[submodule "node_eco/src/server/webglearth2"]
+	path = node_eco/src/server/webglearth2
+	url = https://github.com/webglearth/webglearth2.git
