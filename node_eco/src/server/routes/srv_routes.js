@@ -10,5 +10,5 @@ const srv_routes = [{
     url: '/map',
     handler: srv_ctrl.map
   }
-]
-module.exports = srv_routes
+];
+module.exports = srv_routes;

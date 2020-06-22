@@ -1,4 +1,5 @@
-const boom = require('boom')
+const boom = require('boom');
+//const path = require('path');
 
 // Add your API endpoints here
 // fastify.get
@@ -18,7 +19,7 @@ exports.map = async (req,res) => {
     });
     return res;
 */
-  res.send("Temporarily a route test...")
+  res.sendFile("map/earth.html");//, path.join(__dirname, 'map'));
   } catch (err) {
     throw boom.boomify(err)
   }

@@ -1,5 +1,6 @@
 #ignore node_modules
 node_modules
+**/map/
 pub
 ver_bak
 coverage

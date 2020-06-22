@@ -7,6 +7,8 @@ const nconf= require('nconf');
 const srv_routes = require('./routes/srv_routes');
 const mongoose = require('mongoose')
 const mongoConnector = require('./db/mongoconn');
+//Swagger options
+//const swagger = require('./config/swagger');
 
 const startServer = async (opts) => {
     const { env, logSeverity, port, mongo_uri } = opts;
@@ -16,32 +18,30 @@ const startServer = async (opts) => {
     });
 
     // register the plugins, routes
-/*
-    server.register(AutoLoad, {
-      dir: path.join(__dirname, '../..', 'plugins'),
-      options: Object.assign({}, opts)
-    });
-    server.register(AutoLoad, {
-      dir: path.join(__dirname, 'api', 'routes')
-    });
-    server.register(jwt, {
-      secret: nconf.get('secrets.jwt'),
-    });
-*/
+    //await server.register(require('fastify-swagger'), swagger.options);
+
     await server.register(require('fastify-static'), {
       root: path.join(__dirname, '..', 'ui'),
     });
 
+    await server.register(require('fastify-static'), {
+      root: path.join(__dirname, '../ui', 'map'),
+      prefix: '/map/',
+      decorateReply: false
+    });
+
+
     await server.register(mongoConnector, {uri: mongo_uri});
 
     await srv_routes.forEach((route, index) => {
-        server.route(route)
+        server.route(route);
     })
 
     // start the server
     const start = async () => {
       try {
         await server.listen(parseInt(port));
+      //await server.swagger();
         server.log.info(`server listening on ${server.server.address().port}`)
       } catch (err) {
         server.log.error(err)
