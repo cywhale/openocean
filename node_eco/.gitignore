@@ -1,6 +1,7 @@
 #ignore node_modules
 node_modules
 **/map/
+webgl
 pub
 ver_bak
 coverage
@@ -9,6 +10,7 @@ temp
 tmp
 nohup.out
 .vscode
+*.save
 *.bak
 *.swp
 *~

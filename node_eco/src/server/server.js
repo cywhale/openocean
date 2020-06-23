@@ -25,8 +25,8 @@ const startServer = async (opts) => {
     });
 
     await server.register(require('fastify-static'), {
-      root: path.join(__dirname, '../ui', 'map'),
-      prefix: '/map/',
+      root: path.join(__dirname, '..', '..', 'webgl'),
+      prefix: '/includes/',
       decorateReply: false
     });
 

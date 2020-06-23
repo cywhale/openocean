@@ -1,5 +1,5 @@
 const boom = require('boom');
-//const path = require('path');
+const path = require('path');
 
 // Add your API endpoints here
 // fastify.get
@@ -19,7 +19,7 @@ exports.map = async (req,res) => {
     });
     return res;
 */
-  res.sendFile("map/earth.html");//, path.join(__dirname, 'map'));
+  res.sendFile("earth.html", path.join(__dirname, '../../..', 'webgl'));
   } catch (err) {
     throw boom.boomify(err)
   }
