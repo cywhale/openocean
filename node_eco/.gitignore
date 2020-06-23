@@ -18,3 +18,6 @@ nohup.out
 .credentials.*
 .config.*
 .eslintrc.*
+**/*.pem
+**/*.key
+**/*.cert

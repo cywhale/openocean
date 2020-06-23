@@ -2,6 +2,7 @@
 
 const fastify = require('fastify');
 //const AutoLoad = require('fastify-autoload');
+const fs = require('fs');
 const path = require('path');
 const nconf= require('nconf');
 const srv_routes = require('./routes/srv_routes');
@@ -14,6 +15,13 @@ const startServer = async (opts) => {
     const { env, logSeverity, port, mongo_uri } = opts;
     // create the server
     const server = fastify({
+      http2: true,
+      trustProxy: true,
+      https: {
+        allowHTTP1: true, 
+        key: fs.readFileSync(path.join(__dirname, 'config', 'privkey.pem')),
+        cert: fs.readFileSync(path.join(__dirname, 'config', 'fullchain.pem'))
+      },
       logger: { level: logSeverity }
     });
 
@@ -30,13 +38,15 @@ const startServer = async (opts) => {
       decorateReply: false
     });
 
-
     await server.register(mongoConnector, {uri: mongo_uri});
 
     await srv_routes.forEach((route, index) => {
         server.route(route);
     })
 
+    //server.get('/', async (res, rep) => {
+    //  await rep.writeHead(200)
+    //})
     // start the server
     const start = async () => {
       try {
