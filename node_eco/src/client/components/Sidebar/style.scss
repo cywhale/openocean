@@ -1,0 +1,145 @@
+.sideblock {
+    display:flex;
+    height:auto;
+}
+.menuToggle {
+    margin-top: -25px;
+    margin-left: -12px;
+    padding: 5px 5px 5px 5px;
+    z-index: 1002;
+    max-width: 100px;
+    max-height: 100px;
+}
+.menuBtn_in_span {
+    display: inline-block;
+    margin: 5px;
+}
+.menuButn {
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 6px 12px;
+    background: transparent;
+}
+.menuButn::before {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    width: 2em;
+    height: 2em;
+    background: url('../../assets/icons/menu-blue96.png');
+    background-size: 100% auto;
+}
+ 
+/* https://codepen.io/andornagy/pen/xhiJH */ 
+/* https://onextrapixel.com/creating-a-swipeable-side-menu-for-the-web/ */ 
+.swipe_area {
+    position: absolute;
+    width: 15px;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background:rgba(0, 0, 0, 0.2);
+    z-index: 0;
+    cursor: grab;
+}
+/*
+  #sideBar {
+    display: none;
+  }*/
+  .sideContainer {
+    left: -320px;
+    top: 60px;
+    height: 100%;
+    width: auto;
+    position: absolute;    
+    margin-top: 10px;
+    z-index: 100; 
+    background: #191818;
+    overflow: hidden;
+    -webkit-transition:  left 0.4s ease-in-out;
+    -moz-transition:  left 0.4s ease-in-out;
+    -ms-transition:  left 0.4s ease-in-out;
+    -o-transition:  left 0.4s ease-in-out;
+    transition:  left 0.4s ease-in-out;      
+  }
+  
+  .sideContainer.open_sidebar {
+      left: 0;
+  }
+    
+  .sideContainer a {
+      color: #999;
+      border: none;
+      padding: 0.6em 0 0.6em 0.6em;
+  }
+  
+  .sidemenu {
+    background-color: #1e3f5a;
+    width: 100%;
+    height: 100%;
+    box-sizing:border-box;
+    overflow-y: auto;
+  }
+
+  .sidemenu ul {
+  /*  position:relative;*/
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    border: none;
+    background: transparent;
+  }
+  .sidemenu ul li {
+    margin: 0;
+  }
+  
+  .sidemenu ul li a {
+      display:block;
+      font-size:20px;
+      line-height: 60px;
+      text-decoration:none;
+  }
+  .sidemenu li a:hover, .sidemenu li a:focus {
+      background: #333;
+      border-bottom: 1px solid #F0E68C;
+  }
+  
+  /* light border to separate items into groups */
+  .sidemenu ul, .sidemenu .menu_item_divided {
+      border-top: 1px solid #333;
+  }
+  
+  /* hide dropdown */
+  .sidemenu ul ul {
+      display: none;
+      left: 0px; 
+  }
+  /* hover and show dropdown */
+  .sidemenu ul li:hover > ul {
+      display:inherit;
+  }
+  
+  /* Fisrt Tier Dropdown */
+  .sidemenu ul ul li {
+    position: relative;
+	  float:right;
+    display:list-item;
+    width:100%;
+    background-color: #11263b;
+  }
+  /* Second, Third and more Tiers	*/
+  .sidemenu ul ul ul li {
+    position: relative;
+	  float:right;
+    display:list-item;
+    background-color: #0b1927;
+    width:100%;
+  }
+  li > a:after {content:  '⏬';}
+  li > a:only-child:after { content: ''; }
+  
+  

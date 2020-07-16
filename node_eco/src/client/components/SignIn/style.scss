@@ -1,0 +1,39 @@
+.signIn {
+  align-items: bottom;
+	display: flex;
+	flex-direction: column;
+  flex-grow: 1;
+	justify-content: center;
+}
+
+.signInImg {
+  max-width: 100%;
+  height: auto;  
+}
+/*
+h1 {
+  color: #ffffff;
+  font-size: 48px;
+  margin: 0;
+}
+*/
+.button {
+  background: #5c677e;
+  border: 0;
+  border-radius: 22px;
+  box-shadow: 0 3px 6px rgba(#000, 0.2);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 24px;
+  line-height: 1;
+  margin: 14px 14px 0;
+  padding: 12px;
+
+  &:active,
+  &:focus,
+  &:hover {
+    background: lighten(#5c677e, 10%);
+    outline: 0;
+    transition: background 0.3s ease-in-out;
+  }
+}

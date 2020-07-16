@@ -47,6 +47,12 @@ const startServer = async (opts) => {
     
     await server.register(require('fastify-static'), {
       root: path.join(__dirname, '..', 'ui'),
+      prefix: '/',
+      prefixAvoidTrailingSlash: true,
+      list: {
+        format: 'html',
+        names: ['index', 'index.html', '/']
+      }
     });
 
     await server.register(require('fastify-static'), {
@@ -59,11 +65,8 @@ const startServer = async (opts) => {
 
     await srv_routes.forEach((route, index) => {
         server.route(route);
-    })
+    });
 
-    //server.get('/', async (res, rep) => {
-    //  await rep.writeHead(200)
-    //})
     // start the server
     const start = async () => {
       try {

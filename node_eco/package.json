@@ -11,14 +11,19 @@
   "license": "MIT",
   "dependencies": {
     "boom": "^7.3.0",
-    "fastify": "^3.0.0-rc.4",
+    "fastify": "^3.0.2",
     "fastify-plugin": "^1.5.0",
     "fastify-static": "3.0.1",
+    "firebase": "^7.16.0",
     "fs": "^0.0.1-security",
+    "htm": "^3.0.4",
     "loadash": "^1.0.0",
     "mongoose": "^5.9.17",
     "nconf": "^0.10.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "preact": "^10.4.6",
+    "preact-router": "^3.2.1",
+    "purecss": "^2.0.3"
   },
   "devDependencies": {
     "eslint": "^7.1.0",

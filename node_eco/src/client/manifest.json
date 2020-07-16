@@ -1,0 +1,16 @@
+{
+  "name": "ECO NODE",
+  "short_name": "ECONODE",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000",
+  "theme_color": "#02075d",
+  "icons": [
+    {
+      "src": "/assets/icons/favicon.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    }
+  ]
+}

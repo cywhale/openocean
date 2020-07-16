@@ -1,6 +1,11 @@
 const srv_ctrl = require('../controllers/srv_ctrl');
 
-const srv_routes = [{
+const srv_routes = [//{
+//    method: 'GET',
+//    url: '/',
+//    handler: srv_ctrl.home
+//  },
+  {
     method: 'GET',
     url: '/api/time',
     handler: srv_ctrl.api_time
