@@ -2,11 +2,70 @@ import webpack from 'webpack';
 import path from 'path';
 //https://cesium.com/docs/tutorials/cesium-and-webpack/
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+//import merge from 'webpack-merge';
+const { merge } = require('webpack-merge');
 const cesiumSource = "node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
 
+//https://github.com/preactjs/preact-cli/blob/81c7bb23e9c00ba96da1c4b9caec0350570b8929/src/lib/webpack/webpack-client-config.js
+const cesium_other_config = () => { //(env)
+  return {
+    //mode: prod ? "production" : "development",
+    //externals: {
+      //cesium: "Cesium",
+    //}, 
+       
+    output: {
+      filename: '[name].js',
+      path: path.resolve(__dirname, 'dist'),    
+      // Needed to compile multiline strings in Cesium
+      sourcePrefix: ''
+    },
+    amd: {
+      // Enable webpack-friendly use of require in Cesium
+      toUrlUndefined: true
+    },
+    node: {
+      // Resolve node module use of fs
+      fs: 'empty'
+    },        
+    resolve: {
+      alias: {
+        cesium: path.resolve(__dirname, cesiumSource)
+      }
+    },
+//https://github.com/CesiumGS/cesium-webpack-example/issues/7    
+    optimization: {
+      splitChunks: {
+        cacheGroups: {
+          vendors: {
+            name: `chunk-vendors`,
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+            chunks: 'initial'
+          },
+          commons: {
+            name: 'Cesium',
+            test: /[\\/]node_modules[\\/]cesium/,
+            chunks: 'all'
+          }
+        }
+      }
+    }
+    // you can add preact-cli plugins here
+    //plugins: [
+        //https://github.com/preactjs/preact-cli/wiki/Config-Recipes
+        //config.plugins.push( new CopyWebpackPlugin([{ context: `${__dirname}/src/assets`, from: `*.*` }]) );
+        // https://resium.darwineducation.com/installation1https://resium.darwineducation.com/installation1
+        //new HtmlWebpackPlugin({
+        //  template: 'src/index.html'
+        //}),
+    //  ],
+  };
+}
+
 //module exports = {
-export default (config) => {
+const baseConfig = (config) => {
   if (!config.plugins) {
         config.plugins = [];
   }
@@ -34,55 +93,14 @@ export default (config) => {
           // Define relative base path in cesium for loading assets
        CESIUM_BASE_URL: JSON.stringify('')
     })
-  );
-  return config; //{
-  /*  
-    //mode: prod ? "production" : "development",
-    //externals: {
-      //cesium: "Cesium",
-      //CESIUM_BASE_URL: JSON.stringify('localhost:8020')
-    //},
-    output: {
-      filename: '[name].js',
-      path: path.resolve(__dirname, 'dist'),
+  ); 
+  return config;  
+};
 
-      // Needed to compile multiline strings in Cesium
-      sourcePrefix: ''
-    },
-    amd: {
-      // Enable webpack-friendly use of require in Cesium
-      toUrlUndefined: true
-    },
-    node: {
-      // Resolve node module use of fs
-      fs: 'empty'
-    },
-    resolve: {
-        alias: {
-          //cesium$: "cesium/Cesium",
-          //cesium: "cesium/Source",
-          cesium: path.resolve(__dirname, cesiumSource)
-        },
-    },
-    // you can add preact-cli plugins here
-    plugins: [
-      //https://github.com/preactjs/preact-cli/wiki/Config-Recipes
-      //config.plugins.push( new CopyWebpackPlugin([{ context: `${__dirname}/src/assets`, from: `*.*` }]) );
-      // https://resium.darwineducation.com/installation1https://resium.darwineducation.com/installation1
-      //new HtmlWebpackPlugin({
-      //  template: 'src/index.html'
-      //}),
-    ],
-	/**
-	 * Function that mutates the original webpack config.
-	 * Supports asynchronous changes when a promise is returned (or it's an async function).
-	 *
-	 * @param {object} config - original webpack config.
-	 * @param {object} env - options passed to the CLI.
-	 * @param {WebpackConfigHelpers} helpers - object with useful helpers for working with the webpack config.
-	 * @param {object} options - this is mainly relevant for plugins (will always be empty in the config), default to an empty object
-	 webpack(config, env, helpers, options) {
-    }, 	 **/
-  //}
+//module exports = {
+export default (config) => {
+  return merge(
+		baseConfig(config),
+    cesium_other_config()); 
 };
 //module exports = config;
