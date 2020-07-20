@@ -21,3 +21,5 @@ nohup.out
 **/*.pem
 **/*.key
 **/*.cert
+yarn.lock
+../.env
