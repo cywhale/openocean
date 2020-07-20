@@ -5,7 +5,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 //import merge from 'webpack-merge';
 const { merge } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+//const HtmlWebpackPlugin = require('html-webpack-plugin');
 const cesiumSource = "node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
 
@@ -16,9 +16,10 @@ const cesium_other_config = () => { //(env)
     //externals: {
       //cesium: "Cesium",
     //},
-    entry: {
-      app: './src/index.js'
-    },
+    entry: [
+      'webpack-dev-server/client?https:0.0.0.0:3000/',
+      './src/index.js'
+    ],
     output: {
       filename: '[name].[hash:8].js',
       sourceMapFilename: '[name].[hash:8].map',
@@ -40,13 +41,29 @@ const cesium_other_config = () => { //(env)
         cesium: path.resolve(__dirname, cesiumSource)
       }
     },
-    //devServer: {
-    //  contentBase: path.join(__dirname, 'dist'),
-    //  compress: true,
-    //  https: true,
-    //  port: 3000,
-    //  hot: true
-    //},
+    devServer: {
+      contentBase: path.join(__dirname, 'dist'),
+      https: true,
+      port: 3000,
+      proxy: {
+	'**': 'http://0.0.0.0:3000'
+      },
+      hot: true,
+      sockjsPrefix: '/assets',
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
+      },
+      historyApiFallback: {
+        disableDotRule: true
+      },
+      public : 'eco.odb.ntu.edu.tw',
+      host : '0.0.0.0',
+      disableHostCheck: true,
+      quiet: true,
+      inline: true,
+      compress: true
+    },
 //https://github.com/CesiumGS/cesium-webpack-example/issues/7
     optimization: {
        minimizer:
@@ -90,12 +107,13 @@ const baseConfig = (config) => {
   if (!config.plugins) {
         config.plugins = [];
   }
-
+/*
   config.plugins.push(
      new HtmlWebpackPlugin({
          template: 'template.html'
      })
   );
+*/
   config.plugins.push(
     new CopyWebpackPlugin({
       patterns: [

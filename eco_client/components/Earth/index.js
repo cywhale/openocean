@@ -1,5 +1,6 @@
 import { Viewer } from 'cesium';
 import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
+import Rectangle from 'cesium/Source/Core/Rectangle'
 //import Cesium from "cesium/Cesium";
 import { useState, useEffect, useRef} from 'preact/hooks';
 //import { Component } from 'preact';
@@ -10,11 +11,16 @@ const Earth = () => {
   const [viewer, setGlobe] = useState(null);
   const csContainer = useRef(null);
 
-  const bnds = [[-90, -180], [90, 180]];
+  const bnds = [-180 * Math.PI / 180.0,
+                -90 * Math.PI / 180.0,
+                180 * Math.PI / 180.0,
+                90 * Math.PI / 180.0] //[[-90, -180], [90, 180]]; // * Math.PI / 180.0,
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&width=3600&height=1800';
   const sTileImg = new SingleTileImageryProvider({
     url: evlay01url,
-    rectangle: [bnds[0][1], bnds[0][0], bnds[1][1], bnds[1][0]],
+    rectangle: new Rectangle(bnds[0], bnds[1], bnds[2], bnds[3]),
+    numberOfLevelZeroTilesX: 1,
+    numberOfLevelZeroTilesY: 1,
   });
 
   useEffect(() => {
@@ -22,12 +28,12 @@ const Earth = () => {
     initGlobe();
   }, [csContainer]);
 
-//https://github.com/preactjs/preact/issues/1788 
+//https://github.com/preactjs/preact/issues/1788
   const initGlobe = () => {
     setGlobe({
       viewer: new Viewer(csContainer.current, {
-        geocode: false,
-        sTileImg
+        //geocode: false,
+        imageryProvider: sTileImg
       })
       //viewerLoad: true,
     });
