@@ -4,6 +4,8 @@ import path from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 //import merge from 'webpack-merge';
 const { merge } = require('webpack-merge');
+const TerserPlugin = require('terser-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const cesiumSource = "node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
 
@@ -13,11 +15,15 @@ const cesium_other_config = () => { //(env)
     //mode: prod ? "production" : "development",
     //externals: {
       //cesium: "Cesium",
-    //}, 
-       
+    //},
+    entry: {
+      app: './src/index.js'
+    },
     output: {
-      filename: '[name].js',
-      path: path.resolve(__dirname, 'dist'),    
+      filename: '[name].[hash:8].js',
+      sourceMapFilename: '[name].[hash:8].map',
+      chunkFilename: '[id].[hash:8].js',
+      path: path.resolve(__dirname, 'build'),
       // Needed to compile multiline strings in Cesium
       sourcePrefix: ''
     },
@@ -28,14 +34,32 @@ const cesium_other_config = () => { //(env)
     node: {
       // Resolve node module use of fs
       fs: 'empty'
-    },        
+    },
     resolve: {
       alias: {
         cesium: path.resolve(__dirname, cesiumSource)
       }
     },
-//https://github.com/CesiumGS/cesium-webpack-example/issues/7    
+    //devServer: {
+    //  contentBase: path.join(__dirname, 'dist'),
+    //  compress: true,
+    //  https: true,
+    //  port: 3000,
+    //  hot: true
+    //},
+//https://github.com/CesiumGS/cesium-webpack-example/issues/7
     optimization: {
+       minimizer:
+       [
+         new TerserPlugin({
+             sourceMap: false,
+             extractComments: {
+               filename: (fileData) => {
+                 return `${fileData.filename}.OTHER.LICENSE.txt${fileData.query}`;
+               }
+             }
+         })
+      ],
       splitChunks: {
         cacheGroups: {
           vendors: {
@@ -57,9 +81,6 @@ const cesium_other_config = () => { //(env)
         //https://github.com/preactjs/preact-cli/wiki/Config-Recipes
         //config.plugins.push( new CopyWebpackPlugin([{ context: `${__dirname}/src/assets`, from: `*.*` }]) );
         // https://resium.darwineducation.com/installation1https://resium.darwineducation.com/installation1
-        //new HtmlWebpackPlugin({
-        //  template: 'src/index.html'
-        //}),
     //  ],
   };
 }
@@ -70,6 +91,11 @@ const baseConfig = (config) => {
         config.plugins = [];
   }
 
+  config.plugins.push(
+     new HtmlWebpackPlugin({
+         template: 'template.html'
+     })
+  );
   config.plugins.push(
     new CopyWebpackPlugin({
       patterns: [
@@ -93,8 +119,8 @@ const baseConfig = (config) => {
           // Define relative base path in cesium for loading assets
        CESIUM_BASE_URL: JSON.stringify('')
     })
-  ); 
-  return config;  
+  );
+  return config;
 };
 
 //module exports = {
