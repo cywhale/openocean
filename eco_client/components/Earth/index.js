@@ -5,22 +5,25 @@ import Rectangle from 'cesium/Source/Core/Rectangle'
 import { useState, useEffect, useRef} from 'preact/hooks';
 //import { Component } from 'preact';
 import style from './style';
-import '../../node_modules/cesium/Build/Cesium/Widgets/widgets.css'; //require('cesium/Widgets/widgets.css'); //
+//import '../../node_modules/cesium/Build/Cesium/Widgets/widgets.css'; //require('cesium/Widgets/widgets.css'); //
+import 'Widgets/widgets.css'; //require('cesium/Widgets/widgets.css'); //
 
 const Earth = () => {
   const [viewer, setGlobe] = useState(null);
   const csContainer = useRef(null);
-
+/*
   const bnds = [-180 * Math.PI / 180.0,
                 -90 * Math.PI / 180.0,
                 180 * Math.PI / 180.0,
-                90 * Math.PI / 180.0] //[[-90, -180], [90, 180]]; // * Math.PI / 180.0,
+                90 * Math.PI / 180.0] //[[-90, -180], [90, 180]]; // * Math.PI / 180.0, */  
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&width=3600&height=1800';
   const sTileImg = new SingleTileImageryProvider({
     url: evlay01url,
-    rectangle: new Rectangle(bnds[0], bnds[1], bnds[2], bnds[3]),
-    numberOfLevelZeroTilesX: 1,
-    numberOfLevelZeroTilesY: 1,
+    //rectangle: new Rectangle(bnds[0], bnds[1], bnds[2], bnds[3]),
+    rectangle: Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0),
+    //numberOfLevelZeroTilesX: 1,
+    //numberOfLevelZeroTilesY: 1,
+    proxy : new Cesium.DefaultProxy('/proxy/') //https://github.com/CesiumGS/EarthKAMExplorer/blob/master/server/server.js
   });
 
   useEffect(() => {
@@ -51,3 +54,4 @@ const Earth = () => {
 
 };
 export default Earth;
+export const csViewer = viewer;

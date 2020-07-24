@@ -118,15 +118,15 @@ const baseConfig = (config) => {
     new CopyWebpackPlugin({
       patterns: [
       {
-        from: path.join(cesiumSource, cesiumWorkers),
+        from: path.join(__dirname, cesiumSource, cesiumWorkers),
         to: "Workers",
       },
       {
-        from: path.join(cesiumSource, "Assets"),
+        from: path.join(__dirname, cesiumSource, "Assets"),
         to: "Assets",
       },
       {
-        from: path.join(cesiumSource, "Widgets"),
+        from: path.join(__dirname, cesiumSource, "Widgets"),
         to: "Widgets",
       },
       ],

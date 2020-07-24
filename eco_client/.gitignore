@@ -18,10 +18,11 @@ nohup.out
 *~
 .DS_Store
 .credentials.*
-.config.*
 .eslintrc.*
 **/*.pem
 **/*.key
 **/*.cert
 yarn.lock
-.cache
+**/.cache
+size-plugin.json
+**/.log
