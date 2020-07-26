@@ -1,10 +1,10 @@
-import { Component } from 'preact';
+//import { Component } from 'preact';
 //import { Router } from 'preact-router';
 import Sidebar from './Sidebar';
 import Earth from './Earth';
 import style from './style';
 
-export default class App extends Component {
+const App = () => { //class App extends Component {
 	/** Gets fired when the route changes.
 	 *	@param {Object} event		"change" event from [preact-router](http://git.io/preact-router)
 	 *	@param {string} event.url	The newly routed URL
@@ -16,7 +16,7 @@ export default class App extends Component {
 			<div path="/" class={style.home} />
 	    </Router>
 	*/
-  render() {
+  //render() {
     return (
    	<div id="app">
 	  <div path="/" class={style.home}>
@@ -25,5 +25,6 @@ export default class App extends Component {
 	  </div>
 	</div>
      );
-  }
+  //}
 }
+export default App;

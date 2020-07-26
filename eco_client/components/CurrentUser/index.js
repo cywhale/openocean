@@ -1,22 +1,25 @@
-import { Component } from 'preact';
-import { auth } from '../firebase';
+//import { Component } from 'preact';
+//import { auth } from '../firebase';
 import style from './style';
 
-export default class CurrentUser extends Component {
-  constructor() {
-    super();
-  }
+const CurrentUser = (props) => { //class CurrentUser extends Component {
+  //constructor() {
+  //  super();
+  //}
 
-  render() {
-    const user = this.props.user;
+  //render() {
+  // onClick={() => auth.signOut()}
+    //const user = this.props.user;
+    const {user} = props;
     return (<article class={style.currentUser}>
         <img alt={user.displayName} 
         referrerpolicy="no-referrer" 
 		    class={style.avatar} 
 		    src={user.photoURL} 
 		    width="128"	/>
-	      <button onClick={() => auth.signOut()}>Sign Out</button>
+	      <button onClick={() => {return null;}}>Sign Out</button>
 	    </article>
     );
-  }
-}
+  //}
+};
+export default CurrentUser;

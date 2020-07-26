@@ -39,7 +39,6 @@
   },
   "dependencies": {
     "cesium": "^1.71.0",
-    "firebase": "^7.16.0",
     "preact": "^10.3.2",
     "webpack-cli": "^3.3.12"
   },
