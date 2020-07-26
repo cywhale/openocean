@@ -1,14 +1,16 @@
 //import { h } from 'preact';
 import { useState } from 'preact/hooks'; //, useEffect, useCallback
 import UserHandler from '../UserHandler';
+//import BasemapPicker from '../Earth/BasemapPicker';
 import style from './style';
 
 //export default class Sidebar extends Component {
-const Sidebar = () => {
+const Sidebar = () => { //props
+//const {scene} = props;
   const [menuItem, setMenuItem] = useState({
       onSidebar: false
   });
-/*  
+/*
   useEffect(() => {
     console.log("Now onSidebar is: " + menuItem.onSidebar);
     toggleSidebar();
@@ -27,9 +29,19 @@ const Sidebar = () => {
   } else {
     className=`${style.sideContainer}`
   }
+/*
+  const render_sceneloaded = () => {
+    let content = null;
+    if (scene) {
+      return (<BasemapPicker scene={scene} />);
+    }
+    return null;
+  };
+*/
+//{ render_sceneloaded() }
   return (
-    <div class = {style.sideblock}> 
-      <div id="swipex" class = {style.swipe_area}></div> 
+    <div class = {style.sideblock}>
+      <div id="swipex" class = {style.swipe_area}></div>
       <div class = {style.menuToggle}>
           <div class = {style.menuBtn_in_span}>
           <button class = {style.menuButn} type="button" 
@@ -39,21 +51,21 @@ const Sidebar = () => {
             <i></i>
           </button>
           </div>
-      </div>    
+      </div>
       <div id="sideBar" class={className}>
           <div class = {style.sidemenu}>
             <ul>
               <li><a href="#"><UserHandler /></a></li>
               <li><a href="#">Setting</a>
                 <ul>
-                  <li><a href="#">About</a></li> 
+                  <li><a href="#">Test Widget</a></li>
                   <li><a href="#">Look 2th</a>
                     <ul>
-                      <li><a href="#">It 3rd</a></li> 
+                      <li><a href="#">It 3rd</a></li>
                       <li class = {style.menu_item_divided}><a href="#">End</a>
                       </li>
-                    </ul>    
-                  </li> 
+                    </ul>
+                  </li>
                   <li class = {style.menu_item_divided}><a href="#">Services</a>
                   </li>
                 </ul>
@@ -65,5 +77,5 @@ const Sidebar = () => {
     </div>
   );
 };
-  
+
 export default Sidebar;

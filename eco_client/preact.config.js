@@ -38,7 +38,9 @@ const cesium_other_config = () => { //(env)
     },
     resolve: {
       alias: {
-        cesium: path.resolve(__dirname, cesiumSource)
+        cesium: path.resolve(__dirname, cesiumSource),
+        //"react": "preact-compat",
+        //"react-dom": "preact-compat"
       }
     },
     devServer: {
@@ -114,24 +116,26 @@ const baseConfig = (config) => {
      })
   );
 */
+
   config.plugins.push(
     new CopyWebpackPlugin({
       patterns: [
       {
-        from: path.join(__dirname, cesiumSource, cesiumWorkers),
-        to: "Workers",
+        from: path.join(cesiumSource, cesiumWorkers), //__dirname,
+        to: "Workers", //path.join(__dirname, "Workers"),
       },
       {
-        from: path.join(__dirname, cesiumSource, "Assets"),
-        to: "Assets",
+        from: path.join(cesiumSource, "Assets"), //__dirname,
+        to: "Assets", //path.join(__dirname, "Assets"),
       },
       {
-        from: path.join(__dirname, cesiumSource, "Widgets"),
-        to: "Widgets",
+        from: path.join(cesiumSource, "Widgets"), //__dirname,
+        to: "Widgets", //path.join(__dirname, "Widgets"),
       },
       ],
     })
   );
+
   config.plugins.push(
     new webpack.DefinePlugin({
           // Define relative base path in cesium for loading assets

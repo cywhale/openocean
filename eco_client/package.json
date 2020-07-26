@@ -4,7 +4,6 @@
   "license": "MIT",
   "main": "./src/index.js",
   "scripts": {
-    "copy:cesium": "copyfiles -s -u 4 \"node_modules/cesium/Build/Cesium/**/*\" dist/cesium",
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
     "build": "preact build",
     "serve": "sirv build --cors --single",
@@ -20,7 +19,6 @@
   },
   "devDependencies": {
     "copy-webpack-plugin": "^6.0.3",
-    "copyfiles": "^2.3.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-preact-pure": "^2.0.0",
     "eslint": "^6.0.1",
@@ -42,9 +40,7 @@
   "dependencies": {
     "cesium": "^1.71.0",
     "firebase": "^7.16.0",
-    "global": "^4.4.0",
     "preact": "^10.3.2",
-    "preact-router": "^3.2.1",
     "webpack-cli": "^3.3.12"
   },
   "jest": {
