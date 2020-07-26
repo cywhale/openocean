@@ -13,9 +13,11 @@ import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
 import { useState, useEffect, useRef } from 'preact/hooks';
 //import { createContext } from 'preact';
 //import Sidebar from '../Sidebar';
-import BasemapPicker from './BasemapPicker'; 
+import BasemapPicker from './BasemapPicker';
+import ToolModal from '../Modal/ToolModal';
 import style from './style';
 import 'cesium/Source/Widgets/widgets.css'; //import '../../node_modules/cesium/Build/Cesium/Widgets/widgets.css';
+//import './csviewer.css'
 /*
 const csLoader = createContext({
   loaded: false,
@@ -67,10 +69,22 @@ const Earth = () => {
     setState(true);
   };
 
-  const render_csloaded = () => {
+  const render_basemap = () => {
     if (state) {
       const {_scene} = viewer.viewer._cesiumWidget;
-      return (<BasemapPicker scene={_scene} />); //<Sidebar scene={_scene} />
+      return (
+        <BasemapPicker scene={_scene} />
+      ); //<Sidebar scene={_scene} />
+    }
+    return null;
+  };
+
+  const render_toolmodal = () => {
+    if (state) {
+      //const {_scene} = viewer.viewer._cesiumWidget;
+      return (
+        <ToolModal />
+      );
     }
     return null;
   };
@@ -80,11 +94,15 @@ const Earth = () => {
   // </csLoader.Provider>
   return (
     <div style={style.csdiv}>
-        { render_csloaded() }
         <div id="cesiumContainer"
           ref = {csContainer}
-          class={style.fullSize} />
-        <div id="toolbar" class={style.toolbar}></div>
+          class={style.fullSize}>
+          <div style="height:100%;float:right;right:0;position:absolute;width:38px;margin:0">
+             { render_basemap() }
+          </div>
+          <div id="toolbar" class={style.toolbar}></div>
+        </div>
+        { render_toolmodal() }
     </div>
   );
 

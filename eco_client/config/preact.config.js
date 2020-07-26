@@ -18,7 +18,7 @@ const cesium_other_config = () => { //(env)
     //},
     entry: [
       'webpack-dev-server/client?https:0.0.0.0:3000/',
-      './src/index.js'
+      './index.js'
     ],
     output: {
       filename: '[name].[hash:8].js',
@@ -35,6 +35,30 @@ const cesium_other_config = () => { //(env)
     node: {
       // Resolve node module use of fs
       fs: 'empty'
+    },
+    module: {
+        rules: [{
+            test: /\.css$/,
+            use: [ 'style-loader', 'css-loader' ]
+        }, {
+            test: /\.(png|gif|jpg|jpeg|svg|xml|json)$/,
+            use: [ 'url-loader' ]
+        }, {
+            // Remove pragmas
+            test: /\.js$/,
+            enforce: 'pre',
+            include: path.resolve(__dirname, 'node_modules/cesium/Source'),
+            sideEffects: false,
+            use: [{
+                loader: 'strip-pragma-loader',
+                options: {
+                    pragmas: {
+                        debug: false
+                    }
+                }
+            }]
+          }
+        ]
     },
     resolve: {
       alias: {
@@ -68,6 +92,7 @@ const cesium_other_config = () => { //(env)
     },
 //https://github.com/CesiumGS/cesium-webpack-example/issues/7
     optimization: {
+       usedExports: true,
        minimizer:
        [
          new TerserPlugin({
@@ -80,6 +105,8 @@ const cesium_other_config = () => { //(env)
          })
       ],
       splitChunks: {
+        chunks: 'all',
+        name: 'vendors',
         cacheGroups: {
           vendors: {
             name: `chunk-vendors`,
@@ -98,7 +125,7 @@ const cesium_other_config = () => { //(env)
     // you can add preact-cli plugins here
     //plugins: [
         //https://github.com/preactjs/preact-cli/wiki/Config-Recipes
-        //config.plugins.push( new CopyWebpackPlugin([{ context: `${__dirname}/src/assets`, from: `*.*` }]) );
+        //config.plugins.push( new CopyWebpackPlugin([{ context: `${__dirname}/assets`, from: `*.*` }]) );
         // https://resium.darwineducation.com/installation1https://resium.darwineducation.com/installation1
     //  ],
   };
@@ -131,7 +158,10 @@ const baseConfig = (config) => {
       {
         from: path.join(cesiumSource, "Widgets"), //__dirname,
         to: "Widgets", //path.join(__dirname, "Widgets"),
-      },
+      } /*,
+      { from: 'node_modules/cesium/Build/Cesium/ThirdParty',
+        to: 'ThirdParty'
+      } */
       ],
     })
   );
@@ -148,7 +178,8 @@ const baseConfig = (config) => {
 //module exports = {
 export default (config) => {
   return merge(
-		baseConfig(config),
-    cesium_other_config()); 
+    baseConfig(config),
+    cesium_other_config()
+  );
 };
 //module exports = config;
