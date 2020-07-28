@@ -11,11 +11,7 @@ import { useState, useEffect, useRef } from 'preact/hooks';
 //import { createContext } from 'preact';
 //import Sidebar from '../Sidebar';
 import BasemapPicker from './BasemapPicker';
-<<<<<<< HEAD
 import Layer from '../Layer';
-=======
-import ToolModal from '../Modal/ToolModal';
->>>>>>> 0aa2843886e235df404ea6532f398b6e3e06fab0
 import style from './style';
 import 'cesium/Source/Widgets/widgets.css'; //import '../../node_modules/cesium/Build/Cesium/Widgets/widgets.css';
 //import './csviewer.css'
@@ -55,7 +51,6 @@ const Earth = () => {
   };
 
   const render_basemap = () => {
-<<<<<<< HEAD
     if (state) {
       //const {_scene} = viewer.viewer._cesiumWidget;
       const {scene} = viewer.viewer;
@@ -70,22 +65,6 @@ const Earth = () => {
     if (state) {
       return (
         <Layer viewer={viewer.viewer} />
-=======
-    if (state) {
-      const {_scene} = viewer.viewer._cesiumWidget;
-      return (
-        <BasemapPicker scene={_scene} />
-      ); //<Sidebar scene={_scene} />
-    }
-    return null;
-  };
-
-  const render_toolmodal = () => {
-    if (state) {
-      //const {_scene} = viewer.viewer._cesiumWidget;
-      return (
-        <ToolModal />
->>>>>>> 0aa2843886e235df404ea6532f398b6e3e06fab0
       );
     }
     return null;
@@ -104,11 +83,7 @@ const Earth = () => {
           </div>
           <div id="toolbar" class={style.toolbar}></div>
         </div>
-<<<<<<< HEAD
         { render_layer() }
-=======
-        { render_toolmodal() }
->>>>>>> 0aa2843886e235df404ea6532f398b6e3e06fab0
     </div>
   );
 };
