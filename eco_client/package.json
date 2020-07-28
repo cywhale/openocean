@@ -2,7 +2,7 @@
   "name": "ECO_client",
   "version": "0.0.1",
   "license": "MIT",
-  "main": "./src/index.js",
+  "main": "./index.js",
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
     "build": "preact build",
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "copy-webpack-plugin": "^6.0.3",
+    "css-loader": "^4.0.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-preact-pure": "^2.0.0",
     "eslint": "^6.0.1",
@@ -34,7 +35,10 @@
     "preact-render-spy": "^1.2.1",
     "sass-loader": "^7.3.1",
     "sirv-cli": "^0.4.5",
+    "strip-pragma-loader": "^1.0.0",
+    "style-loader": "^1.2.1",
     "terser-webpack-plugin": "^3.0.7",
+    "url-loader": "^4.1.0",
     "webpack-merge": "^5.0.9"
   },
   "dependencies": {

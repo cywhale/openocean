@@ -20,8 +20,8 @@ const App = () => { //class App extends Component {
     return (
    	<div id="app">
 	  <div path="/" class={style.home}>
-            <Earth />
             <Sidebar />
+            <Earth />
 	  </div>
 	</div>
      );
