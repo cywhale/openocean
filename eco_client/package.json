@@ -2,11 +2,11 @@
   "name": "ECO_client",
   "version": "0.0.1",
   "license": "MIT",
-  "main": "./index.js",
+  "main": "./src/index.js",
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "build": "preact build",
-    "serve": "sirv build --cors --single",
+    "build": "export NODE_ENV=production && preact build --config config/preact.config.js --no-esm --sw -no-prerender --template ./src/template.html",
+    "serve": "sirv build --cors --single --port 3000 --http2 --cert ./fullchain.pem --key ./privkey.pem",
     "dev": "preact watch",
     "lint": "eslint src",
     "test": "jest"
@@ -24,6 +24,7 @@
     "enzyme-adapter-preact-pure": "^2.0.0",
     "eslint": "^6.0.1",
     "eslint-config-preact": "^1.1.0",
+    "html-webpack-plugin": "^4.3.0",
     "identity-obj-proxy": "^3.0.0",
     "if-env": "^1.0.4",
     "install": "^0.13.0",
@@ -39,12 +40,14 @@
     "style-loader": "^1.2.1",
     "terser-webpack-plugin": "^3.0.7",
     "url-loader": "^4.1.0",
+    "webpack-cli": "^3.3.12",
     "webpack-merge": "^5.0.9"
   },
   "dependencies": {
     "cesium": "^1.71.0",
+    "history": "^5.0.0",
     "preact": "^10.3.2",
-    "webpack-cli": "^3.3.12"
+    "preact-router": "^3.2.1"
   },
   "jest": {
     "preset": "jest-preset-preact",

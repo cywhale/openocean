@@ -5,8 +5,8 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 //import merge from 'webpack-merge';
 const { merge } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
-//const HtmlWebpackPlugin = require('html-webpack-plugin');
-const cesiumSource = "node_modules/cesium/Source";
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const cesiumSource = "../node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
 
 //https://github.com/preactjs/preact-cli/blob/81c7bb23e9c00ba96da1c4b9caec0350570b8929/src/lib/webpack/webpack-client-config.js
@@ -18,12 +18,12 @@ const cesium_other_config = () => { //(env)
     //},
     entry: [
       'webpack-dev-server/client?https:0.0.0.0:3000/',
-      './index.js'
+      './src/index.js'
     ],
     output: {
       filename: '[name].[hash:8].js',
       sourceMapFilename: '[name].[hash:8].map',
-      chunkFilename: '[id].[hash:8].js',
+      chunkFilename: 'chunks/[name].[id].[hash:8].js',
       path: path.resolve(__dirname, 'build'),
       // Needed to compile multiline strings in Cesium
       sourcePrefix: ''
@@ -47,7 +47,7 @@ const cesium_other_config = () => { //(env)
             // Remove pragmas
             test: /\.js$/,
             enforce: 'pre',
-            include: path.resolve(__dirname, 'node_modules/cesium/Source'),
+            include: path.resolve(__dirname, '../node_modules/cesium/Source'),
             sideEffects: false,
             use: [{
                 loader: 'strip-pragma-loader',
@@ -75,7 +75,7 @@ const cesium_other_config = () => { //(env)
 	'**': 'http://0.0.0.0:3000'
       },
       hot: true,
-      sockjsPrefix: '/assets',
+      //sockjsPrefix: '/assets',
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -96,17 +96,22 @@ const cesium_other_config = () => { //(env)
        minimizer:
        [
          new TerserPlugin({
-             sourceMap: false,
-             extractComments: {
-               filename: (fileData) => {
-                 return `${fileData.filename}.OTHER.LICENSE.txt${fileData.query}`;
-               }
-             }
+             cache: true,
+             parallel: true,
+             sourceMap: true,
+             terserOptions: {
+		output: { comments: false }
+             }, //https://github.com/preactjs/preact-cli/blob/master/packages/cli/lib/lib/webpack/webpack-client-config.js
+             extractComments: false //{
+               //filename: (fileData) => {
+               //  return `${fileData.filename}.OTHER.LICENSE.txt${fileData.query}`;
+               //}
+             //}
          })
       ],
       splitChunks: {
-        chunks: 'all',
-        name: 'vendors',
+        //chunks: 'all',
+        //name: 'vendors',
         cacheGroups: {
           vendors: {
             name: `chunk-vendors`,
@@ -136,13 +141,12 @@ const baseConfig = (config) => {
   if (!config.plugins) {
         config.plugins = [];
   }
-/*
+
   config.plugins.push(
      new HtmlWebpackPlugin({
          template: 'template.html'
      })
   );
-*/
 
   config.plugins.push(
     new CopyWebpackPlugin({

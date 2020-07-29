@@ -1,8 +1,10 @@
-//import { Component } from 'preact';
-//import { Router } from 'preact-router';
+//import { h, render } from 'preact'; //Component
+import { Router } from 'preact-router';
+//import { createHashHistory } from 'history';
 import Sidebar from './Sidebar';
-import Earth from './Earth';
+import Earth from 'async!./Earth';
 import style from './style';
+/** @jsx h */
 
 const App = () => { //class App extends Component {
 	/** Gets fired when the route changes.
@@ -17,14 +19,18 @@ const App = () => { //class App extends Component {
 	    </Router>
 	*/
   //render() {
-    return (
-   	<div id="app">
-	  <div path="/" class={style.home}>
-            <Sidebar />
-            <Earth />
-	  </div>
-	</div>
-     );
-  //}
+  return (
+  //const Main = () => { <Router history={createHashHistory()}>
+    <div id="app">
+      <Router>
+        <div path="/" class={style.home}>
+          <Sidebar />
+          <Earth />
+        </div>
+      </Router>
+    </div>
+  //};
+  );
+  //render(<Main /> , document.body);
 }
 export default App;

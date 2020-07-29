@@ -65,7 +65,7 @@ const Layer = (props) => {
   };
 
   return (
-    <div style="max-width:100px;margin-left:5px">
+    <div style="max-width:100px">
         { render_ctrlmodal() }
         { render_datasource() }
     </div>
