@@ -1,4 +1,4 @@
-//import { csLoader } from '../Earth/index'; //csConsumer
+//import { csConsumer } from '../Earth'; //csLoader
 import { useRef, useState, useEffect, useMemo } from 'preact/hooks'; // useContext
 //import { useContext } from 'react';
 import BaseLayerPicker from 'cesium/Source/Widgets/BaseLayerPicker/BaseLayerPicker';
@@ -15,7 +15,7 @@ import style from './style_basemapPicker';
 //const terrainModels = createDefaultTerrainProviderViewModels();
 
 const BasemapPicker = (props) => {
-  const {scene} = props;
+  const {scene} = props; //loaded
   const [basemap, setBasemap] = useState(null);
   const [state, setState] = useState(false);
 
@@ -23,13 +23,14 @@ const BasemapPicker = (props) => {
   //const { loaded, viewer } = useContext(csLoader);
 
   useEffect(() => {
+    //if (loaded) {
     console.log('Initialize BasemapModels');
     initBasemap();
+    //}
   }, []); //loaded
 
   const initBasemap = () => {
     if (scene) {
-      //const { scene } = viewer;
       const defModels = createDefaultImageryProviderViewModels();
       let imgModels = [];
       imgModels.push(new ProviderViewModel({
@@ -57,23 +58,6 @@ const BasemapPicker = (props) => {
     }
   };
 
-  /*<csConsumer>
-      { cs => {
-          const {loaded, viewer} = cs;
-          const until = function (condition) {
-            const poll = resolve => {
-              if(condition()) resolve();
-              else setTimeout(_ => poll(resolve), 400);
-            }
-            return new Promise(poll);
-          };
-          const wait_viewer = async () => {
-            await until(_ => loaded? true: false);
-            initBasemapModels(viewer);
-          };
-          wait_viewer();
-          return (<div/>);
-  </csConsumer> */
   //{ initBasemap(loaded) }
   return useMemo (() => {
     return(

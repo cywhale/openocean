@@ -8,26 +8,48 @@ const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const cesiumSource = "../node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
+const testenv = {NODE_ENV: process.env.NODE_ENV};
 
 //https://github.com/preactjs/preact-cli/blob/81c7bb23e9c00ba96da1c4b9caec0350570b8929/src/lib/webpack/webpack-client-config.js
-const cesium_other_config = () => { //(env)
+const cesium_other_config = (config, env) => {
+  var entryx;
+  var outputx = {
+      filename: '[name].[hash:8].js',
+      sourceMapFilename: '[name].[hash:8].map',
+      chunkFilename: 'chunks/[name].[id].[hash:8].js',
+      // Needed to compile multiline strings in Cesium
+      sourcePrefix: ''
+    };
+
+  if (testenv.NODE_ENV === "production") {
+    console.log("Node env in production...");
+    config.devtool = false;
+    entryx = [
+      './src/index.js'
+    ];
+    outputx = {...outputx,
+      path: path.resolve(__dirname, 'build')
+    };
+  } else {
+    console.log("Node env in development...");
+
+    entryx = [
+      'webpack-dev-server/client?https:0.0.0.0:3000/',
+      './src/index.js'
+    ];
+    outputx = {
+      ...outputx,
+      path: path.resolve(__dirname, 'dist')
+    };
+  }
+
   return {
     //mode: prod ? "production" : "development",
     //externals: {
       //cesium: "Cesium",
     //},
-    entry: [
-      'webpack-dev-server/client?https:0.0.0.0:3000/',
-      './src/index.js'
-    ],
-    output: {
-      filename: '[name].[hash:8].js',
-      sourceMapFilename: '[name].[hash:8].map',
-      chunkFilename: 'chunks/[name].[id].[hash:8].js',
-      path: path.resolve(__dirname, 'build'),
-      // Needed to compile multiline strings in Cesium
-      sourcePrefix: ''
-    },
+    entry: entryx,
+    output: outputx,
     amd: {
       // Enable webpack-friendly use of require in Cesium
       toUrlUndefined: true
@@ -137,16 +159,18 @@ const cesium_other_config = () => { //(env)
 }
 
 //module exports = {
-const baseConfig = (config) => {
+const baseConfig = (config, env) => {
   if (!config.plugins) {
         config.plugins = [];
   }
 
-  config.plugins.push(
-     new HtmlWebpackPlugin({
+  if (testenv.NODE_ENV === "production") {
+    config.plugins.push(
+      new HtmlWebpackPlugin({
          template: 'template.html'
-     })
-  );
+      })
+    );
+  }
 
   config.plugins.push(
     new CopyWebpackPlugin({
@@ -180,10 +204,10 @@ const baseConfig = (config) => {
 };
 
 //module exports = {
-export default (config) => {
+export default (config, env) => {
   return merge(
-    baseConfig(config),
-    cesium_other_config()
+    baseConfig(config, env),
+    cesium_other_config(config, env)
   );
 };
 //module exports = config;

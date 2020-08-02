@@ -7,36 +7,48 @@ import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 //import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
 //import createWorldTerrain from 'cesium/Source/Core/createWorldTerrain'
 import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
-import { useState, useEffect, useRef } from 'preact/hooks';
-//import { createContext } from 'preact';
+import { render, Fragment } from 'preact';
+import { useState, useEffect } from 'preact/hooks'; //useRef, useImperativeHandle
+//import { forwardRef } from 'preact/compat';
+//import { createContext } from 'preact'; //createContext seems can be used only within Parent DOM..
 //import Sidebar from '../Sidebar';
-import BasemapPicker from './BasemapPicker';
-import Layer from '../Layer';
+import BasemapPicker from 'async!./BasemapPicker';
+import Layer from 'async!../Layer';
 import style from './style';
-import 'cesium/Source/Widgets/widgets.css'; //import '../../node_modules/cesium/Build/Cesium/Widgets/widgets.css';
-//import './csviewer.css'
-/*
-const csLoader = createContext({
-  loaded: false,
-  viewer: null,
-});
-*/
-//export const csConsumer = csLoader.Consumer
+import 'cesium/Source/Widgets/widgets.css';
 
-const Earth = () => {
-  const [state, setState] = useState(false);
-  const [viewer, setGlobe] = useState(null);
-  const csContainer = useRef(null);
+//var csLoader = { csloaded: false, csviewer: null };
+//export const csLoader = createContext({
+//  csloaded: false,
+//  csviewer: null
+//}); //{ csProvider, csConsumer }
+
+const Earth = (props, ref) => { //forwardRef((props, ref) => {
+  //const ref = useRef(null);
+  //const [state, setState] = useState(false);
+  //const {appstate} = props;
+  //const { Provider, Consumer } = csLoader;
+  const [globe, setGlobe] = useState({
+    loaded: false,
+    viewer: null
+  });
 
   useEffect(() => {
-    console.log('Initialize Viewer');
-    initGlobe();
-  }, [csContainer]);
+    console.log('Initialize Viewer after appstate'); // + appstate);
+    if (!globe.loaded) {
+      initGlobe();
+    } else {
+        render(render_basemap(), document.getElementById('rightarea'))
+    }
+    //const { loaded: csloaded, viewer: csviewer } = {...globe};
+    //csLoader = Object.assign({}, { csloaded, csviewer });
+  }, [globe.loaded]);
 
 //https://github.com/preactjs/preact/issues/1788
   const initGlobe = () => {
     setGlobe({
-      viewer: new Viewer(csContainer.current, {
+      loaded: true,
+      viewer: new Viewer(ref.current, {
         timeline: true,
         animation: true,
         geocoder: true,
@@ -47,45 +59,62 @@ const Earth = () => {
         //globe: new Globe(MapProjection.ellipsoid),
       }),
     });
-    setState(true);
   };
 
-  const render_basemap = () => {
-    if (state) {
+const render_basemap = () => {
+    if (globe.loaded) {
       //const {_scene} = viewer.viewer._cesiumWidget;
-      const {scene} = viewer.viewer;
+      const {scene} = globe.viewer;
       return (
         <BasemapPicker scene={scene} />
       ); //<Sidebar scene={_scene} />
     }
     return null;
   };
-
   const render_layer = () => {
-    if (state) {
+    if (globe.loaded) {
       return (
-        <Layer viewer={viewer.viewer} />
+        <Layer viewer={globe.viewer} />
       );
     }
     return null;
   };
 
-  // <div id="loadingOverlay"><h1>Loading...</h1></div>
-  // <csLoader.Provider value={{loaded: state, viewer: viewer}}>
-  // </csLoader.Provider>
+/*const getGlobe = () => ({loaded: globe.loaded, viewer: globe.viewer });
+  useImperativeHandle(ref, () => {
+    if (globe.loaded) {
+      return ({
+        ...ref.current,
+        globe: globe
+      });
+    }
+    return ref.current;
+  }, [globe])
+  const globe_handler = () => {
+    if (globe.loaded) {
+      useImperativeHandle(ref.current, () => ({
+        globe: globe
+      }), [ref.current, globe]);
+      //const { loaded: csloaded, viewer: csviewer } = {...globe};
+      //csLoader = Object.assign({}, { csloaded, csviewer });
+    }
+    return (<div style="display:none" id="csLoader" csLoader={globe} />);
+  }
+/*<csLoader.Provider value={{csloaded: globe.loaded, csviewer: globe.viewer}}>
+    <div style="display:block"><div class={style.basepicker}>
+    { props.children }
+    { render_basemap() }
+    { globe_handler() }
+    </div></csLoader.Provider>*/
   return (
-    <div style={style.csdiv}>
-        <div id="cesiumContainer"
-          ref = {csContainer}
-          class={style.fullSize}>
-          <div style="height:100%;float:right;right:0;position:absolute;width:38px;margin:0">
-             { render_basemap() }
-          </div>
-          <div id="toolbar" class={style.toolbar}></div>
-        </div>
-        { render_layer() }
-    </div>
+    <Fragment>
+      <div id="cesiumContainer"
+          ref = {ref}
+          class={style.fullSize} />
+      <div id="toolbar" class={style.toolbar} />
+      { render_layer() }
+    </Fragment>
   );
 };
 export default Earth;
-//export { csLoader };
+//export { csLoader }; //const {csProvider, csConsumer} = csLoader;

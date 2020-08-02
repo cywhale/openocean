@@ -1,11 +1,12 @@
 {
   "name": "ECO_client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "MIT",
   "main": "./src/index.js",
+  "homepage": ".",
   "scripts": {
     "start": "if-env NODE_ENV=production && npm run -s serve || npm run -s dev",
-    "build": "export NODE_ENV=production && preact build --config config/preact.config.js --no-esm --sw -no-prerender --template ./src/template.html",
+    "build": "cp config/template.html src/ && export NODE_ENV=production && preact build --config config/preact.config.js --no-esm --sw --template ./src/template.html",
     "serve": "sirv build --cors --single --port 3000 --http2 --cert ./fullchain.pem --key ./privkey.pem",
     "dev": "preact watch",
     "lint": "eslint src",
@@ -45,7 +46,6 @@
   },
   "dependencies": {
     "cesium": "^1.71.0",
-    "history": "^5.0.0",
     "preact": "^10.3.2",
     "preact-router": "^3.2.1"
   },
