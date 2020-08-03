@@ -8,6 +8,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const cesiumSource = "../node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
+//const paths = require("./paths");
 const testenv = {NODE_ENV: process.env.NODE_ENV};
 
 //https://github.com/preactjs/preact-cli/blob/81c7bb23e9c00ba96da1c4b9caec0350570b8929/src/lib/webpack/webpack-client-config.js
@@ -50,6 +51,8 @@ const cesium_other_config = (config, env) => {
     //},
     entry: entryx,
     output: outputx,
+    //https://blog.isquaredsoftware.com/2017/03/declarative-earth-part-1-cesium-webpack/#including-cesium-in-production
+    unknownContextCritical : false,
     amd: {
       // Enable webpack-friendly use of require in Cesium
       toUrlUndefined: true
@@ -167,7 +170,8 @@ const baseConfig = (config, env) => {
   if (testenv.NODE_ENV === "production") {
     config.plugins.push(
       new HtmlWebpackPlugin({
-         template: 'template.html'
+         template: 'template.html',
+         production : true
       })
     );
   }

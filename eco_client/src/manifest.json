@@ -10,7 +10,13 @@
     {
       "src": "/assets/icons/favicon.png",
       "type": "image/png",
-      "sizes": "128x128"
+      "sizes": "128x128",
+      "src": "/assets/icons/favicon_48.png",
+      "type": "image/png",
+      "sizes": "48x48",
+      "src": "/assets/icons/favicon_16.png",
+      "type": "image/png",
+      "sizes": "16x16"
     }
   ]
 }

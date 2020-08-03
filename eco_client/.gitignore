@@ -5,6 +5,7 @@ build
 **/ssr-build/
 webgl
 pub
+public/cesium/
 ver_bak
 coverage
 data
@@ -27,3 +28,4 @@ yarn.lock
 size-plugin.json
 **/.log
 .testenv.js
+config/cesium_css_modify.txt
