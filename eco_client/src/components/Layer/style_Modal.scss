@@ -41,7 +41,7 @@
    height: auto;
    left:10%;
    position:fixed;
-   right:10px;
+   //right:10px;
    top:10%;
    overflow:hidden;
    max-width:66em;
@@ -80,11 +80,11 @@
   }
   .close{
     background-color:rgba(0,51,102,.75);
-    border:1px solid darkgrey;
-    border-radius:10px;
+    border:0px solid darkgrey;
+    border-radius:6px;
     color:white;
     font-size:24px;
-    padding:8px 12px;
+    padding:1px 5px;
     position:absolute;
     right:0;
     text-align:center;
@@ -115,7 +115,7 @@
 }
 
 @media screen and (max-width:64em) {
-  .ctrlsect .ctrlcolumn {
+  .ctrlsect div {
     margin-bottom: 5px;
     flex-basis: 40%;
     &:nth-last-child(2) {
@@ -128,7 +128,7 @@
   }
 }
 @media screen and (max-width: 680px) {
-    .ctrlsect .ctrlcolumn {
+    .ctrlsect div {
 	flex-basis: 100%;
 	margin: 0 0 5px 0;
     }

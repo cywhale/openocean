@@ -30,32 +30,34 @@ const BasemapPicker = (props) => {
   }, []); //loaded
 
   const initBasemap = () => {
-    if (scene) {
-      const defModels = createDefaultImageryProviderViewModels();
-      let imgModels = [];
-      imgModels.push(new ProviderViewModel({
-         name : 'NOAA ETOPO\u00a0I',
-         iconUrl : buildModuleUrl('https://ecodata.odb.ntu.edu.tw/pub/icon/etopo1_64x64.png'),
-          tooltip : 'NOAA Etopo',
-          creationFunction : function() {
-            return new UrlTemplateImageryProvider({
-              url : buildModuleUrl('https://gis.ngdc.noaa.gov/arcgis/rest/services/web_mercator/etopo1_hillshade/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
-              credit : '© NOAA etopo1 hillshade',
-            });
-          }
-      }));
-      [4,6,8,9,11,13,14].map(i => imgModels.push(defModels[i]));
+    //if (scene) { //Now globe.loaded detect in Earth
+      const getImgModels = () => {
+        const defModels = createDefaultImageryProviderViewModels();
+        let imgModels = [];
+        imgModels.push(new ProviderViewModel({
+           name : 'NOAA ETOPO\u00a0I',
+           iconUrl : buildModuleUrl('https://ecodata.odb.ntu.edu.tw/pub/icon/etopo1_64x64.png'),
+            tooltip : 'NOAA Etopo',
+            creationFunction : function() {
+              return new UrlTemplateImageryProvider({
+                url : buildModuleUrl('https://gis.ngdc.noaa.gov/arcgis/rest/services/web_mercator/etopo1_hillshade/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
+                credit : '© NOAA etopo1 hillshade',
+              });
+            }
+        }));
+        [4,6,8,9,11,13,14].map(i => imgModels.push(defModels[i]));
+        return imgModels;
+      };
 
-      createDefaultImageryProviderViewModels();
       setBasemap(async () => {
         basemap: await new BaseLayerPicker(baseContainer.current, {
           globe: scene.globe,
-          imageryProviderViewModels: imgModels,
+          imageryProviderViewModels: getImgModels(),
           terrainProviderViewModels: createDefaultTerrainProviderViewModels()
         })
       });
       setState(true);
-    }
+    //}
   };
 
   //{ initBasemap(loaded) }

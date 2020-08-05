@@ -4,7 +4,7 @@ import { useState, useEffect } from 'preact/hooks';
 //       } from './firebase';
 import CurrentUser from './CurrentUser';
 import SignIn from './SignIn';
-import style from './style';
+import style from './style/style_userhandler';
 /*
 const handleAuth = (auth) => {
     const [currUser, setCurrUser] = useState(null);

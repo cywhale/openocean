@@ -4,7 +4,7 @@ import { Router } from 'preact-router';
 //import { createHashHistory } from 'history';
 import Sidebar from 'async!./Sidebar';
 import Earth from 'async!./Earth'; // {csConsumer}
-import style from './style';
+import style from './style/style_app';
 //import BasemapPicker from './Earth/BasemapPicker'; //async!
 //import Layer from './Layer';
 /** @jsx h */

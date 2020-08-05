@@ -3,8 +3,8 @@
   left: 140px;
   align-items: flex-end;
   height: 40px;
-  margin-top: -35px;
-  margin-left: 5px;
+  margin-top: 10px;
+  margin-left:-40px;
 }
 /*
 .svglogo {
@@ -16,5 +16,5 @@
 }
 
 .Redo.notbusy {
-  top: 0;
+  display: none;
 }

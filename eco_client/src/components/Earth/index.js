@@ -13,7 +13,7 @@ import { useState, useEffect } from 'preact/hooks'; //useRef, useImperativeHandl
 //import { createContext } from 'preact'; //createContext seems can be used only within Parent DOM..
 //import Sidebar from '../Sidebar';
 import BasemapPicker from 'async!./BasemapPicker';
-import Layer from 'async!../Layer';
+import Layer from '../Layer';
 import style from './style';
 import 'cesium/Source/Widgets/widgets.css';
 
@@ -61,7 +61,7 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
     });
   };
 
-const render_basemap = () => {
+  const render_basemap = () => {
     if (globe.loaded) {
       //const {_scene} = viewer.viewer._cesiumWidget;
       const {scene} = globe.viewer;

@@ -1,15 +1,24 @@
+import { Fragment } from 'preact'; //render, createContext
 import Color from 'cesium/Source/Core/Color.js';
 //import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import defined from 'cesium/Source/Core/defined.js';
-import Rectangle from 'cesium/Source/Core/Rectangle';
+//import Rectangle from 'cesium/Source/Core/Rectangle';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
-import SiteCluster, { SiteConsumer } from './SiteCluster';
-import CtrlModal from './CtrlModal';
+import SiteCluster from 'async!../SiteCluster'; //{ SiteConsumer }
+//import sitePickedLabel from 'async!../SiteCluster/sitePickedLabel';
 
+import style from './style_Modal';
+//import CtrlModal from 'async!./CtrlModal';
+/*
+  export const siteLoader = createContext({
+    loaded: false,
+    cluster: null,
+    customstyle: null
+});
+*/
 const Layer = (props) => {
   const {viewer} = props;
-
 /*
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&wi$
   const sTileImg = new SingleTileImageryProvider({
@@ -21,7 +30,6 @@ const Layer = (props) => {
     proxy : new DefaultProxy('/proxy/') //https://github.com/CesiumGS/EarthKAMExplorer/blob/master/ser$
   });
 */
-
   const render_datasource = () => {
       const opts = { // temporarily hard-coded here
         dataname: 'windpower',
@@ -36,9 +44,9 @@ const Layer = (props) => {
       );
   };
 
-  const render_ctrlmodal = () => {
-      const {scene} = viewer;
-
+  const sitePicker = () => { //async
+    const {scene} = viewer;
+    //const sitePickedLabel = () => {
       var handler = new ScreenSpaceEventHandler(scene.canvas);
       handler.setInputAction(function (movement) {
         let pickedLabel = scene.pick(movement.position);
@@ -51,27 +59,36 @@ const Layer = (props) => {
           }
         }
       }, ScreenSpaceEventType.LEFT_CLICK);
+    //};
+    // await sitePickedLabel();
+    return(<div style="display:none" />);
+  }
 
-      return (
-        <SiteConsumer>
-        { data => {
-          const {loaded, cluster, customstyle} = data;
-          //if (loaded) {
-            return (<CtrlModal scene={scene} dataSource={cluster} customstyle={customstyle}/>);
-          }
-        }
-        </SiteConsumer>
-      );
-  };
-
+  //<div style="max-width:100px">
   return (
-    <div style="max-width:100px">
-        { render_ctrlmodal() }
-        { render_datasource() }
+    <Fragment>
+    <div style="display:flex;height:auto;" id="ctrlmodal">
+      <div class={style.toolToggle}>
+         <a class={style.toolButn} href="#ctrl"><i></i></a>
+      </div>
+      <div id="ctrl" class={style.modaloverlay}>
+        <div class={style.modal}>
+          <a href="#" class={style.close}>&times;</a>
+
+          <div class={style.ctrlwrapper}>
+            <section class={style.ctrlsect}>
+              <div class={style.ctrlcolumn}>
+                <div id="ctrlsectdiv1" />
+                <div id="ctrlsectdiv2" />
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
     </div>
+    { render_datasource() }
+    { sitePicker() }
+    </Fragment>
   );
-
-
 };
 export default Layer;
-
