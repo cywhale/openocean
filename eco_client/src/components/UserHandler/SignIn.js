@@ -1,6 +1,6 @@
 //import { Component } from 'preact';
 //import { auth, googleAuthProvider } from '../firebase';
-import style from './style';
+import style from './style_signin';
 
 const SignIn = () => { //class SignIn extends Component {
   //constructor() {

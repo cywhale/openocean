@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'preact/hooks';
 //import VerticalOrigin from 'cesium/Source/Scene/VerticalOrigin.js';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
 //import siteClusterStyling from './siteClusterStyling';
+import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_ctrlmodal';
 import '../style/style_bubblelabel.scss';
 //import '../style/style_arialabel.scss';
@@ -17,35 +18,12 @@ const CtrlModal = (props) => {
     minimumClusterSize: 3
   });
 
-  //https://css-tricks.com/value-bubbles-for-range-inputs/
-  const bubble_labeler = () => {
-    const setBubble = (range, bubble) => {
-      const val = range.value;
-      const min = range.min ? range.min : 0;
-      const max = range.max ? range.max : 100;
-      const newVal = Number(((val - min) * 100) / (max - min));
-      bubble.innerHTML = val;
-      // Sorta magic numbers based on size of the native UI thumb
-      bubble.style.left = `calc(${newVal}% + (${8 - newVal * 0.15}px))`;
-    };
-
-    const allRanges = document.querySelectorAll(".ctrlrange-wrap");
-    allRanges.forEach(wrap => {
-      const range = wrap.querySelector(".range");
-      const bubble = wrap.querySelector(".bubble");
-      range.addEventListener("input", () => {
-        setBubble(range, bubble);
-      });
-      setBubble(range, bubble);
-    });
-  };
-
   useEffect(() => {
       knockout.track(viewModel);
       knockout.applyBindings(viewModel, ctrlRef.current);
       setViewModel(kobind());
       setState(true);
-      bubble_labeler();
+      bubble_labeler(".ctrlrange-wrap");
   }, []);
 
   const kobind = () => {

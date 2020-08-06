@@ -1,6 +1,6 @@
 //import { Component } from 'preact';
 //import { auth } from '../firebase';
-import style from './style';
+import style from './style_curruser';
 
 const CurrentUser = (props) => { //class CurrentUser extends Component {
   //constructor() {

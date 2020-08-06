@@ -1,15 +1,4 @@
-/*
-.ctrlcolumn {
-  flex: 1;
-  border: 1px solid gray;
-  margin: 2px;
-  padding: 10px;
-  &:first-child { margin-left: 0; }
-  &:last-child { margin-right: 0; }	
-}
-*/
 .ctrlEnDiv { 
-  border-style: none;
   > input {
     width: 30px;
     margin-top: 10px;

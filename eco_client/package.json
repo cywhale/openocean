@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "cesium": "^1.71.0",
-    "preact": "^10.3.2",
+    "preact": "10.4.7",
     "preact-router": "^3.2.1"
   },
   "jest": {

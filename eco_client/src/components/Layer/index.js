@@ -1,4 +1,5 @@
 import { Fragment } from 'preact'; //render, createContext
+import { useEffect } from 'preact/hooks';
 import Color from 'cesium/Source/Core/Color.js';
 //import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import defined from 'cesium/Source/Core/defined.js';
@@ -7,8 +8,8 @@ import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler'
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import SiteCluster from 'async!../SiteCluster'; //{ SiteConsumer }
 //import sitePickedLabel from 'async!../SiteCluster/sitePickedLabel';
-
-import style from './style_Modal';
+import draggable_element from '../Compo/draggable_element';
+import style from './style_modal';
 //import CtrlModal from 'async!./CtrlModal';
 /*
   export const siteLoader = createContext({
@@ -30,6 +31,11 @@ const Layer = (props) => {
     proxy : new DefaultProxy('/proxy/') //https://github.com/CesiumGS/EarthKAMExplorer/blob/master/ser$
   });
 */
+  useEffect(() => {
+    const drag_opts = { dom: "#ctrl", dragArea: '#ctrlheader' };
+    draggable_element(drag_opts);
+  }, []);
+
   const render_datasource = () => {
       const opts = { // temporarily hard-coded here
         dataname: 'windpower',
@@ -44,7 +50,7 @@ const Layer = (props) => {
       );
   };
 
-  const sitePicker = () => { //async
+  const sitePicker = () => {
     const {scene} = viewer;
     //const sitePickedLabel = () => {
       var handler = new ScreenSpaceEventHandler(scene.canvas);
@@ -64,17 +70,18 @@ const Layer = (props) => {
     return(<div style="display:none" />);
   }
 
-  //<div style="max-width:100px">
+  //<div style="display:flex;height:auto;position:absolute">
   return (
     <Fragment>
-    <div style="display:flex;height:auto;" id="ctrlmodal">
       <div class={style.toolToggle}>
          <a class={style.toolButn} href="#ctrl"><i></i></a>
       </div>
-      <div id="ctrl" class={style.modaloverlay}>
-        <div class={style.modal}>
+      <div id="ctrl" class={style.modalOverlay}>
+        <div class={style.modalHeader} id="ctrlheader">
+          Contrl clustering
           <a href="#" class={style.close}>&times;</a>
-
+        </div>
+        <div class={style.modal}>
           <div class={style.ctrlwrapper}>
             <section class={style.ctrlsect}>
               <div class={style.ctrlcolumn}>
@@ -85,9 +92,8 @@ const Layer = (props) => {
           </div>
         </div>
       </div>
-    </div>
-    { render_datasource() }
-    { sitePicker() }
+      { render_datasource() }
+      { sitePicker() }
     </Fragment>
   );
 };

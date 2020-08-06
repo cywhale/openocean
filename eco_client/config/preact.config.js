@@ -310,10 +310,10 @@ const baseConfig = (config, env) => {
       {
         from: path.join(cesiumSource, "Widgets"), //__dirname,
         to: "Widgets", //path.join(__dirname, "Widgets"),
-      },
+      }/*,
       { from: path.join(cesiumSource, 'ThirdParty'),
         to: 'ThirdParty'
-      }/*,
+      },
       { from: path.join('..', 'distdll/cesiumDll.js'),
         to: 'cesium'
       }*/
