@@ -1,6 +1,8 @@
 #ignore node_modules
 node_modules
+build
 **/map/
+**/ssr-build/
 webgl
 pub
 ver_bak
@@ -23,3 +25,10 @@ nohup.out
 **/*.cert
 yarn.lock
 ../.env
+**/.cache
+size-plugin.json
+**/.log
+.testenv.js
+config/cesium_css_modify.sh
+distdll
+

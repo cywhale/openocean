@@ -4,13 +4,19 @@ import path from 'path';
 // https://cesium.com/docs/tutorials/cesium-and-webpack/
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 //const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+//const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const autoprefixer = require('autoprefixer');
 const { merge } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 //const ManifestPlugin = require('webpack-manifest-plugin');
 const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
+//const AssetsPlugin = require('assets-webpack-plugin'); //dev
+//https://medium.com/@poshakajay/heres-how-i-reduced-my-bundle-size-by-90-2e14c8a11c11
+//https://gist.github.com/AjayPoshak/e41ec36d28437494d10294256e248bc6
+const BrotliPlugin = require('brotli-webpack-plugin');
+const BrotliGzipPlugin = require('brotli-gzip-webpack-plugin');
+
 // Cesium
 const cesiumSource = "../node_modules/cesium/Source";
 const cesiumWorkers = "../Build/Cesium/Workers";
@@ -19,9 +25,10 @@ const testenv = {NODE_ENV: process.env.NODE_ENV};
 // const paths = require("./paths");
 const publicPath= "./";
 const publicUrl = publicPath.slice(0, -1);
-const cssFilename = '[name].[contenthash:8].css'; //'static/css/'
 
-const extractTextPluginOptions = { publicPath: Array(cssFilename.split('/').length).join('../') }
+//const cssFilename = '[name].[contenthash:8].css'; //'static/css/'
+//const extractTextPluginOptions = { publicPath: Array(cssFilename.split('/').length).join('../') }
+
 const globOptions = {};
         //nodir : true,
         //cwd : "node_modules/cesium/Build/Cesium/",
@@ -29,18 +36,17 @@ const globOptions = {};
       //};
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-
 //https://github.com/preactjs/preact-cli/blob/81c7bb23e9c00ba96da1c4b9caec0350570b8929/src/lib/webpack/webpack-client-config.js
 const cesium_other_config = (config, env) => {
   var entryx;
   var outputx = {
-        filename: '[name].[chunkhash:8].js', //'static/js/'
-        sourceMapFilename: '[name].[chunkhash:8].map',
-        chunkFilename: '[name].[chunkhash:8].chunk.[id].js',
-        publicPath: publicPath,
-        //path: path.resolve(__dirname, 'build'),
-        // Needed to compile multiline strings in Cesium
-        sourcePrefix: ''
+      filename: '[name].[chunkhash:8].js', //'static/js/'
+      sourceMapFilename: '[name].[chunkhash:8].map',
+      chunkFilename: '[name].[chunkhash:8].chunk.[id].js',
+      publicPath: publicPath,
+      //path: path.resolve(__dirname, 'build'),
+      // Needed to compile multiline strings in Cesium
+      sourcePrefix: ''
   };
 
   if (testenv.NODE_ENV === "production") {
@@ -91,11 +97,16 @@ const cesium_other_config = (config, env) => {
       // Resolve node module use of fs
       fs: 'empty',
       net: 'empty',
-      tls: 'empty'
+      tls: 'empty',
+      Buffer: false,
+      http: "empty",
+      https: "empty",
+      zlib: "empty"
     },
     resolve: {
       fallback: path.resolve(__dirname, '..', 'src'),
       extensions: ['.js', '.json', '.jsx', ''],
+      //mainFields: ['module', 'main'],
       alias: {
         cesium: path.resolve(__dirname, cesiumSource),
         //"react": "preact-compat",
@@ -104,13 +115,16 @@ const cesium_other_config = (config, env) => {
     },
     module: {
         rules: [{
-            test: /\.css$/,
-            use: [{
-                loader: MiniCssExtractPlugin.loader,
-              },//ExtractTextPlugin.extract(
+            test: /\.(css|scss)$/,
+            use: [//{
+                //loader: MiniCssExtractPlugin.loader,
+              //},//ExtractTextPlugin.extract(
               'style-loader',
-              'css?importLoaders=1!postcss',
-              'css-loader' ]
+              //'css?importLoaders=1!postcss',
+              //'css-loader' ]
+              { loader: 'css-loader' }
+              ],
+              sideEffects: true
               // extractTextPluginOptions
               // )
         }, {
@@ -127,7 +141,7 @@ const cesium_other_config = (config, env) => {
             },
         },*/
         {
-          // Remove pragmas
+// Remove pragmas https://github.com/CesiumGS/cesium-webpack-example/blob/master/webpack.release.config.js
           test: /\.js$/,
           enforce: 'pre',
           include: path.resolve(__dirname, '../node_modules/cesium/Source'),
@@ -165,7 +179,7 @@ const cesium_other_config = (config, env) => {
       quiet: true,
       inline: true,
       compress: true
-    }, // https://bit.ly/3fkiypj
+    }, /* https://bit.ly/3fkiypj
     postcss: function() {
       return [
         autoprefixer({
@@ -177,7 +191,7 @@ const cesium_other_config = (config, env) => {
           ]
         }),
       ];
-    },
+    },*/
 //https://github.com/CesiumGS/cesium-webpack-example/issues/7
     optimization: {
        usedExports: true,
@@ -203,7 +217,7 @@ const cesium_other_config = (config, env) => {
         //name: 'vendors',
         chunks: "all",
         maxInitialRequests: Infinity,
-	minSize: 0,
+	//minSize: 0,
         cacheGroups: {
         /*preactBase: {
             name: 'preactBase',
@@ -215,7 +229,7 @@ const cesium_other_config = (config, env) => {
           },*/
           vendors: {
             test: /[\\/]node_modules[\\/]/,
-            priority: -10,
+            //priority: -10,
             chunks: 'initial',
             name: `chunk-vendors` //(module) {
               // get the name. E.g. node_modules/packageName/not/this/part.js
@@ -224,11 +238,12 @@ const cesium_other_config = (config, env) => {
               // npm package names are URL-safe, but some servers don't like @ symbols
               //return `npm.${packageName.replace('@', '')}`;
             //},
-          },
+          },// https://blog.logrocket.com/guide-performance-optimization-webpack/
           commons: {
             name: 'Cesium',
             test: /[\\/]node_modules[\\/]cesium/,
-            //maxSize: 200000,
+            minSize: 10000,
+            maxSize: 300000,
             chunks: 'all'
           }
         }
@@ -270,6 +285,23 @@ const baseConfig = (config, env) => {
       })
     );
 
+    config.plugins.push(
+	new BrotliPlugin({
+	  asset: '[path].br[query]',
+	  test: /\.(js|css|html|svg)$/,
+	  threshold: 10240,
+	  minRatio: 0.8
+	})
+    );
+    config.plugins.push(
+        new BrotliGzipPlugin({
+          asset: '[path].gz[query]',
+          algorithm: 'gzip',
+          test: /\.(js|css|html|svg)$/,
+          threshold: 10240,
+          minRatio: 0.8
+        })
+    );
 // https://blog.isquaredsoftware.com/2017/03/declarative-earth-part-1-cesium-webpack/
 /*
     config.plugins.push(
@@ -293,7 +325,9 @@ const baseConfig = (config, env) => {
     }));
   }
 
-  config.plugins.push( new MiniCssExtractPlugin({extractTextPluginOptions}) );
+  //config.plugins.push( new MiniCssExtractPlugin()); //{extractTextPluginOptions}) );
+  //    filename: cssFilename
+  //}) );
 
   config.plugins.push(
     new CopyWebpackPlugin({

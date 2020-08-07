@@ -24,6 +24,7 @@ nohup.out
 **/*.key
 **/*.cert
 yarn.lock
+../.env
 **/.cache
 size-plugin.json
 **/.log
