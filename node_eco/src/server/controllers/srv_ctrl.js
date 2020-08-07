@@ -24,7 +24,7 @@ const path = require('path');
     res.header('Content-Type', 'text/html')
        .type('text/html')
        .view(root);
-    */   
+    */
 //    res.sendFile("index.html", path.join(__dirname, '../..', 'ui'));
 //  } catch (err) {
 //    throw boom.boomify(err)

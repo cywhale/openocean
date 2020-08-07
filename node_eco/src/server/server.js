@@ -16,7 +16,7 @@ const mongoConnector = require('./db/mongoconn');
 //const argParser = new ArgumentParser({ addHelp: true; });
 //argParser.addArgument(['--port', '-p'], { type: Number, defaultValue: 3000 }
 
-async function configSecServ(certDir='config') { 
+async function configSecServ(certDir='config') {
   const readCertFile = (filename) => {
     return fs.readFileSync(path.join(__dirname, certDir, filename));
   };
@@ -28,25 +28,39 @@ async function configSecServ(certDir='config') {
 
 const startServer = async (opts) => {
     const { env, logSeverity, port, mongo_uri } = opts;
-    const {key, cert, allowHTTP1} = await configSecServ(); 
+    const {key, cert, allowHTTP1} = await configSecServ();
     // create the server
     const server = fastify({
       http2: true,
       trustProxy: true,
       https: {key, cert, allowHTTP1}, //{
-        //allowHTTP1: true, 
+        //allowHTTP1: true,
         //key: fs.readFileSync(path.join(__dirname, 'config', 'privkey.pem')),
         //cert: fs.readFileSync(path.join(__dirname, 'config', 'fullchain.pem'))
       //},
       logger: { level: logSeverity }
     });
-
+    //https://web.dev/codelab-text-compression-brotli
+    await server.get('*.js', (req, res, next) => {
+      if (req.header('Accept-Encoding').includes('br')) {
+        req.url = req.url + '.br';
+        console.log(req.header('Accept-Encoding Brotli'));
+        res.set('Content-Encoding', 'br');
+        res.set('Content-Type', 'application/javascript; charset=UTF-8');
+      } else {
+        req.url = req.url + '.gz';
+        console.log(req.header('Accept-Encoding Gzip'));
+        res.set('Content-Encoding', 'gzip');
+        res.set('Content-Type', 'application/javascript; charset=UTF-8');
+      }
+      next();
+    });
     // register the plugins, routes
-    //await server.register(fsAutoPush.staticServe, {root: path.join(__dirname, '..', 'ui')}); 
+    //await server.register(fsAutoPush.staticServe, {root: path.join(__dirname, '..', 'ui')});
     //await server.register(require('fastify-swagger'), swagger.options);
-    
+
     await server.register(require('fastify-static'), {
-      root: path.join(__dirname, '..', 'ui'),
+      root: path.join(__dirname, '..', 'ui/build'),
       prefix: '/',
       prefixAvoidTrailingSlash: true,
       list: {
