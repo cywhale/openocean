@@ -99,7 +99,22 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
       //csLoader = Object.assign({}, { csloaded, csviewer });
     }
     return (<div style="display:none" id="csLoader" csLoader={globe} />);
-  }
+  }*/
+
+  const until = function (condition) {
+      const poll = resolve => {
+        if(condition()) resolve();
+        else setTimeout(_ => poll(resolve), 400);
+      }
+      return new Promise(poll);
+  };
+  const wait_until_viewer = async () => {
+      await until(_ => globe.loaded? true: false);
+      let creditx = document.querySelector('.cesium-credit-textContainer')
+      creditx.style.display = 'none';
+  };
+  wait_until_viewer();
+
 /*<csLoader.Provider value={{csloaded: globe.loaded, csviewer: globe.viewer}}>
     <div style="display:block"><div class={style.basepicker}>
     { props.children }

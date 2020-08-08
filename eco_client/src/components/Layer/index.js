@@ -1,5 +1,5 @@
 import { Fragment } from 'preact'; //render, createContext
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import Color from 'cesium/Source/Core/Color.js';
 //import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import defined from 'cesium/Source/Core/defined.js';
@@ -20,6 +20,7 @@ import style from './style_modal';
 */
 const Layer = (props) => {
   const {viewer} = props;
+  const [searchLayer, setSearchLayer] = useState(null);
 /*
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&wi$
   const sTileImg = new SingleTileImageryProvider({
@@ -34,6 +35,7 @@ const Layer = (props) => {
   useEffect(() => {
     const drag_opts = { dom: "#ctrl", dragArea: '#ctrlheader' };
     draggable_element(drag_opts);
+    enable_search_listener();
   }, []);
 
   const render_datasource = () => {
@@ -70,7 +72,31 @@ const Layer = (props) => {
     return(<div style="display:none" />);
   }
 
-  //<div style="display:flex;height:auto;position:absolute">
+  const set_searchingtext= (elem_search, dom, evt) => {
+    let x = elem_search.value;
+    if (x && x.trim() !== "" && x !== dom.dataset.search) {
+      dom.dataset.searchin = x;
+    }
+  };
+
+  const get_searchingtext = (dom, evt) => {
+    //let REGEX_EAST = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\u3131-\uD79D]/;
+    //if (dom.dataset.search && dom.dataset.search.trim() !== "") { //|| dom.dataset.search.match(REGEX_EAST))
+    setSearchLayer(dom.dataset.searchin);
+    dom.dataset.searchout = dom.dataset.searchin;
+  };
+
+  const enable_search_listener = async () => {
+    let elem_search = document.querySelector(".cesium-geocoder-input");
+    let search_term = document.getElementById("searchx");
+    let butt_search = document.querySelector(".cesium-geocoder-searchButton");
+    await elem_search.addEventListener("change", set_searchingtext.bind(null, elem_search, search_term), false);
+    await elem_search.addEventListener("search",get_searchingtext.bind(null, search_term), false);
+    await butt_search.addEventListener("click", get_searchingtext.bind(null, search_term), false);
+  }
+
+
+  //<div style="display:flex;height:auto;position:absolute;bottom:29px;left:400px">
   return (
     <Fragment>
       <div class={style.toolToggle}>
@@ -94,6 +120,8 @@ const Layer = (props) => {
       </div>
       { render_datasource() }
       { sitePicker() }
+      { <div class="cesium-widget-credits" id="searchx" data-searchin="" data-searchout="",style="display:none">
+           Now searching: {searchLayer}</div> }
     </Fragment>
   );
 };
