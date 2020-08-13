@@ -110,11 +110,11 @@ icemaskx <- function(x, days) {
   fifelse(x>=(days-x), 1L, 0L)
 }
 
+## Update 20200814: only fetch till 20200727 ([1] "All resolved BUT NOT exist: 28,29,30,31") 
 library(future.apply)
 plan(multisession)
 options(future.globals.maxSize= 1048576000)
 for (i in yrng) {
-  if (i!=curryr && j!=currmo) {
     mmx <- fifelse(i==curryr, currmo-1L, 12L)
     for (j in 1:mmx) {
       monj <- fifelse(j<10, paste0("0",j), paste0(j))
@@ -161,7 +161,6 @@ for (i in yrng) {
         }
       })
     }
-  }
   if (i!=curryr) try(system(paste0("zip -j -m -9 ", dest, "zip/", i, ".zip ", dest, prex, ".", i, "*.nc")))
 }
 
@@ -170,7 +169,7 @@ plot_stars("../data_src/oisst/monthly_sst/198212_sst.nc", "", "sst")
 plot_stars("../data_src/oisst/monthly_anom/198202_anom.nc", "", "anom")
 plot_stars("../data_src/oisst/monthly_icemask/198212_icemask.nc", "", "icemask")
 
-## Read back
+## Read back https://r-spatial.github.io/stars/articles/stars1.html
 stx <- read_stars(c("../data_src/oisst/monthly_sst/198201_sst.nc", "../data_src/oisst/monthly_sst/198202_sst.nc"), name="sst")
 stx
 names(stx) <- c("sst", "sst")
