@@ -4,6 +4,12 @@
 
 library(stars)
 library(data.table)
+library(magrittr)
+library(abind)
+library(dplyr)
+library(ggplot2)
+library(viridis)
+
 lsm <- read_stars("../data_src/oisst/GLDASp4_landmask_025d.nc4") #0 = water; 1 = land 
 
 dt <- as.data.table(lsm)
@@ -15,7 +21,8 @@ dt[, seamask:= as.integer(!landmask)] #Now seamask 0 is land
 vart <- "icemask"
 yrng <- seq(1982,2019)
 mmx <- 12
-gcnt <- 1
+gcnt <- 1 ## Cannot directly use sum/gcnt as average, beccause may have NA
+cntm <- matrix( rep( 0, len=1440*720), nrow = 1440)
 pret <- as.Date("1982-01-01")
 
 for (i in yrng) {
@@ -26,27 +33,29 @@ for (i in yrng) {
     curt <- as.Date(paste0(i, monj, "01"), format="%Y%m%d")
     
     if (gcnt==1) { 
-      stx <- stars::read_stars(filet, var="Band1") %>% select("Band1")
-      names(stx) <- vart
+      stx <- stars::read_stars(filet)
+      names(stx)[1] <- vart
+      stx <- stx %>% select(vart)
+      cntm[which(!is.na(stx[[1]]))] <- 1
       gcnt <- gcnt + 1
       next 
     }
     x <- stars::read_stars(filet) 
     names(x)[1] <- vart 
     x <- x %>% select(vart)
+    cntm[which(!is.na(x[[1]]))] <- cntm[which(!is.na(x[[1]]))] + 1
     stx <- c(stx, x)
     names(stx) <- c(vart, vart)
-    if (i==yrng[length(yrng)] & j==mmx) { ## last month
-      func <- function (x,...) {sum(x,...)/(gcnt)} ## get average
-    } else {
-      func <- sum
-    }
     stx <- merge(stx) %>% st_set_dimensions(3, values = as.POSIXct(c(pret, curt)), names = "time") %>% 
-      aggregate(by="2 months", FUN=func, na.rm=TRUE)
+      aggregate(by="2 months", FUN=sum, na.rm=TRUE)
     names(stx) <- vart
     stx <- stx %>% select(vart) %>% adrop
-    pret <- curt
-    gcnt <- gcnt + 1
+    if (i==yrng[length(yrng)] & j==mmx) { ## last month
+      stx[[1]] <- stx[[1]]/cntm
+    } else {
+      pret <- curt
+      gcnt <- gcnt + 1
+    }
   }
 }
 
@@ -162,6 +171,10 @@ dt[seamask==16, remark:='Western Tropical Atlantic']
 ## US East Coast
 dt[lon>=278.5 & lon<315 & lat>=27 & lat<=47 & is.na(seamask), `:=`(seamask=17, region='US East Coast')]
 dt[seamask==17, remark:='US East Coast']
+
+## Treat some water bodies as land ## https://github.com/mjacox/Thermal_Displacement/blob/master/oisst_an.m
+dt[lon>=267 & lon<285 & lat>=41 & lat<=50, seamask:=0] ## Great lakes
+dt[lon>=269.5 & lon<270.5 & lat>=30 & lat<=31, seamask:=0]; ## Lake Ponchartrain
 
 ## just check
 ggplot() +  

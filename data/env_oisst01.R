@@ -18,10 +18,10 @@ plot_ncdf4x <- function (file, var="sst") {
   nx0 <- nc_open(file) ## four var: anom (anomaly), err (standard err), ice (sea ice concentration %), sst (in Celsius)
   print(nx0) ## [lon,lat,zlev,time]   (Chunking: [1440,720,1,1])
   #zlev <- ncvar_get(nx0, "zlev") ## only 0 (surface)
-  #latn1<- ncvar_get(nx0, "lat")
-  #lngn1<- ncvar_get(nx0, "lon")
-  #time<- ncvar_get(nx0, "time") 
-  #date<- time %>%  as.Date(origin="1978-01-01 00:00:0.0") 
+  latn1<- ncvar_get(nx0, "lat")
+  lngn1<- ncvar_get(nx0, "lon")
+  time<- ncvar_get(nx0, "time") 
+  date<- time %>%  as.Date(origin="1978-01-01 00:00:0.0") 
   
   dt <- as.data.table(ncvar_get(nx0, var)) %>% melt() %>%
     .[,`:=`(latx=.GRP), by=.(variable)] %>% .[,lngx:=rowid(variable)] %>%
@@ -55,7 +55,7 @@ if (initialTrial) {
 library(stars) #https://www.r-spatial.org/r/2017/11/23/stars1.html
 library(abind)
 library(dplyr)
-gplotx <- function(z, var="sst") {
+gplotx <- function(z, var="sst", returnx=FALSE) {
   df = as.data.frame(z)
   if (is.na(var) | var=="") { var = colnames(df)[3] }
   zcol = chmatch(var, colnames(df))
@@ -65,10 +65,12 @@ gplotx <- function(z, var="sst") {
     zcol = grep(var, colnames(df))
   }  
   df[,zcol] = unclass(df[,zcol])
-  ggplot() +  
+  gx <- ggplot() +  
     geom_tile(data=df, aes_string(x="x", y="y", fill=var), alpha=0.8) + 
     scale_fill_viridis() +
     coord_equal()
+  if (returnx) {return(gx)}
+  gx
 }
 
 if (initialTrial) {
@@ -176,5 +178,6 @@ names(stx) <- c("sst", "sst")
 x <- merge(stx)
 st_set_dimensions(x, 3, values = as.POSIXct(c("1982-01-01", "1982-02-01")), names = "time")
 
+# check: NO missing_data = [1987 12;1988 1;2011 11] in https://github.com/mjacox/Thermal_Displacement/blob/master/oisst_ice_mask_monthly.m
 ######################## detrend: pracma? https://rdrr.io/rforge/pracma/src/R/detrend.R https://stackoverflow.com/questions/45951234/detrend-function-in-r
 
