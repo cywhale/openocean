@@ -55,7 +55,7 @@ if (initialTrial) {
 library(stars) #https://www.r-spatial.org/r/2017/11/23/stars1.html
 library(abind)
 library(dplyr)
-gplotx <- function(z, var="sst", returnx=FALSE) {
+gplotx <- function(z, var="sst", returnx=FALSE, minz=-2, maxz=32.5) {
   df = as.data.frame(z)
   if (is.na(var) | var=="") { var = colnames(df)[3] }
   zcol = chmatch(var, colnames(df))
@@ -67,8 +67,13 @@ gplotx <- function(z, var="sst", returnx=FALSE) {
   df[,zcol] = unclass(df[,zcol])
   gx <- ggplot() +  
     geom_tile(data=df, aes_string(x="x", y="y", fill=var), alpha=0.8) + 
-    scale_fill_viridis() +
     coord_equal()
+  
+  if (any(is.na(c(minz, maxz)))) {
+    gx <- gx + scale_fill_viridis() 
+  } else {
+    gx <- gx + scale_fill_viridis(limits=c(minz, maxz))
+  }
   if (returnx) {return(gx)}
   gx
 }
@@ -179,5 +184,4 @@ x <- merge(stx)
 st_set_dimensions(x, 3, values = as.POSIXct(c("1982-01-01", "1982-02-01")), names = "time")
 
 # check: NO missing_data = [1987 12;1988 1;2011 11] in https://github.com/mjacox/Thermal_Displacement/blob/master/oisst_ice_mask_monthly.m
-######################## detrend: pracma? https://rdrr.io/rforge/pracma/src/R/detrend.R https://stackoverflow.com/questions/45951234/detrend-function-in-r
 

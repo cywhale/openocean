@@ -64,7 +64,7 @@ if (initialTrial) { #### Just a trial ###########
   gplotx(xt, "Jan")  
 }
 
-yrng <- seq(1982,2019)
+yrng <- seq(1982,2020)
 clim_years = seq(1982,2011) #for climatology
 climyrs<- clim_years[length(clim_years)] - clim_years[1] + 1 #30 yrs
 monstr <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
@@ -113,16 +113,111 @@ lay1 <- rbind(c(1,1,2,2,3,3),
               c(10,10,11,11,12,12))
 evplot <- paste0('grid.arrange(', pstrx, ' layout_matrix=lay1)') #(globs = list())
 eval(parse(text=evplot))
+
+save(stm, file="../data_src/oisst/sst_1982_2011month_climatology_nc.RData")
+
+
 #### Double check if the plots is right ####
 #### download NetCDF OISST (0.5d, monthly mean) from ftp://ftp.cdc.noaa.gov/Datasets/noaa.oisst.v2/sst.mnmean.nc 
+library(ncdf4)
+library(sf)
+library(rnaturalearth)
 
+nx0 <- nc_open("../data_src/oisst/sst.mnmean.nc") 
+print(nx0) ## sst[lon,lat,time]   (Chunking: [360,180,464])
+latn1<- ncvar_get(nx0, "lat") # 89.5 - -89.5
+lngn1<- ncvar_get(nx0, "lon") # 0 - 359.5
+time<- ncvar_get(nx0, "time") # 1981-12.01 - 2020-07-01, we now check every March, and August
+date<- time %>%  as.Date(origin="1800-01-01 00:00:0.0") 
 
+maridx <- seq(4, 464, by = 12) #check date[maridx]
+augidx <- seq(9, 464, by = 12)
+#yrng <- seq(1982,2019)
+#clim_years = seq(1982,2011) #for climatology
 
+get_sstmx <- function (midx, minsst=-2, maxsst=32.5) {
+  dt <- as.data.table(ncvar_get(nx0, "sst")[,,midx]) %>% 
+    .[,.(sstm=mean(value, na.rm=TRUE)), by=.(V1,V2)] %>%
+    .[,`:=`(longitude=fifelse(lngn1[V1]>180, lngn1[V1]-360, lngn1[V1]), latitude=latn1[V2])] %>%
+    .[,.(longitude, latitude, sstm)]
+  
+  gx <- ggplot() + 
+    geom_tile(data=dt, aes_string(x="longitude", y="latitude", fill="sstm"), alpha=0.8) + 
+    scale_fill_viridis(limits=c(minsst, maxsst)) +
+    geom_sf(data = ne_coastline(scale = "large", returnclass = "sf"), color = 'darkgray', size = .3) +
+    coord_sf() + 
+    xlim(c(-180, 180)) + ylim(c(-90, 90))
+  
+  return(gx)  
+}
 
+gx3 <- get_sstmx(maridx)
+gx8 <- get_sstmx(augidx)
 
+# stm from aboving code 
+# load("../data_src/oisst/sst_1982_2011month_climatology_nc.RData")
+gt3 <- gplotx(stm[[3]], "Mar", returnx=TRUE)  
+gt8 <- gplotx(stm[[8]], "Aug", returnx=TRUE)  
 
+lay2 <- rbind(c(1,1,2,2),
+              c(3,3,4,4))
+grid.arrange(gx3, gt3, gx8, gt8, layout_matrix=lay2)
+# ---- Only a double check to see the long-term average is correct ####
 
+#### Evaluate anormaly by substrating long-term mean ####
+## trackdate <- seq.Date(as.IDate(Sys.Date()-7), as.IDate(Sys.Date()-1), by="day")
+## Update 20200814: only fetch till 20200727 ([1] "All resolved BUT NOT exist: 28,29,30,31") 
+trackdate <- seq.Date(as.IDate("2020-07-27")-6, as.IDate("2020-07-27"), by="day")
+curryr <- year(as.IDate("2020-07-27"))
+currmo <- month(as.IDate("2020-07-27"))
 
+#for (i in yrng) {
+  i <- 1982
+  mmx <- fifelse(i==curryr, currmo-1L, 12L)
+  #for (j in 1:mmx) {
+  j <- 1
+    monj <- fifelse(j<10, paste0("0",j), paste0(j))
+    jstr <- monstr[j]
+  
+    x <- read_stars(paste0("../data_src/oisst/monthly_sst/", i, monj, "_sst.nc"))
+    names(x)[1] <- "anom" 
+    x[[1]][which(landm==1)] <- NA_real_
+    ice <- read_stars(paste0("../data_src/oisst/monthly_icemask/", i, monj, "_icemask.nc"))
+    x[[1]][which(ice[[1]]==1)] <- NA_real_
+    
+    x[[1]] <- x[[1]] - stm[[j]][[1]]
+  # filet <- paste0("../data_src/oisst/monthly_anom_by_sstm30yr/", i, monj, "_anom.nc")
+  # write_stars(x, filet)
+  #}
+#}
 
+## Just check if plot 1982-01
+gx <- gplotx(x, "anom", minz=-8.5, maxz=4.5, return=TRUE)
+y <- read_stars("../data_src/oisst/monthly_anom/198201_anom.nc")
+names(y)[1] <- "anom" 
+gy <- gplotx(y, "anom", minz=-8.5, maxz=4.5, return=TRUE)
 
+layt <- rbind(c(1,1),
+              c(2,2))
+grid.arrange(gx, gy, layout_matrix=layt)
+## ---- Very similar, do not need recompute, but need exclude ice and land ####
 
+for (i in yrng) {
+  mmx <- fifelse(i==curryr, currmo-1L, 12L)
+  for (j in 1:mmx) {
+    monj <- fifelse(j<10, paste0("0",j), paste0(j))
+    jstr <- monstr[j]
+    
+    z <- read_stars(paste0("../data_src/oisst/monthly_anom/", i, monj, "_anom.nc"))
+    names(z)[1] <- "anom" 
+    z[[1]][which(landm==1)] <- NA_real_
+    ice <- read_stars(paste0("../data_src/oisst/monthly_icemask/", i, monj, "_icemask.nc"))
+    z[[1]][which(ice[[1]]==1)] <- NA_real_
+    
+    #x[[1]] <- x[[1]] - stm[[j]][[1]]
+    filet <- paste0("../data_src/oisst/monthly_anom_icemask/", i, monj, "_anom.nc")
+    write_stars(z, filet)
+  }
+}
+
+## It's hard to detrend each x,y along almost 30yr (30x12) year trend. Must read 1440x720x30x12 at once...
