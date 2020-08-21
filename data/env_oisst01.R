@@ -55,7 +55,7 @@ if (initialTrial) {
 library(stars) #https://www.r-spatial.org/r/2017/11/23/stars1.html
 library(abind)
 library(dplyr)
-gplotx <- function(z, var="sst", returnx=FALSE, minz=-2, maxz=32.5) {
+gplotx <- function(z, var="sst", returnx=FALSE, minz=-2, maxz=32.5, no_coord=FALSE) {
   df = as.data.frame(z)
   if (is.na(var) | var=="") { var = colnames(df)[3] }
   zcol = chmatch(var, colnames(df))
@@ -65,9 +65,14 @@ gplotx <- function(z, var="sst", returnx=FALSE, minz=-2, maxz=32.5) {
     zcol = grep(var, colnames(df))
   }  
   df[,zcol] = unclass(df[,zcol])
-  gx <- ggplot() +  
-    geom_tile(data=df, aes_string(x="x", y="y", fill=var), alpha=0.8) + 
-    coord_equal()
+  if (no_coord) {
+    gx <- ggplot() +  
+      geom_tile(data=df, aes_string(x="x", y="y", fill=var), alpha=0.8)
+  } else {
+    gx <- ggplot() +  
+      geom_tile(data=df, aes_string(x="x", y="y", fill=var), alpha=0.8) + 
+      coord_equal()
+  }
   
   if (any(is.na(c(minz, maxz)))) {
     gx <- gx + scale_fill_viridis() 

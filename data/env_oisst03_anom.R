@@ -4,6 +4,8 @@
 library(stars)
 library(data.table)
 library(magrittr)
+library(abind)
+library(dplyr)
 
 land_mask <- fread("../data_src/oisst/sea_icemask_025d.csv") %>%
   .[, `:=`(x= fifelse(x<0, x+360, x), landmask= fifelse(!is.na(seamask) & seamask==0, 1L, 0L))] %>%
@@ -220,4 +222,68 @@ for (i in yrng) {
   }
 }
 
-## It's hard to detrend each x,y along almost 30yr (30x12) year trend. Must read 1440x720x30x12 at once...
+## It's hard/slow to detrend each x,y along almost 30yr (30x12) year trend. Must read 1440x720x30x12 at once...
+
+yrs <- yrng[length(yrng)] - yrng[1] + 1
+
+for (j in 1:12) {
+  monj <- fifelse(j<10, paste0("0",j), paste0(j))
+  jstr <- monstr[j]
+  for (i in yrng) {
+    #mmx <- fifelse(i==curryr, currmo-1L, 12L)
+    if (i==curryr & j>(currmo-1)) break
+    
+    z <- read_stars(paste0("../data_src/oisst/monthly_anom_icemask/", i, monj, "_anom.nc"))
+
+    if (i==yrng[1]) {
+      stdrx <- z
+      datex<- as.Date(paste0(i, monj, "01"), format="%Y%m%d")
+    } else {
+      stdrx <- c(stdrx, z)
+      datex<- c(datex, as.Date(paste0(i, monj, "01"), format="%Y%m%d"))
+    }
+  }
+  names(stdrx) <- rep(jstr, length(names(stdrx)))
+  print(paste0("Now in Year-month: ", i," - ", monj, " and have length stdrx: ", length(datex)))
+  
+  predy <- function(x) { return (stats::predict(lm(x ~ seq_along(datex)))) }
+  trd <- merge(stdrx) %>% st_set_dimensions(3, values = as.POSIXct(datex), names = "time") %>% 
+    aggregate(by=paste0(yrs, " years"), FUN = function(y) {
+       #y[[1]][] <- vapply(y[[1]], residy, numeric(1))
+       if (all(is.na(y))) return(y)
+       y[!is.na(y)] <- as.numeric(predy(y)) #Seems if return value has equal length, the result will be simplified by aggregate if using as.matrix
+       return(list(as.numeric(predy(y)))) #residy(y)
+    }) #%>% .[[1]]
+  tk <- array(unlist(trd[[1]]), dim = c(length(datex),1440,720)) #bug fix: NOT each predict have the same length result (if input has NA)
+  
+  print(paste0("Predict ok with dim(tk): ", paste0(dim(tk), collapse=",")))
+  for (k in seq_along(yrng)) {
+    if (yrng[k]==curryr & j>(currmo-1)) break
+    
+    z <- read_stars(paste0("../data_src/oisst/monthly_anom_icemask/", yrng[k], monj, "_anom.nc"))
+    notna1 <- which(!is.na(z[1][[1]]))
+    notna2 <- which(!is.na(tk[k,,]))
+    notna <- intersect(notna1, notna2)
+    z[[1]][notna] <- z[[1]][notna]- tk[1,,][notna]
+    names(z)[1] <- "anom"
+    
+    filet <- paste0("../data_src/oisst/monthly_anom_detrend/", yrng[k], monj, "_anom.nc")
+    write_stars(z, filet)
+    print(paste0("Now write Year-month: ", yrng[k], " - ", monj, " ok"))
+  }
+}
+
+## Just check
+zk <- read_stars(paste0("../data_src/oisst/monthly_anom_detrend/", 2020, "06", "_anom.nc"))
+z <- read_stars(paste0("../data_src/oisst/monthly_anom_icemask/", 2020, "06", "_anom.nc"))
+names(zk)[1] <- "anom"
+names(z)[1] <- "anom"
+print(range(na.omit(as.data.table(zk)$anom))) #-8.227043 11.727673
+print(range(na.omit(as.data.table(z)$anom))) # -8.361936  6.181935
+
+gz <- gplotx(z, "anom", minz = -6, maxz = 11, returnx=TRUE)  
+gzk<- gplotx(zk, "anom", minz = -6, maxz = 11, returnx=TRUE)  
+
+layt <- rbind(c(1,1),
+              c(2,2))
+grid.arrange(gz, gzk, layout_matrix=layt)
