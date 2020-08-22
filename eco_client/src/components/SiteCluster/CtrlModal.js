@@ -7,6 +7,7 @@ import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_ctrlmodal';
 import '../style/style_bubblelabel.scss';
 //import '../style/style_arialabel.scss';
+//import {Checkbox} from '@rmwc/checkbox';
 
 const CtrlModal = (props) => {
   const {scene, dataSource} = props; //Pins, removeListener, siteClusterStyling
@@ -43,6 +44,7 @@ const CtrlModal = (props) => {
   //<button data-bind="submit: siteClusterStyling()">Custom styling</button>
   //<input type="text" size="2" data-bind="value: pixelRange" />
   //<input type="text" size="2" data-bind="value: minimumClusterSize" />
+  //<Checkbox label='Marker Clustering' checked="true"  data-bind="checked: enabled" />
   return (
     <div ref={ctrlRef}>
       <table style="color:antiquewhite;">

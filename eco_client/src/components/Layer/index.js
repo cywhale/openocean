@@ -120,7 +120,7 @@ const Layer = (props) => {
       </div>
       { render_datasource() }
       { sitePicker() }
-      { <div class="cesium-widget-credits" id="searchx" data-searchin="" data-searchout="",style="display:none">
+      { <div class="cesium-widget-credits" id="searchx" data-searchin="" data-searchout="" style="display:none">
            Now searching: {searchLayer}</div> }
     </Fragment>
   );
