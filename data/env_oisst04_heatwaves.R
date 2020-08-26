@@ -10,6 +10,12 @@ library(data.table)
 library(magrittr)
 library(abind)
 library(dplyr)
+library(ggplot2)
+library(viridis)
+library(sf)
+library(rnaturalearth)
+library(grid)
+library(gridExtra)
 
 yrng <- seq(1982,2020)
 clim_years = seq(1982,2011) #for climatology
@@ -22,7 +28,7 @@ options(future.globals.maxSize= 1048576000*2)
 
 #### Define Marine heatwave is monthly anomaly > 90% historical anomaly
 Thresh <- 0.9
-Detrend <- TRUE
+Detrend <- TRUE #FALSE
 if (Detrend) {
   prex <- "../data_src/oisst/monthly_anom_detrend/"
   outd <- "../data_src/oisst/monthly_heatwave_detrend/"
@@ -30,7 +36,6 @@ if (Detrend) {
   prex <- "../data_src/oisst/monthly_anom_icemask/"
   outd <- "../data_src/oisst/monthly_heatwave/"
 }
-
 
 sty <- future_lapply(1:12, function(j) {
   if (j==1) {
@@ -75,7 +80,6 @@ sty <- future_lapply(1:12, function(j) {
                 as.Date(paste0(i, monj[2], "01"), format="%Y%m%d"),
                 fifelse(winj[3]==1, as.Date(paste0(i+1, monj[3], "01"), format="%Y%m%d"), as.Date(paste0(i, monj[3], "01"), format="%Y%m%d")))
     }
-    
     if (i == clim_years[1]) {
       styx <- x
       datey<- datex
@@ -84,6 +88,8 @@ sty <- future_lapply(1:12, function(j) {
       datey<- c(datey, datex)
     }
   }
+  print(paste0("Before process quantile Year-month: ", i," - ", monj, " ..."))
+  
   names(styx) <- rep(jstr, length(names(styx)))
   styx <- merge(styx) %>% st_set_dimensions(3, values = as.POSIXct(datey), names = "time") %>% 
     aggregate(by=paste0(climyrs, " years"), FUN=quantile, na.rm=TRUE, probs=Thresh, names=FALSE)
@@ -102,11 +108,11 @@ for (i in yrng) {
   for (j in 1:mmx) {
     monj <- fifelse(j<10, paste0("0",j), paste0(j))
     jstr <- monstr[j]
-    
+    print(paste0("Now in Year-month: ", i," - ", monj, " to get heatwave"))
     z <- read_stars(paste0(prex, i, monj, "_anom.nc"))
     names(z)[1] <- "heatwave" 
     zt <- matrix(rep(0, len=1440*720), nrow = 1440)
-    zt[which(z[[1]]>=sty[[j]][[1]])] <- 1
+    zt[which(z[[1]]>=sty[[j]][[1]] & z[[1]]>0)] <- 1  ## NOTE: HERE different with ref code, add criteria: ANOMALY > 0
     z[[1]] <- zt
 
     #x[[1]] <- x[[1]] - stm[[j]][[1]]
@@ -116,7 +122,11 @@ for (i in yrng) {
 }
 
 ## Just check
-tt <- as.data.table(z) %>% 
+#tt <- as.data.table(z) %>% 
+#  .[,`:=`(longitude=fifelse(x>180, x-360, x), latitude=y)] %>% .[,.(longitude, latitude, heatwave)]
+tt <- read_stars(paste0("../data_src/oisst/monthly_heatwave_detrend/", 2019, "02", "_heatwave.nc"))
+names(tt)[1] <- "heatwave"
+tt <- as.data.table(tt) %>% 
   .[,`:=`(longitude=fifelse(x>180, x-360, x), latitude=y)] %>% .[,.(longitude, latitude, heatwave)]
 
 gx  <- ggplot() +  
@@ -126,7 +136,7 @@ gx  <- ggplot() +
   coord_sf() + 
   xlim(c(-180, 180)) + ylim(c(-90, 90))  
 
-zt <- read_stars(paste0("../data_src/oisst/monthly_heatwave/", 2020, "06", "_heatwave.nc"))
+zt <- read_stars(paste0("../data_src/oisst/monthly_heatwave/", 2019, "02", "_heatwave.nc")) #2020, "06"
 names(zt)[1] <- "heatwave"
 
 zt <- as.data.table(zt) %>% 
