@@ -10,7 +10,8 @@ import SiteCluster from 'async!../SiteCluster'; //{ SiteConsumer }
 //import sitePickedLabel from 'async!../SiteCluster/sitePickedLabel';
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
-//import CtrlModal from 'async!./CtrlModal';
+import LayerModal from 'async!./LayerModal';
+
 /*
   export const siteLoader = createContext({
     loaded: false,
@@ -72,6 +73,11 @@ const Layer = (props) => {
     return(<div style="display:none" />);
   }
 
+  const render_ImgLayer = () => {
+    //render(<LayerModal viewer={viewer} />, document.getElementById('ctrlsectdiv2'));
+    return(<LayerModal viewer={viewer} />);
+  }
+
   const set_searchingtext= (elem_search, dom, evt) => {
     let x = elem_search.value;
     if (x && x.trim() !== "" && x !== dom.dataset.search) {
@@ -112,7 +118,9 @@ const Layer = (props) => {
             <section class={style.ctrlsect}>
               <div class={style.ctrlcolumn}>
                 <div id="ctrlsectdiv1" />
-                <div id="ctrlsectdiv2" />
+                <div id="ctrlsectdiv2">
+                  { render_ImgLayer() }
+                </div>
               </div>
             </section>
           </div>
