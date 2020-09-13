@@ -1,86 +1,368 @@
-import { useEffect, useState, useRef } from 'preact/hooks';
+import { useEffect, useState, useRef } from 'preact/hooks'; //useCallback
 import Color from 'cesium/Source/Core/Color.js';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
+//import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
+//import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
+import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
+import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
+import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
-// follow SiteCluster/CtrlModal.js knouout code
+// follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
 import bubble_labeler from '../Compo/bubble_labeler';
+import style from './style_layermodal.scss';
+import './style_layerctrl.scss';
 import '../style/style_bubblelabel.scss';
 
 const LayerModal = (props) => {
-  const {viewer} = props;
-  const layers = viewer.imageryLayers;
-  const baseLayer = layers.get(0);
-  const ctrlRef = useRef(null);
-  //const [state, setState] = useState(false);
-  const [viewModel, setViewModel] = useState({
-    imgalpha: 0.5
+  const { viewer } = props;
+  const { imageryLayers } = viewer; //basemapLayerPicker
+  const layerctrlRef = useRef(null);
+//const [state, setState] = useState(false);
+  const [viewModel, setModel] = useState({
+    layers: [],
+    sImg: [],
+    selectedLayer: null,
+    //selectedImagery: null,
+    //selectedTerrain: null,
+    upLayer: null,
+    downLayer: null,
+    isSelectableLayer: function (layer) {
+        return this.sImg.indexOf(layer.imageryProvider) >= 0;
+    },
+    raise: function (layer, index) {
+        imageryLayers.raise(layer);
+        viewModel.upLayer = layer;
+        viewModel.downLayer = viewModel.layers[Math.max(0, index - 1)];
+        updateLayerList();
+        window.setTimeout(function () {
+          viewModel.upLayer = viewModel.downLayer = null;
+        }, 10);
+    },
+    lower: function (layer, index) {
+        imageryLayers.lower(layer);
+        viewModel.upLayer =
+          viewModel.layers[
+            Math.min(viewModel.layers.length - 1, index + 1)
+          ];
+        viewModel.downLayer = layer;
+        updateLayerList();
+        window.setTimeout(function () {
+          viewModel.upLayer = viewModel.downLayer = null;
+        }, 10);
+    },
+    canRaise: function (index) {
+        return index > 0;
+    },
+    canLower: function (index) {
+        return index >= 0 && index < imageryLayers.length - 1;
+    },
   });
+/*
+  const bindBaseLayer = () => {
+    const { baseLayerPicker, imageryLayers } = viewer;
+    const baseImg = knockout
+        .getObservable(baseLayerPicker.viewModel,'selectedImagery')
+        .subscribe(function() { return baseLayerPicker.viewModel.selectedImagery.name; });
+    const baseTerrain = knockout
+        .getObservable(baseLayerPicker.viewModel,'selectedTerrain')
+        .subscribe(function() { return viewer.baseLayerPicker.viewModel.selectedTerrain.name; });
+
+    const baseLayer = imageryLayers.get(0);
+    console.log(baseLayer.name + ":" + baseLayer + " and currImg: " + baseImg + ", currTerrain: " + baseTerrain);
+
+    let newbase;
+    if (baseImg !== viewModel.base & baseImg !== viewModel.selectedImagery) {
+      newbase = baseImg;
+    } else if (baseTerrain !== viewModel.base & baseTerrain !== viewModel.selectedTerrain) {
+      newbase = baseTerrain;
+    }
+
+    let layt = viewModel.layers;
+    if (viewModel.base) {
+      const idx = name.indexOf(viewModel.base)
+      layt[idx] = baseLayer;
+      //name[idx] = newbase;
+    } else {
+      layt.push(baseLayer);
+    }
+    setModel((preMdl) => ({
+      ...preMdl,
+      layers: layt,
+      base: newbase,
+      selectedImagery: baseImg,
+      selectedTerrain: baseTerrain
+    }));
+  };
+*/
+  //if add a new layer...
+  //const evlay01url = 'https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png';
+  const add_gbloverlay = (url, name, alpha, show, rectangle) => {
+    //const baseLayer = layers.get(0);
+    //baseLayer.colorToAlpha = new Color(0.0, 0.016, 0.059);
+    //baseLayer.colorToAlphaThreshold = 0.5;
+    /* layer = layers.addImageryProvider(imageryProvider);
+       if (layer) {
+         imageryLayers.remove(layer);
+         layer = null;
+       } else {
+         layer = imageryLayers.addImageryProvider(new Cesium.SingleTileImageryProvider({
+           url : url,
+           rectangle : Cesium.Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0)
+         }));
+       }*/
+    const lay = //new ImageryLayer(name, //imageryLayers.addImageryProvider(
+      new SingleTileImageryProvider({
+          url: url,
+          //rectangle: new Cesium.Rectangle(bnds[0], bnds[1], bnds[2], bnds[3]),
+          rectangle: rectangle, //| Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0),
+          //numberOfLevelZeroTilesX: 1,
+          //numberOfLevelZeroTilesY: 1,
+          defaultAlpha: alpha | 0.5,
+          //parameters: {transparent : 'true',
+          //           //alpha: 0.5,
+          //             format : 'image/png'},
+          proxy : new DefaultProxy('/proxy/')
+      });
+    //);
+    lay.alpha= alpha| 0.5;  //Cesium.defaultValue(alpha, 0.5);
+    lay.show = show | false;//Cesium.defaultValue(show, true);
+    lay.name = name;
+    //knockout.track(lay, ["alpha", "show", "name"]);
+    let layt;
+    let simg = viewModel.sImg;
+    if (!simg.length) {
+      layt = imageryLayers.addImageryProvider(lay);
+      layt.name = name;
+      layt.show = show | false;
+      layt.alpha = alpha | 0.5;
+      //const blay = imageryLayers.get(0);
+      //blay.name = "Basemap";
+      simg.push(lay);
+      setModel((preMdl) => ({
+        ...preMdl,
+        sImg: simg,
+        selectedLayer: lay
+      }));
+    } else {
+      simg.push(lay);
+      setModel((preMdl) => ({
+        ...preMdl,
+        sImg: simg,
+      }));
+    }
+  }
+
+  const addAdditionalLayerOption = (name, imageryProvider, alpha, show) => {
+    const layer= imageryLayers.addImageryProvider(imageryProvider);
+    layer.alpha= alpha| 0.5; //Cesium.defaultValue(alpha, 0.5);
+    layer.show = show | false;//Cesium.defaultValue(show, true);
+    layer.name = name;
+    knockout.track(layer, ["alpha", "show", "name"]);
+  }
 
   useEffect(() => {
       knockout.track(viewModel);
-      knockout.applyBindings(viewModel, ctrlRef.current);
-      setViewModel(kobind());
+      knockout.applyBindings(viewModel, layerctrlRef.current);
+      //setModel(kobind());
+      //bindBaseLayer();
+      setupLayers();
+      updateLayerList();
       //setState(true);
+      setModel((preMdl) => ({
+        ...preMdl,
+        ...bindSelLayer(),
+      }));
+      //bindSelLayer();
       bubble_labeler(".ctrlrange-wrap2");
   }, []);
-
+/*
   const kobind = () => {
-    function subscribeParameter(name) {
+    function subscribeParameter() {
       knockout
-        .getObservable(viewModel, name)
-        .subscribe(function (newValue) {
+        .getObservable(viewModel, "imgalpha")
+        .subscribe(function () {
            sTileImg.alpha = newValue;
         });
     }
     return({ imgalpha: subscribeParameter("imgalpha") })
   };
+*/
+  const updateLayerList = () => { //sidx=null, preidx=null) => {
+    const nlayers = imageryLayers.length;
+    let vlay = viewModel.layers;
+    let blay, nowlay, simg;
+    if (!vlay.length) {
+      blay = imageryLayers.get(0);
+      blay.name = "Basemap";
+      vlay.splice(0, vlay.length);
+      for (var i = nlayers - 1; i >= 1; --i) {
+        vlay.push(imageryLayers.get(i));
+      }
+      vlay.push(blay);
+    } else {
+      /*if (sidx!==null) {
+        nowlay = imageryLayers.get(nlayers - preidx - 1);
+        simg = viewModel.sImg;
+        simg.splice(sidx, 1, nowlay);
+        setModel((preMdl) => ({
+          ...preMdl,
+          selectedLayer: nowlay,
+          sImg: simg,
+        }));
+      }*/
+      vlay.splice(0, vlay.length);
+      for (var i = nlayers - 1; i >= 0; --i) {
+        vlay.push(imageryLayers.get(i));
+      }
+    }
+    setModel((preMdl) => ({
+        ...preMdl,
+        layers: vlay,
+    }));
+  }
 
-  //if add a new layer...
-  const evlay01url = 'https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png'; //'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&width=3600&height=1800';
-  //baseLayer.colorToAlpha = new Color(0.0, 0.016, 0.059);
-  //baseLayer.colorToAlphaThreshold = 0.5;
+  const bindSelLayer = () => {
+    //const subscribeSelected = () => {
+      knockout
+        .getObservable(viewModel, "selectedLayer")
+        .subscribe(function (selLayer) {
+    //Handle changes to the drop-down base layer selector.
+          let activeLayerIndex = 0;
+          let nlayers = viewModel.layers.length;
+          for (var i = 0; i < nlayers; ++i) {
+            if (viewModel.isSelectableLayer(viewModel.layers[i])) {
+              activeLayerIndex = i;
+              break;
+            }
+          }
+          const activeLayer = viewModel.layers[activeLayerIndex];
+          const show = activeLayer.show;
+          const alpha = activeLayer.alpha;
+          //const actidx = viewModel.sImg.indexOf(activeLayer); //=== 0;
+          const selidx = //typeof selLayer['isBaseLayer'] === 'function' && selLayer.isBaseLayer();
+                         viewModel.sImg.indexOf(selLayer); // === 0;
+          //if (actidx!==0)
+          activeLayer.show = false;
+          activeLayer.alpha = 0;
+          imageryLayers.remove(activeLayer, false);
+          let nowLayer;
+          if (selLayer.constructor.name === "SingleTileImageryProvider") {
+            nowLayer = imageryLayers.addImageryProvider(selLayer, nlayers - activeLayerIndex - 1);
+          } else {
+            imageryLayers.add(selLayer, nlayers - activeLayerIndex - 1);
+            nowLayer = imageryLayers.get(activeLayerIndex);
+          }
+          nowLayer.show = show;
+          nowLayer.alpha = alpha;
+          nowLayer.name = selLayer.name;
+          //}
+          //let simg = viewModel.sImg; //Not sure why this will trigger knockout and infinite loop
+          //simg.splice(selidx, 1, nowLayer);
+          //let vlay = viewModel.layers;
+          //vlay.splice(activeLayerIndex, 1, nowLayer);
+          updateLayerList(); //selidx, activeLayerIndex);
+          return ({ selectedLayer: nowLayer, //imageryLayers.get(activeLayerIndex),
+                    //sImg: simg,
+                    //layers: vlay
+                 });
+        });
+  };
 
-  const sTileImg = layers.addImageryProvider(
-      new SingleTileImageryProvider({
-        url: evlay01url,
-        //rectangle: new Cesium.Rectangle(bnds[0], bnds[1], bnds[2], bnds[3]),
-        rectangle: Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0),
-        //numberOfLevelZeroTilesX: 1,
-        //numberOfLevelZeroTilesY: 1,
-        defaultAlpha: 0.5,
-        //parameters: {transparent : 'true',
-        //           //alpha: 0.5,
-        //             format : 'image/png'},
-        proxy : new DefaultProxy('/proxy/') //https://github.com/CesiumGS/EarthKAMExplorer/blob/master/server/server.js
+  const setupLayers = () => {
+    const grect = Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0);
+    add_gbloverlay('https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png',
+                   'NASA_NEO_Chla', 0.5, false, grect);
+
+    add_gbloverlay('https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&width=3600&height=1800',
+                   'NASA_NEO_Chla_origin', 0.5, false, grect);
+
+    add_gbloverlay('https://ecodata.odb.ntu.edu.tw/pub/img/neo_AQUA_MODIS_20200628.png',
+                   'NASA_false_color', 0.5, false, grect);
+
+    /* Create the additional layers
+    addAdditionalLayerOption(
+      "United States GOES Infrared",
+      new Cesium.WebMapServiceImageryProvider({
+        url:
+          "https://mesonet.agron.iastate.edu/cgi-bin/wms/goes/conus_ir.cgi?",
+        layers: "goes_conus_ir",
+        credit: "Infrared data courtesy Iowa Environmental Mesonet",
+        parameters: {
+          transparent: "true",
+          format: "image/png",
+        },
       })
-  );
-
-  sTileImg.alpha = 0.5
-
-  //const tms = new Cesium.UrlTemplateImageryProvider({...})
-  //tms.alpha = 0.7;
-/*
-    viewer.imageryLayers.addImageryProvider(tms);
-    var options = {
-      camera: viewer.scene.camera,
-      canvas: viewer.scene.canvas,
-    };*/
+    );*/
+    addAdditionalLayerOption(
+      "United States Weather Radar",
+      new WebMapServiceImageryProvider({
+        url:
+          "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?",
+        layers: "nexrad-n0r",
+        credit: "Radar data courtesy Iowa Environmental Mesonet",
+        parameters: {
+          transparent: "true",
+          format: "image/png",
+        },
+      })
+    );
+/*  addAdditionalLayerOption(
+      "TileMapService Image",
+      new Cesium.TileMapServiceImageryProvider({
+        url: "../images/cesium_maptiler/Cesium_Logo_Color",
+      }),
+      0.2
+    );
+    addAdditionalLayerOption(
+      "Single Image",
+      new Cesium.SingleTileImageryProvider({
+        url: "../images/Cesium_Logo_overlay.png",
+        rectangle: Cesium.Rectangle.fromDegrees(
+          -115.0, 38.0, -107, 39.75
+        ),
+      }),
+      1.0
+    );*/
+    addAdditionalLayerOption(
+      "Grid",
+      new GridImageryProvider(),
+      1.0, false
+    );
+    addAdditionalLayerOption(
+      "Tile Coordinates",
+      new TileCoordinatesImageryProvider(),
+      1.0, false
+    );
+  }
 
   return (
-    <div ref={ctrlRef}>
+    <div id="layerctrl" ref={layerctrlRef}>
       <table style="color:antiquewhite;">
-      <tbody>
-       <tr>
-         <td>Overlay transparency</td>
-         <td><span class="ctrlrange-wrap2">
-          <input type="range"  class="range" min="0.0" max="1.0" step="0.01" data-bind="value: imgalpha, valueUpdate: 'input'" />
-          <output class="bubble" />
-          </span>
-         </td>
-       </tr>
-      </tbody>
+        <tbody data-bind="foreach: layers">
+          <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
+            <td class={style.smalltd}><input class={style.laychkbox} type="checkbox" data-bind="checked: show" /></td>
+            <td class={style.smalltd}>
+              <span data-bind="text: name, visible: !$parent.isSelectableLayer($data)"></span>
+              <select class={style.simgsel} data-bind="visible: $parent.isSelectableLayer($data), options: $parent.sImg, optionsText: 'name', value: $parent.selectedLayer"></select>
+            </td>
+            <td class={style.smalltd}><span class="ctrlrange-wrap2">
+              <input type="range" class="range" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
+              <output class="bubble" /></span>
+            </td>
+            <td class={style.smalltd}>
+              <button type="button" class={style.modalbutton} data-bind="click: function() { $parent.raise($data, $index()); }, visible: $parent.canRaise($index())">
+                ▲
+              </button>
+            </td>
+            <td class={style.smalltd}>
+              <button type="button" class={style.modalbutton} data-bind="click: function() { $parent.lower($data, $index()); }, visible: $parent.canLower($index())">
+                ▼
+              </button>
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   )

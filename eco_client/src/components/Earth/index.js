@@ -30,6 +30,7 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   //const { Provider, Consumer } = csLoader;
   const [globe, setGlobe] = useState({
     loaded: false,
+    //baseLoaded: false,
     viewer: null
   });
 
@@ -48,6 +49,7 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   const initGlobe = () => {
     setGlobe({
       loaded: true,
+      //baseLoaded: false,
       viewer: new Viewer(ref.current, {
         timeline: true,
         animation: true,
@@ -65,6 +67,13 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
     if (globe.loaded) {
       //const {_scene} = viewer.viewer._cesiumWidget;
       const {scene} = globe.viewer;
+      //const {globe} = scene.globe;
+      //setGlobe((preState) => ({
+      //  ...preState,
+      //  baseLayerPicker: basemap_module(globe.viewer),
+      //  baseLoaded: true,
+      //}));
+
       return (
         <BasemapPicker scene={scene} />
       ); //<Sidebar scene={_scene} />
@@ -72,7 +81,7 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
     return null;
   };
   const render_layer = () => {
-    if (globe.loaded) {
+    if (globe.loaded) { //& globe.baseLoaded) {
       return (
         <Layer viewer={globe.viewer} />
       );

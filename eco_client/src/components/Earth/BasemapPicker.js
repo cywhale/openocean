@@ -15,7 +15,9 @@ import style from './style_basemapPicker';
 //const terrainModels = createDefaultTerrainProviderViewModels();
 
 const BasemapPicker = (props) => {
-  const {scene} = props; //loaded
+  const {scene} = props;
+  //const {viewer} = props;
+  //const {scene} = viewer;
   const [basemap, setBasemap] = useState(null);
   const [state, setState] = useState(false);
 
@@ -26,6 +28,7 @@ const BasemapPicker = (props) => {
     //if (loaded) {
     console.log('Initialize BasemapModels');
     initBasemap();
+    //viewer.baseLayerPicker = basemap;
     //}
   }, []); //loaded
 

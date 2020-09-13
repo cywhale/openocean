@@ -1,0 +1,25 @@
+#layerctrl {
+  background: rgba(42, 42, 42, 0.8);
+  padding: 4px;
+  border-radius: 4px;
+}
+#layerctrl input {
+  vertical-align: middle;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  }
+#layerctrl table tr {
+  transform: translateY(0);
+  transition: transform 0.4s ease-out;
+}
+#layerctrl table tr.up {
+  transform: translateY(33px);
+  transition: none;
+}
+#layerctrl table tr.down {
+  transform: translateY(-33px);
+  transition: none;
+}
+.range {
+  min-width:120px;
+}

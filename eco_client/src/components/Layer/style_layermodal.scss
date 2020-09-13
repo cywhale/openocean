@@ -1,0 +1,30 @@
+.modalbutton {
+    display: inline-block;
+    position: relative;
+    background: #303336;
+    border: 1px solid #444;
+    color: #edffff;
+    fill: #edffff;
+    border-radius: 4px;
+    padding: 4px 6px;
+    margin: 2px;
+    margin-right: -2px;
+    cursor: pointer;
+    overflow: hidden;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.smalltd {
+  max-width:120px;
+}
+.simgsel {
+  font-size:10px;
+  max-width:120px;
+}
+.laychkbox {
+  margin-left: -10px;
+  width: 25px;
+}
