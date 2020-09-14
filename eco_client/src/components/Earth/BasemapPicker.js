@@ -7,30 +7,48 @@ import createDefaultTerrainProviderViewModels from 'cesium/Source/Widgets/BaseLa
 import buildModuleUrl from 'cesium/Source/Core/buildModuleUrl';
 import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider';
 import ProviderViewModel from 'cesium/Source/Widgets/BaseLayerPicker/ProviderViewModel';
+import knockout from 'cesium/Source/ThirdParty/knockout.js';
 import 'cesium/Source/Widgets/widgets.css';
 import style from './style_basemapPicker';
 //import './csviewer.css'
-
 //const imageryViewModels = createDefaultImageryProviderViewModels()[8,10,11,12,14];
 //const terrainModels = createDefaultTerrainProviderViewModels();
 
 const BasemapPicker = (props) => {
-  const {scene} = props;
-  //const {viewer} = props;
-  //const {scene} = viewer;
-  const [basemap, setBasemap] = useState(null);
+  const {scene, basePick, onchangeBase} = props;
+  const [basemap, setBasemap] = useState({
+    picker: null,
+    selectedImagery: null,
+    selectedTerrain: null,
+  });
   const [state, setState] = useState(false);
-
-  const baseContainer = useRef(null);
   //const { loaded, viewer } = useContext(csLoader);
+  const baseContainer = useRef(null);
 
   useEffect(() => {
-    //if (loaded) {
-    console.log('Initialize BasemapModels');
-    initBasemap();
-    //viewer.baseLayerPicker = basemap;
-    //}
-  }, []); //loaded
+    if (!state) {
+      console.log('Initialize BasemapModels');
+      initBasemap();
+    } else {
+    /*  if (!basemap.binded) {
+        setBasemap((preState) => ({
+            ...preState,
+            binded: true,
+        }));
+        knockout.track(basemap);
+        //knockout.applyBindings(basemap, baseContainer.current);
+      }
+    */ // already knockout track when build basemap picker (cesium internally)
+      setBasemap((preState) => ({
+        ...preState,
+        selectedImagery: bindSelImagery(),
+      }));
+      setBasemap((preState) => ({
+        ...preState,
+        selectedTerrain: bindSelTerrain(),
+      }));
+    }
+  }, [state]);
 
   const initBasemap = () => {
     //if (scene) { //Now globe.loaded detect in Earth
@@ -48,20 +66,47 @@ const BasemapPicker = (props) => {
               });
             }
         }));
-        [4,6,8,9,11,13,14].map(i => imgModels.push(defModels[i]));
+        [6,8,9,11,12,13,14].map(i => imgModels.push(defModels[i])); //4: Mapbox Streets
         return imgModels;
       };
 
-      setBasemap(async () => {
-        basemap: await new BaseLayerPicker(baseContainer.current, {
+      setBasemap((preState) => ({ //async //await new
+        ...preState,
+        picker: new BaseLayerPicker(baseContainer.current, {
           globe: scene.globe,
           imageryProviderViewModels: getImgModels(),
           terrainProviderViewModels: createDefaultTerrainProviderViewModels()
         })
-      });
+      }));
       setState(true);
     //}
   };
+
+  const bindSelImagery = () => {
+    const {viewModel} = basemap.picker; //original: baseLayerPicker.viewModel.selectedImagery
+    knockout
+      .getObservable(viewModel, 'selectedImagery') //baseLayerPicker.viewModel
+      .subscribe(function() {
+        const baseImg = viewModel.selectedImagery.name;
+        if (baseImg !== basePick.name && baseImg !== basemap.selectedImagery) {
+          onchangeBase({ name: baseImg });
+        }
+        return ({ selectedImagery: baseImg });
+      });
+  }
+
+  const bindSelTerrain = () => {
+    const {viewModel} = basemap.picker; //original: baseLayerPicker.viewModel.selectedTerrain
+    knockout
+      .getObservable(viewModel, 'selectedTerrain') //baseLayerPicker.viewModel
+      .subscribe(function() {
+        const baseTerrain = viewModel.selectedTerrain.name;
+        if (baseTerrain !== basePick.name && baseTerrain !== basemap.selectedTerrain) {
+          onchangeBase({ name: baseTerrain });
+        }
+        return ({ selectedTerrain: baseTerrain });
+      });
+  }
 
   //{ initBasemap(loaded) }
   return useMemo (() => {

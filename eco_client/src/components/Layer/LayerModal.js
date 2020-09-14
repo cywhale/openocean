@@ -16,14 +16,16 @@ import './style_layerctrl.scss';
 import '../style/style_bubblelabel.scss';
 
 const LayerModal = (props) => {
-  const { viewer } = props;
+  const { viewer, baseName, userBase } = props;
   const { imageryLayers } = viewer; //basemapLayerPicker
   const layerctrlRef = useRef(null);
-//const [state, setState] = useState(false);
+  const [state, setState] = useState(false);
+  const [base, setBase] = useState({ name: userBase });
   const [viewModel, setModel] = useState({
     layers: [],
     sImg: [],
     selectedLayer: null,
+    baseLayer: null,
     //selectedImagery: null,
     //selectedTerrain: null,
     upLayer: null,
@@ -59,43 +61,25 @@ const LayerModal = (props) => {
         return index >= 0 && index < imageryLayers.length - 1;
     },
   });
-/*
-  const bindBaseLayer = () => {
-    const { baseLayerPicker, imageryLayers } = viewer;
-    const baseImg = knockout
-        .getObservable(baseLayerPicker.viewModel,'selectedImagery')
-        .subscribe(function() { return baseLayerPicker.viewModel.selectedImagery.name; });
-    const baseTerrain = knockout
-        .getObservable(baseLayerPicker.viewModel,'selectedTerrain')
-        .subscribe(function() { return viewer.baseLayerPicker.viewModel.selectedTerrain.name; });
 
-    const baseLayer = imageryLayers.get(0);
-    console.log(baseLayer.name + ":" + baseLayer + " and currImg: " + baseImg + ", currTerrain: " + baseTerrain);
-
-    let newbase;
-    if (baseImg !== viewModel.base & baseImg !== viewModel.selectedImagery) {
-      newbase = baseImg;
-    } else if (baseTerrain !== viewModel.base & baseTerrain !== viewModel.selectedTerrain) {
-      newbase = baseTerrain;
+  const checkBaseLayer = () => {
+    if (baseName!==null && base.name!==base && viewModel.layers.length) {
+      let vlay = viewModel.layers;
+      let blay = imageryLayers.get(0);
+      let bidx = vlay.indexOf(viewModel.baseLayer);
+      blay.name = baseName;
+      blay.show = vlay[bidx].show;
+      blay.alpha= vlay[bidx].alpha;
+      vlay.splice(bidx, 1, blay);
+      setBase({ name: baseName });
+      setModel((preMdl) => ({
+        ...preMdl,
+        baseLayer: blay,
+        layers: vlay,
+      }));
+      //updateLayerList();
     }
-
-    let layt = viewModel.layers;
-    if (viewModel.base) {
-      const idx = name.indexOf(viewModel.base)
-      layt[idx] = baseLayer;
-      //name[idx] = newbase;
-    } else {
-      layt.push(baseLayer);
-    }
-    setModel((preMdl) => ({
-      ...preMdl,
-      layers: layt,
-      base: newbase,
-      selectedImagery: baseImg,
-      selectedTerrain: baseTerrain
-    }));
   };
-*/
   //if add a new layer...
   //const evlay01url = 'https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png';
   const add_gbloverlay = (url, name, alpha, show, rectangle) => {
@@ -156,27 +140,32 @@ const LayerModal = (props) => {
 
   const addAdditionalLayerOption = (name, imageryProvider, alpha, show) => {
     const layer= imageryLayers.addImageryProvider(imageryProvider);
+    layer.show = show | false;
     layer.alpha= alpha| 0.5; //Cesium.defaultValue(alpha, 0.5);
-    layer.show = show | false;//Cesium.defaultValue(show, true);
     layer.name = name;
     knockout.track(layer, ["alpha", "show", "name"]);
   }
 
   useEffect(() => {
+  /*if (!state && userBase && userBase!=="") {
+      setBase({ name: userBase });
+    }*/
+    if (!state) {
       knockout.track(viewModel);
       knockout.applyBindings(viewModel, layerctrlRef.current);
       //setModel(kobind());
-      //bindBaseLayer();
       setupLayers();
       updateLayerList();
-      //setState(true);
+      setState(true);
       setModel((preMdl) => ({
         ...preMdl,
         ...bindSelLayer(),
       }));
-      //bindSelLayer();
       bubble_labeler(".ctrlrange-wrap2");
-  }, []);
+    } else {
+      checkBaseLayer();
+    }
+  }, [state, baseName]);
 /*
   const kobind = () => {
     function subscribeParameter() {
@@ -195,7 +184,12 @@ const LayerModal = (props) => {
     let blay, nowlay, simg;
     if (!vlay.length) {
       blay = imageryLayers.get(0);
-      blay.name = "Basemap";
+      blay.name = base.name;
+      setModel((preMdl) => ({
+        ...preMdl,
+        baseLayer: blay,
+      }));
+
       vlay.splice(0, vlay.length);
       for (var i = nlayers - 1; i >= 1; --i) {
         vlay.push(imageryLayers.get(i));

@@ -20,7 +20,7 @@ import LayerModal from 'async!./LayerModal';
 });
 */
 const Layer = (props) => {
-  const {viewer} = props;
+  const {viewer, baseName, userBase} = props;
   const [searchLayer, setSearchLayer] = useState(null);
 /*
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&wi$
@@ -75,7 +75,8 @@ const Layer = (props) => {
 
   const render_ImgLayer = () => {
     //render(<LayerModal viewer={viewer} />, document.getElementById('ctrlsectdiv2'));
-    return(<LayerModal viewer={viewer} />);
+    //userBase: default baselayer, but can be changed after user cookies set
+    return(<LayerModal viewer={viewer} baseName={baseName} userBase={userBase} />);
   }
 
   const set_searchingtext= (elem_search, dom, evt) => {

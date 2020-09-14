@@ -28,15 +28,18 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   //const [state, setState] = useState(false);
   //const {appstate} = props;
   //const { Provider, Consumer } = csLoader;
+  const [userScene, setUserScene] = useState({ baseLayer: "" });
   const [globe, setGlobe] = useState({
     loaded: false,
-    //baseLoaded: false,
+    baseLoaded: false,
     viewer: null
   });
+  const [basePick, setBasePick] = useState({ name: "" });
 
   useEffect(() => {
     console.log('Initialize Viewer after appstate'); // + appstate);
     if (!globe.loaded) {
+      setUserScene({ baseLayer: "NOAA ETOPO\u00a0I" });
       initGlobe();
     } else {
         render(render_basemap(), document.getElementById('rightarea'))
@@ -68,22 +71,22 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
       //const {_scene} = viewer.viewer._cesiumWidget;
       const {scene} = globe.viewer;
       //const {globe} = scene.globe;
-      //setGlobe((preState) => ({
-      //  ...preState,
+      setGlobe((preState) => ({
+        ...preState,
       //  baseLayerPicker: basemap_module(globe.viewer),
-      //  baseLoaded: true,
-      //}));
+        baseLoaded: true,
+      }));
 
       return (
-        <BasemapPicker scene={scene} />
+        <BasemapPicker scene={scene} basePick={basePick} onchangeBase={setBasePick}/>
       ); //<Sidebar scene={_scene} />
     }
     return null;
   };
   const render_layer = () => {
-    if (globe.loaded) { //& globe.baseLoaded) {
+    if (globe.loaded & globe.baseLoaded) {
       return (
-        <Layer viewer={globe.viewer} />
+        <Layer viewer={globe.viewer} baseName={basePick.name} userBase={userScene.baseLayer}/>
       );
     }
     return null;
