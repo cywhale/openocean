@@ -16,17 +16,22 @@ import './style_layerctrl.scss';
 import '../style/style_bubblelabel.scss';
 
 const LayerModal = (props) => {
-  const { viewer, baseName, userBase } = props;
+  const { viewer, baseName, userBase } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
   const { imageryLayers } = viewer; //basemapLayerPicker
   const layerctrlRef = useRef(null);
-  const [state, setState] = useState(false);
-  const [base, setBase] = useState({ name: userBase });
+  /*const [state, setState] = useState(false); //cannot be used inside viewModel function
+  const [base, setBase] = useState({
+    name: userBase,
+    layer: null,
+  });*/
   const [viewModel, setModel] = useState({
+    loaded: false,
     layers: [],
     sImg: [],
     selectedLayer: null,
-    baseLayer: null,
-    //selectedImagery: null,
+    selbase: userBase,
+    baselayer: imageryLayers.get(0),
+    //selectedImagery: null, //move to BasemapPicker
     //selectedTerrain: null,
     upLayer: null,
     downLayer: null,
@@ -37,7 +42,7 @@ const LayerModal = (props) => {
         imageryLayers.raise(layer);
         viewModel.upLayer = layer;
         viewModel.downLayer = viewModel.layers[Math.max(0, index - 1)];
-        updateLayerList();
+        updateLayerList(this.selbase, this.baselayer); // call from here will lost other states outside viewModel
         window.setTimeout(function () {
           viewModel.upLayer = viewModel.downLayer = null;
         }, 10);
@@ -49,7 +54,7 @@ const LayerModal = (props) => {
             Math.min(viewModel.layers.length - 1, index + 1)
           ];
         viewModel.downLayer = layer;
-        updateLayerList();
+        updateLayerList(this.selbase, this.baselayer);
         window.setTimeout(function () {
           viewModel.upLayer = viewModel.downLayer = null;
         }, 10);
@@ -62,19 +67,19 @@ const LayerModal = (props) => {
     },
   });
 
-  const checkBaseLayer = () => {
-    if (baseName!==null && base.name!==base && viewModel.layers.length) {
+  const updateBaseLayer = () => { //BaseLayer changed from BasemapPicker, so need update viewModel
+    if (baseName!==null && baseName!=viewModel.selbase && viewModel.layers.length) {
       let vlay = viewModel.layers;
       let blay = imageryLayers.get(0);
-      let bidx = vlay.indexOf(viewModel.baseLayer);
+      let bidx = vlay.indexOf(viewModel.baselayer);
       blay.name = baseName;
       blay.show = vlay[bidx].show;
       blay.alpha= vlay[bidx].alpha;
       vlay.splice(bidx, 1, blay);
-      setBase({ name: baseName });
       setModel((preMdl) => ({
         ...preMdl,
-        baseLayer: blay,
+        selbase: baseName,
+        baselayer: blay,
         layers: vlay,
       }));
       //updateLayerList();
@@ -83,7 +88,6 @@ const LayerModal = (props) => {
   //if add a new layer...
   //const evlay01url = 'https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png';
   const add_gbloverlay = (url, name, alpha, show, rectangle) => {
-    //const baseLayer = layers.get(0);
     //baseLayer.colorToAlpha = new Color(0.0, 0.016, 0.059);
     //baseLayer.colorToAlphaThreshold = 0.5;
     /* layer = layers.addImageryProvider(imageryProvider);
@@ -121,8 +125,6 @@ const LayerModal = (props) => {
       layt.name = name;
       layt.show = show | false;
       layt.alpha = alpha | 0.5;
-      //const blay = imageryLayers.get(0);
-      //blay.name = "Basemap";
       simg.push(lay);
       setModel((preMdl) => ({
         ...preMdl,
@@ -150,22 +152,23 @@ const LayerModal = (props) => {
   /*if (!state && userBase && userBase!=="") {
       setBase({ name: userBase });
     }*/
-    if (!state) {
+    if (!viewModel.loaded) {
       knockout.track(viewModel);
       knockout.applyBindings(viewModel, layerctrlRef.current);
       //setModel(kobind());
       setupLayers();
-      updateLayerList();
-      setState(true);
-      setModel((preMdl) => ({
+      updateLayerList(viewModel.selbase, viewModel.baselayer);
+      setModel((preMdl) => ({ //setModel(kobind());
         ...preMdl,
         ...bindSelLayer(),
+        loaded: true,
       }));
       bubble_labeler(".ctrlrange-wrap2");
+      //setState(true);
     } else {
-      checkBaseLayer();
+      updateBaseLayer();
     }
-  }, [state, baseName]);
+  }, [viewModel.loaded, baseName]);
 /*
   const kobind = () => {
     function subscribeParameter() {
@@ -178,37 +181,25 @@ const LayerModal = (props) => {
     return({ imgalpha: subscribeParameter("imgalpha") })
   };
 */
-  const updateLayerList = () => { //sidx=null, preidx=null) => {
+  const updateLayerList = (selBase, baseLayer) => {
     const nlayers = imageryLayers.length;
     let vlay = viewModel.layers;
-    let blay, nowlay, simg;
+    let blay, bidx;
     if (!vlay.length) {
       blay = imageryLayers.get(0);
-      blay.name = base.name;
-      setModel((preMdl) => ({
-        ...preMdl,
-        baseLayer: blay,
-      }));
-
+      blay.name = selBase;
       vlay.splice(0, vlay.length);
       for (var i = nlayers - 1; i >= 1; --i) {
         vlay.push(imageryLayers.get(i));
       }
       vlay.push(blay);
     } else {
-      /*if (sidx!==null) {
-        nowlay = imageryLayers.get(nlayers - preidx - 1);
-        simg = viewModel.sImg;
-        simg.splice(sidx, 1, nowlay);
-        setModel((preMdl) => ({
-          ...preMdl,
-          selectedLayer: nowlay,
-          sImg: simg,
-        }));
-      }*/
+      bidx = imageryLayers.indexOf(baseLayer);
       vlay.splice(0, vlay.length);
       for (var i = nlayers - 1; i >= 0; --i) {
-        vlay.push(imageryLayers.get(i));
+        blay = imageryLayers.get(i);
+        if (i===bidx) { blay.name = selBase }
+        vlay.push(blay);
       }
     }
     setModel((preMdl) => ({
@@ -256,7 +247,7 @@ const LayerModal = (props) => {
           //simg.splice(selidx, 1, nowLayer);
           //let vlay = viewModel.layers;
           //vlay.splice(activeLayerIndex, 1, nowLayer);
-          updateLayerList(); //selidx, activeLayerIndex);
+          updateLayerList(viewModel.selbase, viewModel.baselayer); //selidx, activeLayerIndex);
           return ({ selectedLayer: nowLayer, //imageryLayers.get(activeLayerIndex),
                     //sImg: simg,
                     //layers: vlay
@@ -265,6 +256,14 @@ const LayerModal = (props) => {
   };
 
   const setupLayers = () => {
+    /*Initialize baselayer, cannot setModel within updateLayerList, uncertainly always get null state
+    const blay = imageryLayers.get(0);
+    blay.name = viewModel.selBase;
+    setModel((preMdl) => ({
+      ...preMdl,
+      baselayer: blay,
+    }));
+    */
     const grect = Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0);
     add_gbloverlay('https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png',
                    'NASA_NEO_Chla', 0.5, false, grect);
@@ -341,7 +340,7 @@ const LayerModal = (props) => {
               <span data-bind="text: name, visible: !$parent.isSelectableLayer($data)"></span>
               <select class={style.simgsel} data-bind="visible: $parent.isSelectableLayer($data), options: $parent.sImg, optionsText: 'name', value: $parent.selectedLayer"></select>
             </td>
-            <td class={style.smalltd}><span class="ctrlrange-wrap2">
+            <td class={style.mediumtd}><span class="ctrlrange-wrap2">
               <input type="range" class="range" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
               <output class="bubble" /></span>
             </td>

@@ -20,11 +20,20 @@
 .smalltd {
   max-width:120px;
 }
+.mediumtd {
+  min-width:120px
+}
 .simgsel {
-  font-size:10px;
+  font-size:11px;
   max-width:120px;
 }
 .laychkbox {
   margin-left: -10px;
   width: 25px;
+}
+
+
+@media screen and (max-width: 400px) { 
+  .smalltd { max-width: 90px; font-size:11px} 
+  .simgsel { max-width: 90px; font-size:10px}
 }
