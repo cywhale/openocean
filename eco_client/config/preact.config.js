@@ -119,10 +119,12 @@ const cesium_other_config = (config, env) => {
             use: [//{
                 //loader: MiniCssExtractPlugin.loader,
               //},//ExtractTextPlugin.extract(
-              'style-loader',
+              //'style-loader',
               //'css?importLoaders=1!postcss',
-              //'css-loader' ]
-              { loader: 'css-loader' }
+                { loader: 'style-loader' },
+                { loader: 'css-loader' },
+                { loader: 'sass-loader' }
+              //{ loader: 'css-loader' }
               ],
               sideEffects: true
               // extractTextPluginOptions

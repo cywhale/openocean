@@ -5,7 +5,7 @@ import knockout from 'cesium/Source/ThirdParty/knockout.js';
 //import siteClusterStyling from './siteClusterStyling';
 import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_ctrlmodal';
-import '../style/style_bubblelabel.scss';
+//import '../style/style_bubblelabel.scss';
 //import '../style/style_arialabel.scss';
 //import {Checkbox} from '@rmwc/checkbox';
 
@@ -45,9 +45,10 @@ const CtrlModal = (props) => {
   //<input type="text" size="2" data-bind="value: pixelRange" />
   //<input type="text" size="2" data-bind="value: minimumClusterSize" />
   //<Checkbox label='Marker Clustering' checked="true"  data-bind="checked: enabled" />
+  //const className=`"bubble" ${style.bubblex}`
   return (
-    <div ref={ctrlRef}>
-      <table style="color:antiquewhite;">
+    <div id="sitectrl" ref={ctrlRef}>
+      <table class={style.thinx}>
         <tbody>
          <tr>
           <td>Marker Clustering</td>
@@ -58,16 +59,16 @@ const CtrlModal = (props) => {
          <tr>
           <td>Clustering Range</td>
           <td><span class="ctrlrange-wrap">
-            <input type="range" class="range" min="1" max="200" step="1" data-bind="value: pixelRange, valueUpdate: 'input'" />
-            <output class="bubble" />
+            <input type="range" class="range" style="height:20px;" min="1" max="200" step="1" data-bind="value: pixelRange, valueUpdate: 'input'" />
+            <output class="bubble" style="font-size:9px;position:relative;top:-6px;" />
             </span>
           </td>
          </tr>
          <tr>
           <td>Minimum Cluster Size</td>
           <td><span class="ctrlrange-wrap">
-            <input type="range" class="range" min="2" max="20" step="1" data-bind="value: minimumClusterSize, valueUpdate: 'input'" />
-            <output class="bubble" />
+            <input type="range" class="range" style="height:20px;" min="2" max="20" step="1" data-bind="value: minimumClusterSize, valueUpdate: 'input'" />
+            <output class="bubble" style="font-size:9px;position:relative;top:-6px;" />
             </span>
           </td>
          </tr>

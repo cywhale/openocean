@@ -13,7 +13,7 @@ import knockout from 'cesium/Source/ThirdParty/knockout.js';
 import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
 import './style_layerctrl.scss';
-import '../style/style_bubblelabel.scss';
+//import '../style/style_bubblelabel.scss';
 
 const LayerModal = (props) => {
   const { viewer, baseName, userBase } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
@@ -163,7 +163,7 @@ const LayerModal = (props) => {
         ...bindSelLayer(),
         loaded: true,
       }));
-      bubble_labeler(".ctrlrange-wrap2");
+      //bubble_labeler(".ctrlrange-wrap2");
       //setState(true);
     } else {
       updateBaseLayer();
@@ -206,6 +206,7 @@ const LayerModal = (props) => {
         ...preMdl,
         layers: vlay,
     }));
+    bubble_labeler(".ctrlrange-wrap2");
   }
 
   const bindSelLayer = () => {
@@ -332,7 +333,7 @@ const LayerModal = (props) => {
 
   return (
     <div id="layerctrl" ref={layerctrlRef}>
-      <table style="color:antiquewhite;">
+      <table class={style.thinx}>
         <tbody data-bind="foreach: layers">
           <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
             <td class={style.smalltd}><input class={style.laychkbox} type="checkbox" data-bind="checked: show" /></td>
@@ -341,8 +342,8 @@ const LayerModal = (props) => {
               <select class={style.simgsel} data-bind="visible: $parent.isSelectableLayer($data), options: $parent.sImg, optionsText: 'name', value: $parent.selectedLayer"></select>
             </td>
             <td class={style.mediumtd}><span class="ctrlrange-wrap2">
-              <input type="range" class="range" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
-              <output class="bubble" /></span>
+              <input type="range" class="range" style="height:20px;" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
+              <output class="bubble" style="font-size:9px;position:relative;top:-6px;" /></span>
             </td>
             <td class={style.smalltd}>
               <button type="button" class={style.modalbutton} data-bind="click: function() { $parent.raise($data, $index()); }, visible: $parent.canRaise($index())">

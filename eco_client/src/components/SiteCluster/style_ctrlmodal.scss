@@ -4,3 +4,32 @@
     margin-top: 10px;
   }
 }
+.thinx {
+  color: antiquewhite;
+  font-size:0.9em;
+  tr td {
+    max-height: 40px;
+  }
+}
+/*
+.bubblex {
+  background: black;
+  color: white;
+  font-size:8px;
+  padding: 4px 12px;
+  position: absolute;
+  border-radius: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.bubblex::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: red;
+  top: -1px;
+  left: 50%;
+}
+*/
+

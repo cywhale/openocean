@@ -16,7 +16,10 @@
     -ms-user-select: none;
     user-select: none;
 }
-
+.thinx {
+  color: antiquewhite;
+  font-size:0.9em;
+}
 .smalltd {
   max-width:120px;
 }
@@ -31,7 +34,6 @@
   margin-left: -10px;
   width: 25px;
 }
-
 
 @media screen and (max-width: 400px) { 
   .smalltd { max-width: 90px; font-size:11px} 
