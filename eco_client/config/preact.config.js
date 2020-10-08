@@ -14,8 +14,11 @@ const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack
 //const AssetsPlugin = require('assets-webpack-plugin'); //dev
 //https://medium.com/@poshakajay/heres-how-i-reduced-my-bundle-size-by-90-2e14c8a11c11
 //https://gist.github.com/AjayPoshak/e41ec36d28437494d10294256e248bc6
-const BrotliPlugin = require('brotli-webpack-plugin');
-const BrotliGzipPlugin = require('brotli-gzip-webpack-plugin');
+//const BrotliPlugin = require('brotli-webpack-plugin');
+//const BrotliGzipPlugin = require('brotli-gzip-webpack-plugin');
+//https://github.com/webpack-contrib/compression-webpack-plugin
+const CompressionPlugin = require('compression-webpack-plugin');
+const zlib = require('zlib');
 
 // Cesium
 const cesiumSource = "../node_modules/cesium/Source";
@@ -300,16 +303,24 @@ const baseConfig = (config, env) => {
 // see https://github.com/webpack-contrib/compression-webpack-plugin
 // can replace BrotliPlugin and BrotliGzipPlugin
     config.plugins.push(
-	new BrotliPlugin({
-	  asset: '[path].br[query]',
+	//new BrotliPlugin({
+        new CompressionPlugin({
+	  filename: '[path][base].br', //asset: '[path].br[query]'
+          algorithm: 'brotliCompress', //for CompressionPlugin
+          deleteOriginalAssets: false, //for CompressionPlugin
 	  test: /\.(js|css|html|svg)$/,
+          compressionOptions: {
+            // zlib’s `level` option matches Brotli’s `BROTLI_PARAM_QUALITY` option.
+            level: 11,
+          },
 	  threshold: 10240,
 	  minRatio: 0.8
 	})
     );
     config.plugins.push(
-        new BrotliGzipPlugin({
-          asset: '[path].gz[query]',
+        //new BrotliGzipPlugin({
+        new CompressionPlugin({
+          filename: '[path][base].gz', //asset: '[path].gz[query]'
           algorithm: 'gzip',
           test: /\.(js|css|html|svg)$/,
           threshold: 10240,
