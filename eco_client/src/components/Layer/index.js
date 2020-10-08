@@ -11,6 +11,7 @@ import SiteCluster from 'async!../SiteCluster'; //{ SiteConsumer }
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
 import LayerModal from 'async!./LayerModal';
+import Region from 'async!./Region';
 
 /*
   export const siteLoader = createContext({
@@ -42,7 +43,7 @@ const Layer = (props) => {
   const render_datasource = () => {
       const opts = { // temporarily hard-coded here
         dataname: 'windpower',
-        dataurl: 'https://ecodata.odb.ntu.edu.tw/pub/windpower_multi_4326.geojson',
+        dataurl: 'https://ecodata.odb.ntu.edu.tw/pub/geojson/site/windpower_multi_4326.geojson',
         datacrs: 'EPSG:4326',
         icon: '../../assets/icons/windpower_blue01s.png',
         color: 'cyan',
@@ -119,6 +120,7 @@ const Layer = (props) => {
             <section class={style.ctrlsect}>
               <div class={style.ctrlcolumn}>
                 <div id="ctrlsectdiv1" />
+                <div id="regionsectdiv"><Region viewer={viewer} /></div>
                 <div id="ctrlsectdiv2">
                   { render_ImgLayer() }
                 </div>

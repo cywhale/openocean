@@ -60,8 +60,10 @@
   },
   "dependencies": {
     "cesium": "^1.71.0",
-    "preact": "10.4.7",
-    "preact-router": "^3.2.1"
+    "preact": "10.5.4",
+    "preact-router": "^3.2.1",
+    "react-select": "^3.1.0",
+    "react-sortable-hoc": "^1.11.0"
   },
   "jest": {
     "preset": "jest-preset-preact",

@@ -63,7 +63,12 @@ const cesium_other_config = (config, env) => {
     console.log("Node env in development...");
 
     entryx = [
-      'webpack-dev-server/client?https:0.0.0.0:3000/',
+      'webpack-dev-server/client?https://0.0.0.0:3000/',
+      //'webpack-dev-server/client?https://localhost:3000/',
+      //https://github.com/webpack/webpack-dev-server/issues/416
+      //'webpack-dev-server/client?https://' + require("os").hostname() + ':3000/',
+      //'webpack-dev-server/client?https://eco.odb.ntu.edu.tw:3000/',
+      //'webpack-dev-server/client?https://' + require("ip").address() + ':3000/',
       './src/index.js'
     ];
     outputx = {
@@ -109,8 +114,8 @@ const cesium_other_config = (config, env) => {
       //mainFields: ['module', 'main'],
       alias: {
         cesium: path.resolve(__dirname, cesiumSource),
-        //"react": "preact-compat",
-        //"react-dom": "preact-compat"
+        "react": "preact-compat",
+        "react-dom": "preact-compat"
       }
     },
     module: {
@@ -162,12 +167,18 @@ const cesium_other_config = (config, env) => {
     devServer: {
       contentBase: path.join(__dirname, 'dist'),
       https: true,
+      host : '0.0.0.0',
+      //host: 'localhost',
       port: 3000,
       proxy: {
-	'**': 'http://0.0.0.0:3000'
+	'**': {
+          target: 'https://0.0.0.0:3000',
+          // context: () => true, //https://webpack.js.org/configuration/dev-server/#devserverproxy
+          changeOrigin: true
+        }
       },
       hot: true,
-      sockjsPrefix: '/assets',
+      //sockjsPrefix: '/assets',
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
@@ -176,7 +187,7 @@ const cesium_other_config = (config, env) => {
         disableDotRule: true
       },
       public : 'eco.odb.ntu.edu.tw',
-      host : '0.0.0.0',
+      publicPath: '/',
       disableHostCheck: true,
       quiet: true,
       inline: true,
@@ -286,7 +297,8 @@ const baseConfig = (config, env) => {
       }
       })
     );
-
+// see https://github.com/webpack-contrib/compression-webpack-plugin
+// can replace BrotliPlugin and BrotliGzipPlugin
     config.plugins.push(
 	new BrotliPlugin({
 	  asset: '[path].br[query]',
