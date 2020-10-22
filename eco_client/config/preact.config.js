@@ -1,6 +1,7 @@
 import webpack from 'webpack';
 import path from 'path';
 // Plugins for webpack
+// new release: https://github.com/CesiumGS/cesium-webpack-example/blob/master/webpack.release.config.js
 // https://cesium.com/docs/tutorials/cesium-and-webpack/
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 //const ExtractTextPlugin = require('extract-text-webpack-plugin');
@@ -85,6 +86,7 @@ const cesium_other_config = (config, env) => {
     //externals: {
       //cesium: "Cesium",
     //},
+    context: __dirname,
     entry: entryx,
     output: outputx, /*{
         filename: '[name].[chunkhash:8].js', //'static/js/'
@@ -114,7 +116,7 @@ const cesium_other_config = (config, env) => {
     resolve: {
       fallback: path.resolve(__dirname, '..', 'src'),
       extensions: ['.js', '.json', '.jsx', ''],
-      //mainFields: ['module', 'main'],
+      mainFields: ['module', 'main'],
       alias: {
         cesium: path.resolve(__dirname, cesiumSource),
         "react": "preact-compat",
@@ -245,7 +247,7 @@ const cesium_other_config = (config, env) => {
           },*/
           vendors: {
             test: /[\\/]node_modules[\\/]/,
-            //priority: -10,
+            priority: -10,
             chunks: 'initial',
             name: `chunk-vendors` //(module) {
               // get the name. E.g. node_modules/packageName/not/this/part.js
@@ -258,8 +260,8 @@ const cesium_other_config = (config, env) => {
           commons: {
             name: 'Cesium',
             test: /[\\/]node_modules[\\/]cesium/,
-            minSize: 10000,
-            maxSize: 300000,
+            //minSize: 10000,
+            //maxSize: 300000,
             chunks: 'all'
           }
         }

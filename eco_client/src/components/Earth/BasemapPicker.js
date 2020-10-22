@@ -59,6 +59,7 @@ const BasemapPicker = (props) => {
            name : 'NOAA ETOPO\u00a0I',
            iconUrl : buildModuleUrl('https://ecodata.odb.ntu.edu.tw/pub/icon/etopo1_64x64.png'),
             tooltip : 'NOAA Etopo',
+            category: "Other",
             creationFunction : function() {
               return new UrlTemplateImageryProvider({
                 url : buildModuleUrl('https://gis.ngdc.noaa.gov/arcgis/rest/services/web_mercator/etopo1_hillshade/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
@@ -66,7 +67,14 @@ const BasemapPicker = (props) => {
               });
             }
         }));
-        [6,8,9,11,12,13,14].map(i => imgModels.push(defModels[i])); //4: Mapbox Streets
+//https://github.com/cywhale/preact_cesium/commit/441d3735dfdd110a2cc9ae8e990f8790ab16a608
+//https://github.com/CesiumGS/cesium/blob/1.74/Source/Widgets/BaseLayerPicker/createDefaultImageryProviderViewModels.js
+//https://github.com/CesiumGS/cesium/issues/9211
+//0 "Bing Maps Aerial","Bing Maps Aerial with Labels","Bing Maps Roads",
+//3 "ESRI World Imagery", "ESRI World Street Map", "ESRI National Geographic",
+//6 "Open\u00adStreet\u00adMap","Stamen Watercolor", "Stamen Toner",
+//9 "Sentinel-2","Blue Marble","Earth at night", "Natural Earth\u00a0II",
+        [6,8,9,10,11,12].map(i => imgModels.push(defModels[i])); //4: Mapbox Streets
         return imgModels;
       };
 
