@@ -5,6 +5,7 @@ import Rectangle from 'cesium/Source/Core/Rectangle';
 //import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 //import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
+import GlobeSurfaceTileProvider from 'cesium/Source/Scene/GlobeSurfaceTileProvider.js';
 import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
 import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
 import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
@@ -234,12 +235,12 @@ const LayerModal = (props) => {
           activeLayer.alpha = 0;
           imageryLayers.remove(activeLayer, false);
           let nowLayer;
-          if (selLayer.constructor.name === "SingleTileImageryProvider") {
+          //if (selLayer.constructor.name === "SingleTileImageryProvider") {
             nowLayer = imageryLayers.addImageryProvider(selLayer, nlayers - activeLayerIndex - 1);
-          } else {
-            imageryLayers.add(selLayer, nlayers - activeLayerIndex - 1);
-            nowLayer = imageryLayers.get(activeLayerIndex);
-          }
+          //} else {
+          //  imageryLayers.add(selLayer, nlayers - activeLayerIndex - 1);
+          //  nowLayer = imageryLayers.get(activeLayerIndex);
+          //}
           nowLayer.show = show;
           nowLayer.alpha = alpha;
           nowLayer.name = selLayer.name;
