@@ -1,9 +1,11 @@
-import { createRef } from 'preact'; // h, Component, render, toChildArray. createContext
+import { createRef, useContext } from 'preact'; // h, Component, render, toChildArray
 import { Router } from 'preact-router';
 //import { useRef } from 'preact/hooks'; //useContext
 //import { createHashHistory } from 'history';
 import Sidebar from 'async!./Sidebar';
 import Earth from 'async!./Earth'; // {csConsumer}
+import UserCookies from 'async!./UserHandler/UserCookies';
+//import { UserContextProvider } from "async!./UserHandler/UserContext";
 import style from './style/style_app';
 //import BasemapPicker from './Earth/BasemapPicker'; //async!
 //import Layer from './Layer';
@@ -103,6 +105,7 @@ const App = (props) => { //class App extends Component {
         <div class={style.right_area} id="rightarea" />
         <Sidebar />
         <Earth ref={ref} />
+        <UserCookies />
       </div>
       </Router>
     </div>

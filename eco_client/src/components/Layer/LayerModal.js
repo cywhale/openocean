@@ -74,7 +74,7 @@ const LayerModal = (props) => {
       let blay = imageryLayers.get(0);
       let bidx = vlay.indexOf(viewModel.baselayer);
       blay.name = baseName;
-      blay.show = vlay[bidx].show;
+      //blay.show = vlay[bidx].show;
       blay.alpha= vlay[bidx].alpha;
       vlay.splice(bidx, 1, blay);
       setModel((preMdl) => ({

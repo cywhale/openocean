@@ -1,6 +1,7 @@
 //import { h } from 'preact';
 import { useState } from 'preact/hooks'; //, useEffect, useCallback
-import UserHandler from '../UserHandler';
+import { UserContextProvider } from "../UserHandler/UserContext";
+import UserHandler from 'async!../UserHandler';
 //import BasemapPicker from '../Earth/BasemapPicker';
 import style from './style';
 
@@ -55,7 +56,7 @@ const Sidebar = () => { //props
       <div id="sideBar" class={className}>
           <div class = {style.sidemenu}>
             <ul>
-              <li><a href="#"><UserHandler /></a></li>
+              <li><a href="#"><UserContextProvider><UserHandler /></UserContextProvider></a></li>
               <li><a href="#">Setting</a>
                 <ul>
                   <li><a href="#">Test Widget</a></li>

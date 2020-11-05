@@ -1,0 +1,36 @@
+#useCookies div {
+  opacity: 0.75;
+  position:fixed;  
+  background: #000;
+  bottom:5px;
+  right:5px;
+  max-width:90%;
+  height:auto;
+  padding:10px;
+  z-index:100;
+}
+
+
+#useCookies p {
+  color:#ccc;
+}
+
+#useCookies a {
+  cursor:pointer;
+  color:white;
+}
+
+#useCookies a.close {
+  position: absolute;
+  background-color: rgba(0,51,102,.75);
+  color: white;
+  font-size: 16px;
+  padding: 1px 5px;
+  top:2px;
+  left:6px;  
+}
+
+#useCookies div.details {
+  max-width:90%;
+  height:auto;
+}

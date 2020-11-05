@@ -24,11 +24,12 @@ h1 {
   box-shadow: 0 3px 6px rgba(#000, 0.2);
   color: #ffffff;
   font-family: inherit;
-  font-size: 24px;
+  font-size: 14px;
   line-height: 1;
-  margin: 14px 14px 0;
-  padding: 12px;
-
+  max-width: 60px;
+  margin: 10px 5px 0px;
+  padding: 6px 6px;
+  display: inline-block;
   &:active,
   &:focus,
   &:hover {

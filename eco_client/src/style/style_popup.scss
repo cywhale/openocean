@@ -1,0 +1,37 @@
+.popup {
+  position: fixed;
+  width: auto;
+  height: auto;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  background-color: rgba(0,0,0, 0.5);
+}
+.popup_inner {
+  position: absolute;
+  left: 10%;
+  top: 25%;
+  width: 400px;
+  margin: auto;
+  border-radius: 20px;
+  background: white;
+}
+#ssodiv {
+  height: auto;
+  overflow-y: auto;
+  font-size: 0.6em;
+  padding: 10px;
+}
+#loginclose {
+  border-radius: 20px;
+  margin: 5px 10px;
+}
+
+@media screen and (max-width: 680px) {
+    .popup_inner {
+       width:auto;
+    }
+}
+

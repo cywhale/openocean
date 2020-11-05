@@ -29,5 +29,6 @@ yarn.lock
 size-plugin.json
 **/.log
 .testenv.js
+**/.ssologin.*
 config/cesium_css_modify.sh
 distdll
