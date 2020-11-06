@@ -16,6 +16,7 @@ const UserContextProvider = (props) => {//,...children
     }
   };*/
   const [user, setUser] = useState({
+    init: false,
     logined: false,
     name: '',
     auth: '', //odb, gmail

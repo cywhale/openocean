@@ -1,6 +1,6 @@
-//import { h } from 'preact';
-import { useState } from 'preact/hooks'; //, useEffect, useCallback
-import { UserContextProvider } from "../UserHandler/UserContext";
+import { useState, useEffect, useCallback, useContext } from 'preact/hooks';
+import { UserContext } from "../UserHandler/UserContext";
+import { EarthContext } from "../Earth/EarthContext";
 import UserHandler from 'async!../UserHandler';
 //import BasemapPicker from '../Earth/BasemapPicker';
 import style from './style';
@@ -8,22 +8,40 @@ import style from './style';
 //export default class Sidebar extends Component {
 const Sidebar = () => { //props
 //const {scene} = props;
+  const { user, setUser } = useContext(UserContext);
+  const { earth, setEarth } = useContext(EarthContext);
   const [menuItem, setMenuItem] = useState({
       onSidebar: false
   });
-/*
-  useEffect(() => {
-    console.log("Now onSidebar is: " + menuItem.onSidebar);
-    toggleSidebar();
-  }, [toggleSidebar]);
+  const [hide, setHide] = useState(false);
 
-  const toggleSidebar = useCallback(() => {
-    setMenuItem(itemState => ({
-      //...itemState,
-      onSidebar: itemState.onSidebar? false: true
-    }));
+  const toggleHidex = () => {
+    console.log("Now hide is:", hide, " & user.init is:", user.init, " & viewer:", earth.loaded);
+    toolbarToggle(!hide, user.init, " & viewer:", earth.loaded)
+    setHide(!hide, user.init && earth.loaded);
+  };
+
+  const toolbarToggle = useCallback((hided, enable) => {
+    if (enable) {
+      document.querySelector(".cesium-viewer-toolbar").style.display = hided? 'none': 'block';
+      document.querySelector(".cesium-viewer-animationContainer").style.display = hided? 'none': 'block';
+      document.querySelector(".cesium-viewer-bottom").style.display = hided? 'none': 'block';
+      document.querySelector(".cesium-viewer-timelineContainer").style.display = hided? 'none': 'block';
+      document.getElementById("toolbar").style.display = hided? 'none': 'block';
+      document.getElementById("toolToggle").style.display = hided? 'none': 'block';
+      document.getElementById("rightarea").style.display = hided? 'none': 'block';
+      document.getElementById("ctrl").style.display = hided? 'none': 'block';
+      document.getElementById("menuButn").style.setProperty('--background', hided? "url('../../assets/icons/geometry.png')": "url('../../assets/icons/menu-blue96.png')");
+      setMenuItem(itemState => ({
+        onSidebar: hided? false: true
+      }));
+    }
+  },[]);
+
+  useEffect(() => {
+    document.getElementById("menuButn").style.setProperty('--background', "url('../../assets/icons/menu-blue96.png')");
   }, []);
-*/
+
   let className;
   if (menuItem.onSidebar) {
     className=`${style.sideContainer} ${style.open_sidebar}`;
@@ -45,7 +63,7 @@ const Sidebar = () => { //props
       <div id="swipex" class = {style.swipe_area}></div>
       <div class = {style.menuToggle}>
           <div class = {style.menuBtn_in_span}>
-          <button class = {style.menuButn} type="button" 
+          <button id="menuButn" class = {style.menuButn} type="button"
             onClick={() => setMenuItem(itemState => ({
               onSidebar: itemState.onSidebar? false: true
             }))}>
@@ -56,7 +74,8 @@ const Sidebar = () => { //props
       <div id="sideBar" class={className}>
           <div class = {style.sidemenu}>
             <ul>
-              <li><a href="#"><UserContextProvider><UserHandler /></UserContextProvider></a></li>
+              <li><a href="#"><UserHandler /></a></li>
+              <li><button style="padding:6px 8px;margin:12px" class="button" onClick={toggleHidex}>{hide? 'Show all': 'Hide all'}</button></li>
               <li><a href="#">Setting</a>
                 <ul>
                   <li><a href="#">Test Widget</a></li>

@@ -44,13 +44,13 @@ const UserHandler = () => {
 
   const fetchingUcode = (leng=32) => nanoid(leng);
 
-  const initUcode = () => {
+  const initUcode = async () => {
       let uc = checkcookie('ucode', ucodelen);
       if (uc === '') {
         uc = fetchingUcode(ucodelen);
         cookies.set('ucode', uc, cookieOpts);
       }
-      setUcode((preState) => ({
+      await setUcode((preState) => ({
         ...preState,
         str: uc
       }));
@@ -162,6 +162,10 @@ const UserHandler = () => {
       } else {
         waitFireAuth(uc);;
       }
+      setUser((preState) => ({
+        ...preState,
+        init: true
+      }));
     }
   }, [ucode.str, user.auth, state.ssostate, OdbAuth]);
 

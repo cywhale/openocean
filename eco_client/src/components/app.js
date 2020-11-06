@@ -5,7 +5,8 @@ import { Router } from 'preact-router';
 import Sidebar from 'async!./Sidebar';
 import Earth from 'async!./Earth'; // {csConsumer}
 import UserCookies from 'async!./UserHandler/UserCookies';
-//import { UserContextProvider } from "async!./UserHandler/UserContext";
+import { UserContextProvider } from "./UserHandler/UserContext";
+import { EarthContextProvider } from "./Earth/EarthContext";
 import style from './style/style_app';
 //import BasemapPicker from './Earth/BasemapPicker'; //async!
 //import Layer from './Layer';
@@ -103,8 +104,12 @@ const App = (props) => { //class App extends Component {
       <Router>
       <div path='/' class={style.home}>
         <div class={style.right_area} id="rightarea" />
-        <Sidebar />
-        <Earth ref={ref} />
+        <UserContextProvider>
+          <EarthContextProvider>
+            <Sidebar />
+            <Earth ref={ref} />
+          </EarthContextProvider>
+        </UserContextProvider>
         <UserCookies />
       </div>
       </Router>

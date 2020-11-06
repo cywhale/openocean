@@ -55,11 +55,7 @@ const cesium_other_config = (config, env) => {
 
   if (testenv.NODE_ENV === "production") {
     console.log("Node env in production...");
-<<<<<<< Updated upstream
-    config.devtool = 'source-map'; //false; //if not use sourceMap, set false
-=======
     config.devtool = false; //'source-map'; //if not use sourceMap, set false
->>>>>>> Stashed changes
     entryx = [
       //require.resolve('./polyfills'),
       './src/index.js'

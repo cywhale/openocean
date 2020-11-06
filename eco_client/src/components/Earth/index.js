@@ -13,8 +13,8 @@ import { useState, useEffect } from 'preact/hooks'; //useRef, useImperativeHandl
 //import Sidebar from '../Sidebar';
 import BasemapPicker from 'async!./BasemapPicker';
 import Layer from 'async!../Layer';
-import { UserContext } from 'async!../UserHandler/UserContext';
-import UserCookies from 'async!../UserHandler/UserCookies';
+//import { EarthContext } from "./EarthContext";
+//import { UserContext } from '../UserHandler/UserContext';
 
 import style from './style';
 import 'cesium/Source/Widgets/widgets.css';

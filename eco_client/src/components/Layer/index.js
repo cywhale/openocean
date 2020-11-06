@@ -1,5 +1,5 @@
 import { Fragment } from 'preact'; //render, createContext
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useState, useContext } from 'preact/hooks';
 import Color from 'cesium/Source/Core/Color.js';
 //import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import defined from 'cesium/Source/Core/defined.js';
@@ -12,7 +12,8 @@ import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
 import LayerModal from 'async!./LayerModal';
 import Region from 'async!./Region';
-
+import { EarthContext } from "../Earth/EarthContext";
+import '../../style/style_modal_tab.scss'
 /*
   export const siteLoader = createContext({
     loaded: false,
@@ -23,6 +24,8 @@ import Region from 'async!./Region';
 const Layer = (props) => {
   const {viewer, baseName, userBase} = props;
   const [searchLayer, setSearchLayer] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const { earth, setEarth } = useContext(EarthContext);
 /*
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&wi$
   const sTileImg = new SingleTileImageryProvider({
@@ -34,10 +37,25 @@ const Layer = (props) => {
     proxy : new DefaultProxy('/proxy/') //https://github.com/CesiumGS/EarthKAMExplorer/blob/master/ser$
   });
 */
+  const toggleBtnx = () => {setIsOpen(!isOpen)};
+  const closeBtnx = () => {setIsOpen(false)};
+/*
+  const enable_modalToggle = async () => {
+    let togglebtn= document.getElementById("toolButn");
+    //let closebtn = document.getElementById("toolClose");
+    await togglebtn.addEventListener('click', toggleBtnx.bind(null), false);
+    //await closebtn.addEventListener('click', closeBtnx, false);
+  }
+*/
   useEffect(() => {
     const drag_opts = { dom: "#ctrl", dragArea: '#ctrlheader' };
     draggable_element(drag_opts);
+    //enable_modalToggle();
     enable_search_listener();
+    setEarth((preState) => ({
+      ...preState,
+      loaded: true,
+    }));
   }, []);
 
   const render_datasource = () => {
@@ -103,29 +121,58 @@ const Layer = (props) => {
     await butt_search.addEventListener("click", get_searchingtext.bind(null, search_term), false);
   }
 
-
-  //<div style="display:flex;height:auto;position:absolute;bottom:29px;left:400px">
+  let modalClass;
+  if (!isOpen) {
+    modalClass=`${style.modalOverlay} ${style.notshown}`;
+  } else {
+    modalClass=`${style.modalOverlay}`
+  }
+  console.log("Toggle modal: " + modalClass + " when isOpen is: " + isOpen);
+  //<a href="#ctrl" and in css use &:target{display:block} to show modal
   return (
     <Fragment>
-      <div class={style.toolToggle}>
-         <a class={style.toolButn} href="#ctrl"><i></i></a>
+      <div id="toolToggle" class={style.toolToggle}>
+         <a class={style.toolButn} id="toolButn" onClick={()=>{toggleBtnx()}}><i></i></a>
       </div>
-      <div id="ctrl" class={style.modalOverlay}>
+      <div id="ctrl" class={modalClass}>
         <div class={style.modalHeader} id="ctrlheader">
-          Contrl clustering
-          <a href="#" class={style.close}>&times;</a>
+          <a id="toolClose" class={style.close} onClick={()=>{closeBtnx()}}>&times;</a>
         </div>
         <div class={style.modal}>
-          <div class={style.ctrlwrapper}>
-            <section class={style.ctrlsect}>
-              <div class={style.ctrlcolumn}>
-                <div id="ctrlsectdiv1" />
-                <div id="regionsectdiv"><Region viewer={viewer} /></div>
-                <div id="ctrlsectdiv2">
-                  { render_ImgLayer() }
-                </div>
+          <div class="nav-tabs">
+            <label for="tab-1" tabindex="0" />
+            <input id="tab-1" type="radio" name="tabs" checked="true" aria-hidden="true" />
+            <h2 data-toggle="tab">Layers</h2>
+              <div class={style.ctrlwrapper}>
+                  <section class={style.ctrlsect}>
+                    <div class={style.ctrlcolumn}>
+                      <div id="regionsectdiv"><Region viewer={viewer} /></div>
+                      <div id="ctrlsectdiv2">
+                        { render_ImgLayer() }
+                      </div>
+                    </div>
+                  </section>
               </div>
-            </section>
+            <label for="tab-2" tabindex="1" />
+            <input id="tab-2" type="radio" name="tabs" aria-hidden="true" />
+            <h2 data-toggle="tab">Time</h2>
+              <div class={style.ctrlwrapper}>
+                  <section class={style.ctrlsect}>
+                    <div class={style.ctrlcolumn}>
+                      <div id="timepicker">Just Test</div>
+                    </div>
+                  </section>
+              </div>
+            <label for="tab-3" tabindex="2" />
+            <input id="tab-3" type="radio" name="tabs" aria-hidden="true" />
+            <h2 data-toggle="tab">Clustering</h2>
+              <div class={style.ctrlwrapper}>
+                  <section class={style.ctrlsect}>
+                    <div class={style.ctrlcolumn}>
+                      <div id="ctrlsectdiv1" />
+                    </div>
+                  </section>
+              </div>
           </div>
         </div>
       </div>
