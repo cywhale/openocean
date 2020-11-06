@@ -14,7 +14,7 @@
     display: inline-block;
     margin: 5px;
 }
-.menuButn {
+.menuButn, .menuButnx {
     vertical-align: middle;
     -ms-touch-action: manipulation;
     touch-action: manipulation;
@@ -23,17 +23,31 @@
     border-radius: 6px;
     padding: 6px 6px;
     background: transparent;
+    /*--background: url('../../assets/icons/menu-blue96.png');*/
 }
+/*fallback: https://stackoverflow.com/questions/4481485/changing-css-pseudo-element-styles-via-javascript
+  background: var(--background);
+  background: url('../../assets/icons/menu-blue96.png');*/
 .menuButn::before {
     content: "";
     display: inline-block;
     vertical-align: middle;
     width: 2em;
     height: 2em;
-    background: var(--background);/* url('../../assets/icons/menu-blue96.png');*/
+    background: url('../../assets/icons/menu-blue96.png');
+    /*background: var(--background);*/
     background-size: 100% auto;
 }
- 
+.menuButnx::before {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    width: 2em;
+    height: 2em;
+    background: url('../../assets/icons/geometry.png');
+    background-size: 100% auto;
+}
+
 /* https://codepen.io/andornagy/pen/xhiJH */ 
 /* https://onextrapixel.com/creating-a-swipeable-side-menu-for-the-web/ */ 
 .swipe_area {

@@ -11,7 +11,8 @@ const Sidebar = () => { //props
   const { user, setUser } = useContext(UserContext);
   const { earth, setEarth } = useContext(EarthContext);
   const [menuItem, setMenuItem] = useState({
-      onSidebar: false
+      onSidebar: false,
+//    toggleIcon: 'menu-blue96'
   });
   const [hide, setHide] = useState(false);
 
@@ -24,29 +25,42 @@ const Sidebar = () => { //props
   const toolbarToggle = useCallback((hided, enable) => {
     if (enable) {
       document.querySelector(".cesium-viewer-toolbar").style.display = hided? 'none': 'block';
-      document.querySelector(".cesium-viewer-animationContainer").style.display = hided? 'none': 'block';
       document.querySelector(".cesium-viewer-bottom").style.display = hided? 'none': 'block';
+      document.querySelector(".cesium-viewer-animationContainer").style.display = hided? 'none': 'block';
       document.querySelector(".cesium-viewer-timelineContainer").style.display = hided? 'none': 'block';
+      document.querySelector(".cesium-viewer-fullscreenContainer").style.display = hided? 'none': 'block';
       document.getElementById("toolbar").style.display = hided? 'none': 'block';
       document.getElementById("toolToggle").style.display = hided? 'none': 'block';
       document.getElementById("rightarea").style.display = hided? 'none': 'block';
       document.getElementById("ctrl").style.display = hided? 'none': 'block';
+/* https://github.com/facebook/react/issues/6411 //This works, but seems will re-transmit these two icon png as toggling icon every times
       document.getElementById("menuButn").style.setProperty('--background', hided? "url('../../assets/icons/geometry.png')": "url('../../assets/icons/menu-blue96.png')");
+*/
       setMenuItem(itemState => ({
-        onSidebar: hided? false: true
+        ...itemState,
+        onSidebar: hided? false: true,
+//      toggleIcon: hided? 'geometry': 'menu-blue96'
       }));
     }
   },[]);
-
+/*
   useEffect(() => {
-    document.getElementById("menuButn").style.setProperty('--background', "url('../../assets/icons/menu-blue96.png')");
-  }, []);
-
+    if (!earth.loaded) {
+      document.getElementById("menuButn").style.setProperty('--background', "url('../../assets/icons/menu-blue96.png')");
+    }
+  }, [earth.loaded]);
+*/
   let className;
   if (menuItem.onSidebar) {
     className=`${style.sideContainer} ${style.open_sidebar}`;
   } else {
-    className=`${style.sideContainer}`
+    className=`${style.sideContainer}`;
+  }
+  let classToggle;
+  if (hide) {
+    classToggle=`${style.menuButnx}`;
+  } else {
+    classToggle=`${style.menuButn}`;
   }
 /*
   const render_sceneloaded = () => {
@@ -58,13 +72,26 @@ const Sidebar = () => { //props
   };
 */
 //{ render_sceneloaded() }
+/*            style = {`
+              &::before {
+                content: "";
+                display: inline-block;
+                vertical-align: middle;
+                width: 2em;
+                height: 2em;
+                background: url("../../assets/icons/${menuItem.toggleIcon}.png");
+                background-size: 100% auto;
+              }
+            `}*/
+//style = {{'--background': `url('../../assets/icons/${menuItem.toggleIcon}.png')`}}>
   return (
     <div class = {style.sideblock}>
       <div id="swipex" class = {style.swipe_area}></div>
       <div class = {style.menuToggle}>
           <div class = {style.menuBtn_in_span}>
-          <button id="menuButn" class = {style.menuButn} type="button"
+          <button id="menuButn" class = {classToggle} type="button"
             onClick={() => setMenuItem(itemState => ({
+              ...itemState,
               onSidebar: itemState.onSidebar? false: true
             }))}>
             <i></i>
