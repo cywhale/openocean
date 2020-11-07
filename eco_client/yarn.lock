@@ -1477,23 +1477,23 @@
     kleur "^4.0.2"
     loader-utils "^2.0.0"
 
-"@prefresh/core@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@prefresh/core/-/core-0.7.2.tgz#982a530cd26b1c466786e92b2abfa03aa8c29f56"
-  integrity sha512-K01Yx3cWY+A4Cb61cJ93swmFS2ZaeCD2uRg8dvaUAw/6oZvtEPrqzueVRjjavkRdwhIuOwqHbCg4scSbo7jE/A==
+"@prefresh/core@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@prefresh/core/-/core-0.8.1.tgz#d4f15d9e3ee9c16bf420405e2b422774e807a594"
+  integrity sha512-woho+Ja8w3pxnZwq68MnWzH9ffdidrpJsV6PDTNIsJOpsLYmfCNxqxGsxIqYw40d1yjg4h6HFGbb6Y9lhyTPNA==
 
-"@prefresh/utils@^0.2.1":
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/@prefresh/utils/-/utils-0.2.1.tgz#1446082c87f1ef61b0c407f1bd0e79726fb5ab45"
-  integrity sha512-Ju7WHncqUKsaFp7yAFoNSR2jdr0bjqr8AwV06LtpFmwliPe4IDGRcBGhofg+SY9yld3FUF1JWmEoUOfCyCGRhA==
+"@prefresh/utils@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@prefresh/utils/-/utils-0.3.1.tgz#f9e1a5e1fa4bc02989980733950e60520f0f9869"
+  integrity sha512-9kLzPWN4teeiKuc+Rle3SF/hyx5lzo35X4rHr+kQXnJT+BaEb1ymDWIHGkv85xjnw8+l6I1r1H7JB4BHOMJfmg==
 
-"@prefresh/webpack@^0.8.1":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@prefresh/webpack/-/webpack-0.8.2.tgz#e789437189aaded81eaa083455078b39c5f1922a"
-  integrity sha512-c4YsahgvnaOsSu9IW12yixiYfEKbC+DjqVPSezAhN0B5wXtoaTelEY5vmPSY3bFjcFiqnWXA1NJ49WbQ5ozAcw==
+"@prefresh/webpack@^1.0.2":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@prefresh/webpack/-/webpack-1.1.0.tgz#a36fd072ef1d5cd88ced8df89d7ae62bdbddf71b"
+  integrity sha512-a3JG2maH3bacDobb4WywVTuqvAyBxJ7dRNSG2Ywv1AytAdgpgNZKJpR4xUTzPTwPGpRkfNOOf4mODqoOZ7W0Sw==
   dependencies:
-    "@prefresh/core" "^0.7.2"
-    "@prefresh/utils" "^0.2.1"
+    "@prefresh/core" "^0.8.1"
+    "@prefresh/utils" "^0.3.1"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -3077,10 +3077,10 @@ caseless@~0.12.0:
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
   integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
 
-cesium@1.74:
-  version "1.74.0"
-  resolved "https://registry.yarnpkg.com/cesium/-/cesium-1.74.0.tgz#79038abd40eb3e3a3223162d0984daf6d09496fb"
-  integrity sha512-PwHOz4nF9SUYrEo3Bcz0V7ebsB1XWqRkBkMWkn4BduBxNEzH8QdJ7ipuuNu8KZHfy3a1H2cOrwD8y8TikYmO8Q==
+cesium@1.75:
+  version "1.75.0"
+  resolved "https://registry.yarnpkg.com/cesium/-/cesium-1.75.0.tgz#47552aeda7e4a4a864bf51f02c961ffcc684518a"
+  integrity sha512-CPf1XHkOBXeabRrZD/fDDGf5ajA+13eXv5GciDmKx151umL7WVnd8Pfgdz0dWcCBIMI7arSK7ZaVyQKMLdUZ+Q==
 
 chalk@2.4.1:
   version "2.4.1"
@@ -9248,10 +9248,10 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.27, postcss@^7.0.3
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-preact-cli@^3.0.0-rc.6:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/preact-cli/-/preact-cli-3.0.1.tgz#e8913998df38854e1f1efde21aa1da1e66146b84"
-  integrity sha512-C5fvHo/P9MScpUYp2cwu9w/UBQsVwnOugIbcikY6MS+nEiNX9nE4xpnEghUuZxC+Mr8R2z1WiMAWKQQA4/D78A==
+preact-cli@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/preact-cli/-/preact-cli-3.0.3.tgz#b3cb0a229a5226e0983ef12dbf2ece97502b3938"
+  integrity sha512-U4WY+nUmKvedr+/V2HrC77kQIkKvFYvmdCppfCPlJ8xRmfo1J1soaYccGC6cy+C6+6YzvDQtIPKuSH+aVGjMfQ==
   dependencies:
     "@babel/core" "^7.9.0"
     "@babel/plugin-proposal-class-properties" "^7.8.3"
@@ -9263,7 +9263,7 @@ preact-cli@^3.0.0-rc.6:
     "@babel/preset-env" "^7.9.0"
     "@babel/preset-typescript" "^7.9.0"
     "@preact/async-loader" "^3.0.1"
-    "@prefresh/webpack" "^0.8.1"
+    "@prefresh/webpack" "^1.0.2"
     autoprefixer "^9.6.0"
     babel-esm-plugin "^0.9.0"
     babel-loader "^8.0.6"
@@ -9304,6 +9304,7 @@ preact-cli@^3.0.0-rc.6:
     raw-loader "^4.0.0"
     react-refresh "0.8.3"
     require-relative "^0.8.7"
+    resolve-from "^5.0.0"
     rimraf "^3.0.2"
     sade "^1.4.1"
     size-plugin "^2.0.1"
@@ -10028,6 +10029,11 @@ resolve-from@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-4.0.0.tgz#4abcd852ad32dd7baabfe9b40e00a36db5f392e6"
   integrity sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==
+
+resolve-from@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-5.0.0.tgz#c35225843df8f776df21c57557bc087e9dfdfc69"
+  integrity sha512-qYg9KP24dD5qka9J47d0aVky0N+b4fTU89LN9iDnjB5waksiC49rvMB0PrUJQGoTmH50XPiqOvAjDfaijGxYZw==
 
 resolve-url@^0.2.1:
   version "0.2.1"
@@ -12113,6 +12119,13 @@ workbox-background-sync@^5.1.3:
   dependencies:
     workbox-core "^5.1.3"
 
+workbox-background-sync@^5.1.4:
+  version "5.1.4"
+  resolved "https://registry.yarnpkg.com/workbox-background-sync/-/workbox-background-sync-5.1.4.tgz#5ae0bbd455f4e9c319e8d827c055bb86c894fd12"
+  integrity sha512-AH6x5pYq4vwQvfRDWH+vfOePfPIYQ00nCEB7dJRU1e0n9+9HMRyvI63FlDvtFT2AvXVRsXvUt7DNMEToyJLpSA==
+  dependencies:
+    workbox-core "^5.1.4"
+
 workbox-broadcast-update@^5.1.3:
   version "5.1.3"
   resolved "https://registry.yarnpkg.com/workbox-broadcast-update/-/workbox-broadcast-update-5.1.3.tgz#312e0f065f06a6fb04a050143c84aa6ba0ed8add"
@@ -12174,6 +12187,11 @@ workbox-core@^5.1.3:
   resolved "https://registry.yarnpkg.com/workbox-core/-/workbox-core-5.1.3.tgz#0607acd0018c149162777fe4aae08553bd1559f5"
   integrity sha512-TFSIPxxciX9sFaj0FDiohBeIKpwMcCyNduydi9i3LChItcndDS6TJpErxybv8aBWeCMraXt33TWtF6kKuIObNw==
 
+workbox-core@^5.1.4:
+  version "5.1.4"
+  resolved "https://registry.yarnpkg.com/workbox-core/-/workbox-core-5.1.4.tgz#8bbfb2362ecdff30e25d123c82c79ac65d9264f4"
+  integrity sha512-+4iRQan/1D8I81nR2L5vcbaaFskZC2CL17TLbvWVzQ4qiF/ytOGF6XeV54pVxAvKUtkLANhk8TyIUMtiMw2oDg==
+
 workbox-expiration@^5.1.3:
   version "5.1.3"
   resolved "https://registry.yarnpkg.com/workbox-expiration/-/workbox-expiration-5.1.3.tgz#c793eef17513de86c9c1b8254eb2c9ba3ed17568"
@@ -12219,6 +12237,13 @@ workbox-routing@^5.1.3:
   dependencies:
     workbox-core "^5.1.3"
 
+workbox-routing@^5.1.4:
+  version "5.1.4"
+  resolved "https://registry.yarnpkg.com/workbox-routing/-/workbox-routing-5.1.4.tgz#3e8cd86bd3b6573488d1a2ce7385e547b547e970"
+  integrity sha512-8ljknRfqE1vEQtnMtzfksL+UXO822jJlHTIR7+BtJuxQ17+WPZfsHqvk1ynR/v0EHik4x2+826Hkwpgh4GKDCw==
+  dependencies:
+    workbox-core "^5.1.4"
+
 workbox-strategies@^5.1.3:
   version "5.1.3"
   resolved "https://registry.yarnpkg.com/workbox-strategies/-/workbox-strategies-5.1.3.tgz#220cc9f5519ed76f2452ccb9407a5fd967c37110"
@@ -12226,6 +12251,14 @@ workbox-strategies@^5.1.3:
   dependencies:
     workbox-core "^5.1.3"
     workbox-routing "^5.1.3"
+
+workbox-strategies@^5.1.4:
+  version "5.1.4"
+  resolved "https://registry.yarnpkg.com/workbox-strategies/-/workbox-strategies-5.1.4.tgz#96b1418ccdfde5354612914964074d466c52d08c"
+  integrity sha512-VVS57LpaJTdjW3RgZvPwX0NlhNmscR7OQ9bP+N/34cYMDzXLyA6kqWffP6QKXSkca1OFo/v6v7hW7zrrguo6EA==
+  dependencies:
+    workbox-core "^5.1.4"
+    workbox-routing "^5.1.4"
 
 workbox-streams@^5.1.3:
   version "5.1.3"
