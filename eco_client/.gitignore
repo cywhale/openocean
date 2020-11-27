@@ -30,5 +30,7 @@ size-plugin.json
 **/.log
 .testenv.js
 **/.ssologin.*
+**/.setting.*
+**/*_bak.*
 config/cesium_css_modify.sh
 distdll

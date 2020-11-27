@@ -135,10 +135,11 @@ const cesium_other_config = (config, env) => {
                 { loader: 'css-loader' },
                 { loader: 'sass-loader' }
               //{ loader: 'css-loader' }
-              ],
-              sideEffects: true
-              // extractTextPluginOptions
-              // )
+            ],
+            include: /node_modules[/\\]react-dropdown-tree-select/,
+            sideEffects: true
+            // extractTextPluginOptions
+            // )
         }, {
             test: /\.(png|gif|jpg|jpeg|svg|xml|json)$/,
             use: [ 'url-loader' ],

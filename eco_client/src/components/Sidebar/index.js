@@ -8,8 +8,11 @@ import style from './style';
 //export default class Sidebar extends Component {
 const Sidebar = () => { //props
 //const {scene} = props;
-  const { user, setUser } = useContext(UserContext);
-  const { earth, setEarth } = useContext(EarthContext);
+  const { upars } = useContext(UserContext);
+  const { user, setUser } = upars;
+  const { gpars } = useContext(EarthContext);
+  const { earth, setEarth } = gpars;
+
   const [menuItem, setMenuItem] = useState({
       onSidebar: false,
 //    toggleIcon: 'menu-blue96'

@@ -12,7 +12,8 @@ const { odbConfig } = require('./.ssologin.js');
 const UserHandler = () => {
   const cookies = new Cookies();
 //const history = createBrowserHistory();
-  const { user, setUser } = useContext(UserContext);
+  const { upars } = useContext(UserContext);
+  const { user, setUser } = upars;
 
   const [state, setState] = useState({
     ssostate: '',

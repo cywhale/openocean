@@ -1,4 +1,4 @@
-import { createRef, useContext } from 'preact'; // h, Component, render, toChildArray
+import { createRef } from 'preact'; // h, Component, render, toChildArray
 import { Router } from 'preact-router';
 //import { useRef } from 'preact/hooks'; //useContext
 //import { createHashHistory } from 'history';

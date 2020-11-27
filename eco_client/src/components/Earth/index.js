@@ -10,10 +10,10 @@ import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
 import { render, Fragment } from 'preact'; //createContext seems can be used only within Parent DOM..
 import { useState, useEffect } from 'preact/hooks'; //useRef, useImperativeHandle
 //import { forwardRef } from 'preact/compat';
-//import Sidebar from '../Sidebar';
 import BasemapPicker from 'async!./BasemapPicker';
 import Layer from 'async!../Layer';
-//import { EarthContext } from "./EarthContext";
+import { FlowContextProvider } from "../Flows/FlowContext"; //current, flow for Windjs
+import { ClusterContextProvider } from "../SiteCluster/ClusterContext";
 //import { UserContext } from '../UserHandler/UserContext';
 
 import style from './style';
@@ -44,7 +44,7 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
       setUserScene({ baseLayer: "NOAA ETOPO\u00a0I" });
       initGlobe();
     } else {
-        render(render_basemap(), document.getElementById('rightarea'))
+      render(render_basemap(), document.getElementById('rightarea'))
     }
     //const { loaded: csloaded, viewer: csviewer } = {...globe};
     //csLoader = Object.assign({}, { csloaded, csviewer });
@@ -85,10 +85,13 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
     }
     return null;
   };
+
   const render_layer = () => {
     if (globe.loaded & globe.baseLoaded) {
       return (
-        <Layer viewer={globe.viewer} baseName={basePick.name} userBase={userScene.baseLayer}/>
+        <FlowContextProvider><ClusterContextProvider>
+          <Layer viewer={globe.viewer} baseName={basePick.name} userBase={userScene.baseLayer} />
+        </ClusterContextProvider></FlowContextProvider>
       );
     }
     return null;
@@ -132,7 +135,6 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
 /*<csLoader.Provider value={{csloaded: globe.loaded, csviewer: globe.viewer}}>
     <div style="display:block"><div class={style.basepicker}>
     { props.children }
-    { render_basemap() }
     { globe_handler() }
     </div></csLoader.Provider>*/
   return (

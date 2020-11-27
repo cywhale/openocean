@@ -2,7 +2,7 @@
    https://codepen.io/andornagy/pen/RNeydj */
 .nav-tabs {
   position: relative;
-  label, h2 {
+  label.tablab, h2 {
     display:block;
     color:#fff;
     font-size:17px;
@@ -16,23 +16,23 @@
     padding:14px 20px;
     margin: 0;
   }
-  label {
+  label.tablab {
     position: absolute;
     padding: 24px 20px;
     border-radius: 10px;
     z-index: 1;
   }
-  label:hover {
+  label.tablab:hover {
     cursor: pointer;
   }
-  label ~ label, h2 ~ h2 {
+  label.tablab ~ label.tablab, h2 ~ h2 {
     position: absolute;
     top: 0;
   }
-  label:nth-child(1), h2:nth-child(3) {
+  label.tablab:nth-child(1), h2:nth-child(3) {
     left: 0.5em;
   }
-  label:nth-child(5), h2:nth-child(7) {
+  label.tablab:nth-child(5), h2:nth-child(7) {
     left: 7em;
   }
   label:nth-child(9), h2:nth-child(11) {
@@ -87,7 +87,7 @@
 /*
 @media screen and (max-width: 18em) {
   .nav_tabs {
-    label, input[name="tabs"] {
+    label.tablab, input[name="tabs"] {
       display: none;
     }
     input + h2 + div {

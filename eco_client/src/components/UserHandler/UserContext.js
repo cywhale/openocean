@@ -1,6 +1,6 @@
 //https://www.codegrepper.com/code-examples/javascript/react+multiple+context+providers
 //https://www.pluralsight.com/guides/how-to-use-react-context-to-share-data-between-components
-import { useState } from 'preact/hooks'
+import { useState, useMemo } from 'preact/hooks'
 import { createContext } from 'preact';
 //import { gen_ucode } from 'async!../Compo/gen_ucode';
 
@@ -24,9 +24,11 @@ const UserContextProvider = (props) => {//,...children
     token: '' //gen_ucode({uname: 'ucode'})
   });
 
+  const upars = useMemo(() => ({ user, setUser }), [user]);
+
   //{{...children}}
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ upars }}>
       {props.children}
     </UserContext.Provider>
   );

@@ -1,0 +1,36 @@
+[
+  {
+    "label": "Flows",
+    "disabled": false,
+    "children": [
+      { "label": "Windy","value": "gfs_", "format": "json", "type": "flows" }
+    ],
+    "value": "flows"
+  },
+  {
+    "label": "Natural Reserve, Taiwan",
+    "children": [
+      { "value": "whitedolphin", "label": "White Dolphin Reserve", "type": "region", "format": "geojson" },
+      { "value": "wildanimalreserve", "label": "Wild Animal Habitat", "type": "region", "format": "geojson" },
+      { "value": "naturalreserve", "label": "Natural Reserve", "type": "region", "format": "geojson" }
+    ],
+    "value": "taiwannaturalreserve"
+  },
+  { "label": "-------- Socioeconomics --------", "disabled": true, "value": "socioeconomics"},
+  {
+    "label": "Wind farm, Taiwan",
+    "children": [
+      { "value": "onshorewind", "label": "Onshore wind-power stations", "type": "sitecluster", "format": "geojson" },
+      { "value": "offshorewindpowerplan", "label": "Offshore wind-power plan", "type": "region", "format": "geojson" },
+      { "value": "offshorewindpotential", "label": "Offshore wind-power potential", "type": "region", "format": "geojson" }
+    ],
+    "value": "taiwanwindfarm"
+  },
+  {
+    "label": "Demography",
+    "children": [
+      { "value": "population909500", "label": "Population 1990-2000", "type": "cube", "format": "json" }
+    ],
+    "value": "demography"
+  }
+]

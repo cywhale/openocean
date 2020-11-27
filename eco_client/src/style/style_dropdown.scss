@@ -1,0 +1,41 @@
+.dropdown {
+  color: white;
+  background: transparent;
+  font-size: 75%;
+} 
+
+.react-dropdown-tree-select ul li span {
+  background: transparent;
+}
+.react-dropdown-tree-select ul li span button {
+    padding: 2px;
+    display: inline-block;
+    box-sizing: unset;
+    font-size: 10px;
+    margin: 0;
+}
+.react-dropdown-tree-select .dropdown .dropdown-content {
+  position: relative;
+  background: transparent;
+  width: 100%;
+  font-size: 11px;
+}
+
+.dropdown-content .search {
+  width: auto;
+  font-size: 12px;
+}
+/*
+.dropdown-content ul {
+  font-size: 75%;
+}
+*/
+.dropdown-content ul div div li i {
+  margin-left: 5px;
+  font-size: 11px;
+  padding: 2px;
+}
+.dropdown-content ul div div li label input {
+  width: auto;
+}
+

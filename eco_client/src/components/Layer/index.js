@@ -6,26 +6,29 @@ import defined from 'cesium/Source/Core/defined.js';
 //import Rectangle from 'cesium/Source/Core/Rectangle';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
-import SiteCluster from 'async!../SiteCluster'; //{ SiteConsumer }
-//import sitePickedLabel from 'async!../SiteCluster/sitePickedLabel';
+import Datepicker from 'async!../Compo/Datepicker';
+import LayerModal from 'async!./LayerModal';
+import DataCube from 'async!../DataCube'; //Region (old) + MultiSelectSort
+import Flows from 'async!../Flows';
+import SiteCluster from 'async!../SiteCluster';
+import { EarthContext } from "../Earth/EarthContext";
+import { FlowContext } from "../Flows/FlowContext";
+import { ClusterContext } from "../SiteCluster/ClusterContext";
+
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
-import LayerModal from 'async!./LayerModal';
-import Region from 'async!./Region';
-import { EarthContext } from "../Earth/EarthContext";
 import '../../style/style_modal_tab.scss'
-/*
-  export const siteLoader = createContext({
-    loaded: false,
-    cluster: null,
-    customstyle: null
-});
-*/
+
 const Layer = (props) => {
-  const {viewer, baseName, userBase} = props;
-  const [searchLayer, setSearchLayer] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const { earth, setEarth } = useContext(EarthContext);
+  const { viewer, baseName, userBase } = props;
+  const [ searchLayer, setSearchLayer ] = useState(null);
+  const [ isOpen, setIsOpen ] = useState(false);
+  const { gpars } = useContext(EarthContext);
+  const { earth, setEarth } = gpars;
+  const { clpars } = useContext(ClusterContext);
+  const { cluster, setCluster } = clpars;
+  const { fpars } = useContext(FlowContext);
+  const { flow, setFlow } = fpars;
 /*
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&wi$
   const sTileImg = new SingleTileImageryProvider({
@@ -48,35 +51,26 @@ const Layer = (props) => {
   }
 */
   useEffect(() => {
-    const drag_opts = { dom: "#ctrl", dragArea: '#ctrlheader' };
-    draggable_element(drag_opts);
-    //enable_modalToggle();
-    enable_search_listener();
-    setEarth((preState) => ({
-      ...preState,
-      loaded: true,
-    }));
-  }, []);
+    //if (!earth.loaded) {
+      const drag_opts = { dom: "#ctrl", dragArea: '#ctrlheader' };
+      draggable_element(drag_opts);
+      //enable_modalToggle();
+      enable_search_listener();
+      sitePicker();
+      setEarth((preState) => ({
+        ...preState,
+        loaded: true,
+      }));
+    //} //else {
+      //render_windjs(flow.selgfs);
+    //}
+  },[]); //[earth.loaded]);//, flow.selgfs]);
 
-  const render_datasource = () => {
-      const opts = { // temporarily hard-coded here
-        dataname: 'windpower',
-        dataurl: 'https://ecodata.odb.ntu.edu.tw/pub/geojson/site/windpower_multi_4326.geojson',
-        datacrs: 'EPSG:4326',
-        icon: '../../assets/icons/windpower_blue01s.png',
-        color: 'cyan',
-        viewer: viewer
-      };
-      return (
-        <SiteCluster opts={opts} />
-      );
-  };
-
-  const sitePicker = () => {
+  const sitePicker = async () => { //useCallback(
     const {scene} = viewer;
     //const sitePickedLabel = () => {
-      var handler = new ScreenSpaceEventHandler(scene.canvas);
-      handler.setInputAction(function (movement) {
+    var handler = new ScreenSpaceEventHandler(scene.canvas);
+    await handler.setInputAction(function (movement) {
         let pickedLabel = scene.pick(movement.position);
         if (defined(pickedLabel)) {
           const ids = pickedLabel.id;
@@ -86,18 +80,42 @@ const Layer = (props) => {
             }
           }
         }
-      }, ScreenSpaceEventType.LEFT_CLICK);
+    }, ScreenSpaceEventType.LEFT_CLICK);
     //};
-    // await sitePickedLabel();
-    return(<div style="display:none" />);
-  }
+    //await sitePickedLabel();
+    //return(<div style="display:none" />);
+  };//, []);
 
-  const render_ImgLayer = () => {
+/*<FlowContextProvider>
+  const render_flows = () => {
+    if (earth.loaded) { // & globe.baseLoaded) {
+      const dataset = { // temporarily hard-coded here
+        date: '2018-06-25',
+        time: '00'
+      };
+      return ( //globe.viewer
+          <Flows viewer={viewer} flow={flow} dataset={dataset} />
+      );
+    }
+    return null;
+  };
+*/
+/*<ClusterContextProvider>
+  const render_sitecluster = () => {
+    if (earth.loaded) { // & globe.baseLoaded) {
+      return (
+          <SiteCluster viewer={viewer} cluster={cluster} />
+      );
+    }
+    return null;
+  };*/
+/*
+  const render_ImgLayer = (props) => {
     //render(<LayerModal viewer={viewer} />, document.getElementById('ctrlsectdiv2'));
     //userBase: default baselayer, but can be changed after user cookies set
-    return(<LayerModal viewer={viewer} baseName={baseName} userBase={userBase} />);
-  }
-
+    return(<LayerModal {...props} />);
+  };
+*/
   const set_searchingtext= (elem_search, dom, evt) => {
     let x = elem_search.value;
     if (x && x.trim() !== "" && x !== dom.dataset.search) {
@@ -127,8 +145,11 @@ const Layer = (props) => {
   } else {
     modalClass=`${style.modalOverlay}`
   }
-  console.log("Toggle modal: " + modalClass + " when isOpen is: " + isOpen);
+  //console.log("Toggle modal: " + modalClass + " when isOpen is: " + isOpen);
   //<a href="#ctrl" and in css use &:target{display:block} to show modal
+  //<div id="regionsectdiv"><Region viewer={viewer} /></div>
+  /*                    <FlowContextProvider><ClusterContextProvider>
+                        </ClusterContextProvider></FlowContextProvider>*/
   return (
     <Fragment>
       <div id="toolToggle" class={style.toolToggle}>
@@ -140,30 +161,32 @@ const Layer = (props) => {
         </div>
         <div class={style.modal}>
           <div class="nav-tabs">
-            <label for="tab-1" tabindex="0" />
+            <label class="tablab" for="tab-1" tabindex="0" />
             <input id="tab-1" type="radio" name="tabs" checked="true" aria-hidden="true" />
             <h2 data-toggle="tab">Layers</h2>
               <div class={style.ctrlwrapper}>
                   <section class={style.ctrlsect}>
                     <div class={style.ctrlcolumn}>
-                      <div id="regionsectdiv"><Region viewer={viewer} /></div>
+                      <div id="regionsectdiv">
+                          <DataCube viewer={viewer} />
+                      </div>
                       <div id="ctrlsectdiv2">
-                        { render_ImgLayer() }
+                        <LayerModal {...props} />
                       </div>
                     </div>
                   </section>
               </div>
-            <label for="tab-2" tabindex="1" />
+            <label class="tablab" for="tab-2" tabindex="1" />
             <input id="tab-2" type="radio" name="tabs" aria-hidden="true" />
             <h2 data-toggle="tab">Time</h2>
               <div class={style.ctrlwrapper}>
                   <section class={style.ctrlsect}>
                     <div class={style.ctrlcolumn}>
-                      <div id="timepicker">Just Test</div>
+                      <Datepicker viewer={viewer} />
                     </div>
                   </section>
               </div>
-            <label for="tab-3" tabindex="2" />
+            <label class="tablab" for="tab-3" tabindex="2" />
             <input id="tab-3" type="radio" name="tabs" aria-hidden="true" />
             <h2 data-toggle="tab">Clustering</h2>
               <div class={style.ctrlwrapper}>
@@ -176,8 +199,8 @@ const Layer = (props) => {
           </div>
         </div>
       </div>
-      { render_datasource() }
-      { sitePicker() }
+      <Flows viewer={viewer} flow={flow} />
+      <SiteCluster viewer={viewer} cluster={cluster} />
       { <div class="cesium-widget-credits" id="searchx" data-searchin="" data-searchout="" style="display:none">
            Now searching: {searchLayer}</div> }
     </Fragment>

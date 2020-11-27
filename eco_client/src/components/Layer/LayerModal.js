@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'preact/hooks'; //useCallback
+import { useEffect, useState, useRef, useMemo } from 'preact/hooks'; //useCallback
 import Color from 'cesium/Source/Core/Color.js';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
@@ -13,7 +13,7 @@ import knockout from 'cesium/Source/ThirdParty/knockout.js';
 // follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
 import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
-import './style_layerctrl.scss';
+import '../../style/style_layerctrl.scss';
 //import '../style/style_bubblelabel.scss';
 
 const LayerModal = (props) => {
@@ -332,7 +332,8 @@ const LayerModal = (props) => {
     );
   }
 
-  return (
+  return useMemo (() => {
+    return (
     <div id="layerctrl" ref={layerctrlRef}>
       <table class={style.thinx}>
         <tbody data-bind="foreach: layers">
@@ -360,6 +361,7 @@ const LayerModal = (props) => {
         </tbody>
       </table>
     </div>
-  )
-}
+    )
+  },[]);
+};
 export default LayerModal;
