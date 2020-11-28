@@ -24,6 +24,7 @@ const FlowContainer = (props) => {
         (gfs.data === null || gfs.date !== dataset.date || gfs.time !== dataset.time)) {
       const params = { viewer: viewer,
                        dataurl: baseurl + 'gfs_' + dataset.date.replace(/-/g, '') + dataset.time + '.json'
+                       //enable: enable //just for stop event listener to redraw if not enable
                      };
       await setGFS({ data: new WindyContainer(params),
                      date: dataset.date,
@@ -32,10 +33,12 @@ const FlowContainer = (props) => {
     } else if (enable) {
       let wind = document.getElementById("wind");
       if (wind.style.display === 'none') {
-        await gfs.data.redraw();
+        await gfs.data.redraw(true);
       }
     } else if (!enable && gfs.data !== null) {
-        await gfs.data.stop();
+        //let wind = document.getElementById("wind");
+        //wind.style.display = 'none';
+        await gfs.data.stop(true);
     }
   };//,[]);
 

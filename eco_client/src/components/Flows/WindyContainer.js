@@ -10,6 +10,7 @@ export default class WindyContainer {
       this.canvas = getCanvas();
       //this windy = null;
       this.started = false;
+      this.stopped = false; //if stopped externally, cannot redraw when resuming moving.
 
       function getCanvas() {
         //let canvasx = document.querySelector("#cesiumContainer > div > div.cesium-viewer-cesiumWidgetContainer > div > canvas"$
@@ -37,14 +38,14 @@ export default class WindyContainer {
             .catch(err => console.error('Fetch Wind Json Error:', err))
             .then(data => {
                 this.windy = new Windy({ canvas: this.canvas, data: data, windGlobe: this.windGlobe });
-                this.redraw();
+                this.redraw(true);
                 this.setupEventListeners();
             });
       //};
       //initDraw(this.canvas, this.windGlobe);
     }
 
-    redraw() {
+    redraw(force=false) {
         let width = this.viewer.canvas.width;
         let height = this.viewer.canvas.height;
         let wind = document.getElementById("wind");
@@ -58,12 +59,14 @@ export default class WindyContainer {
             height
         );
         wind.style.display = 'block';
+        if (force) this.stopped = false;
     };
 
-    stop() {
+    stop(force=false) {
       let wind = document.getElementById("wind");
       wind.style.display = 'none';
       this.windy.stop();
+      if (force) this.stopped = true;
     };
 
     setupEventListeners() {
@@ -72,7 +75,7 @@ export default class WindyContainer {
         //console.log("move start...");
         let wind = document.getElementById("wind");
         wind.style.display = 'none';
-        if (!!that.windy && that.started) {
+        if (!!that.windy && that.started && !that.stopped) {
             that.windy.stop();
         }
       });
@@ -81,8 +84,8 @@ export default class WindyContainer {
         //console.log("move end...");
         let wind = document.getElementById("wind");
         wind.style.display = 'none';
-        if (!!that.windy && that.started) {
-            that.redraw();
+        if (!!that.windy && that.started && !that.stopped) { //stop listener op if stopped
+            that.redraw(false);
         }
       });
     }

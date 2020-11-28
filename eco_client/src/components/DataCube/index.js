@@ -281,6 +281,11 @@ const DataCube = (props) => {
                   ...preState,
                   showCluster: true,
                 }));
+              } if (selected.format[i] === 'json' && selected.type[i] === 'flows') {
+                setFlow((preState) => ({
+                  ...preState,
+                  selgfs: true,
+                }));
               } else {
                 //dataSources._dataSources[loadk[i].index].zIndex = nlayers-selIdx;
                 dataSources._dataSources[didx].show = true;

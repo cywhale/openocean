@@ -64,9 +64,9 @@
   },
   "dependencies": {
     "cesium": "1.75",
-    "firebase": "^8.0.0",
+    "firebase": "^8.1.1",
     "nanoid": "^3.1.16",
-    "preact": "10.5.4",
+    "preact": "^10.5.7",
     "preact-router": "^3.2.1",
     "react-dropdown-tree-select": "^2.5.1",
     "universal-cookie": "^4.0.4"
