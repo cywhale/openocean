@@ -26,7 +26,7 @@ export default function Windy ( params ) {
   var τ = 2 * Math.PI;
   var H = Math.pow(10, -5.2);
   var globe = params.windGlobe; //window.cesiumGlobe;
-  
+
   // interpolation for vectors like wind (u,v,m)
   var bilinearInterpolateVector = function(x, y, g00, g10, g01, g11) {
       var rx = (1 - x);
@@ -157,9 +157,9 @@ export default function Windy ( params ) {
   var distort = function(projection, λ, φ, x, y, scale, wind) {
       var u = wind[0] * scale;
       var v = wind[1] * scale;
-      
+
       var d = distortion(projection, λ, φ, x, y);
-      
+
       // Scale distortion vectors by u and v, then add.
       wind[0] = d[0] * u + d[2] * v;
       wind[1] = d[1] * u + d[3] * v;
@@ -189,7 +189,6 @@ export default function Windy ( params ) {
           return column && column[Math.round(y)] || NULL_WIND_VECTOR;
       }
 
-      
       /**
        * @returns {boolean} true if the field is valid at the point (x, y)
        */
@@ -205,7 +204,7 @@ export default function Windy ( params ) {
       field.isInsideBoundary = function(x, y) {
           return field(x, y) !== NULL_WIND_VECTOR;
       };
-      
+
       // Frees the massive "columns" array for GC. Without this, the array is leaked (in Chrome) each time a new
       // field is interpolated because the field closure's context is leaked, for reasons that defy explanation.
       field.release = function() {
@@ -282,7 +281,7 @@ export default function Windy ( params ) {
       var factor = Math.sqrt(minRange / 90);
       return factor;
   }
-  
+
   var interpolateField = function( grid, bounds, /*extent,*/ callback ) {
     var projection = globe.cesiumWGS84ToWindowCoord;
     // How fast particles move on the screen (arbitrary value chosen for aesthetics).
@@ -354,7 +353,7 @@ export default function Windy ( params ) {
           "rgba(" + hexToR('#fb4f17') + ", " + hexToG('#fb4f17') + ", " + hexToB('#fb4f17') + ", " + 1 + ")",
           "rgba(" + hexToR('#fe3705') + ", " + hexToG('#fe3705') + ", " + hexToB('#fe3705') + ", " + 1 + ")",
           "rgba(" + hexToR('#ff0000') + ", " + hexToG('#ff0000') + ", " + hexToB('#ff0000') + ", " + 1 + ")"
-          
+
           /*"rgba(" + hexToR('#00ffff') + ", " + hexToG('#00ffff') + ", " + hexToB('#00ffff') + ", " + 0.5 + ")",
           "rgba(" + hexToR('#64f0ff') + ", " + hexToG('#64f0ff') + ", " + hexToB('#64f0ff') + ", " + 0.5 + ")",
           "rgba(" + hexToR('#87e1ff') + ", " + hexToG('#87e1ff') + ", " + hexToB('#87e1ff') + ", " + 0.5 + ")",
@@ -517,7 +516,7 @@ export default function Windy ( params ) {
 }
 
 
-
+/*
 // shim layer with setTimeout fallback
 window.requestAnimationFrame = (function(){
   return  window.requestAnimationFrame       ||
@@ -529,4 +528,4 @@ window.requestAnimationFrame = (function(){
             window.setTimeout(callback, 1000 / 50);
           };
 })();
-
+*/

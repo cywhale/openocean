@@ -62,6 +62,8 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
         baseLayerPicker: false, //basemapPicker,
         imageryProvider: false, //sTileImg,
         mapProjection : new WebMercatorProjection,
+        requestRenderMode : true, //https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/#handling-simulation-time-changes
+        maximumRenderTimeChange : Infinity
         //terrainProvider: createWorldTerrain(),
         //globe: new Globe(MapProjection.ellipsoid),
       }),

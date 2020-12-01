@@ -442,9 +442,9 @@ const LayerModal = (props) => {
         </tbody>
       </table>
       <div class={style.smalltd} style="display:inline-flex;justify-content:center;flex-direction:row;">
-            <button style="padding:6px 6px;margin:6px" class="button" id="hidecoastbutn" onClick={showCoastline}>
+            <button class={style.coastbutn} id="hidecoastbutn" onClick={showCoastline}>
                {coast.hide? 'Show coastline': 'Hide coastline'}</button>
-            <button style="padding:6px 6px;margin:6px" class="button" id="stopwfsbutn" onClick={stopWFSlisten}>
+            <button class={style.coastbutn} id="stopwfsbutn" onClick={stopWFSlisten}>
                {coast.forcestop? 'Remain WFS': 'Stop WFS'}</button>
       </div>
     </div>

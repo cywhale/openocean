@@ -954,7 +954,11 @@ export default function WebFeatureServiceImageryProvider(options) {
         WebFeatureServiceImageryProvider.prototype.addTicksTrig = function(){
             var that = this;
 
-            this.unsubscribeTicks = this._viewer.clock.onTick.addEventListener(function() {
+            //this._viewer.camera.moveStart.addEventListener(function () {
+            //});
+
+            this.unsubscribeTicks = this._viewer.camera.moveEnd.addEventListener(function () {
+            //this.unsubscribeTicks = this._viewer.clock.onTick.addEventListener(function() {
                 if (!that.scratchCamera.position.equals(that.scratchLastCamera.position) ||
                     !that.scratchCamera.direction.equals(that.scratchLastCamera.direction) ||
                     !that.scratchCamera.up.equals(that.scratchLastCamera.up) ||
