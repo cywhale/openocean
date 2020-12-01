@@ -105,7 +105,9 @@ const Sidebar = () => { //props
           <div class = {style.sidemenu}>
             <ul>
               <li><a href="#"><UserHandler /></a></li>
-              <li><button style="padding:6px 8px;margin:12px" class="button" onClick={toggleHidex}>{hide? 'Show all': 'Hide all'}</button></li>
+              <li>
+                <button style="padding:6px 8px;margin:12px" class="button" onClick={toggleHidex}>{hide? 'Show all': 'Hide all'}</button>
+              </li>
               <li><a href="#">Setting</a>
                 <ul>
                   <li><a href="#">Test Widget</a></li>

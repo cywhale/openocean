@@ -120,8 +120,8 @@ const BasemapPicker = (props) => {
   return useMemo (() => {
     return(
       <div style="display:flex;">
-        <div id="baseLayerPickerContainer" 
-          ref = {baseContainer} 
+        <div id="baseLayerPickerContainer"
+          ref = {baseContainer}
           class={style.baseContainer} />
       </div>
     );

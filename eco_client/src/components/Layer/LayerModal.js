@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from 'preact/hooks'; //useCallback
+import { useEffect, useState, useRef } from 'preact/hooks'; //useCallback, useMemo
 import Color from 'cesium/Source/Core/Color.js';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
@@ -10,11 +10,13 @@ import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
 import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
 import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
+import WebFeatureServiceImageryProvider from '../Earth/WebFeatureServiceImageryProvider';
 // follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
 import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
 import '../../style/style_layerctrl.scss';
 //import '../style/style_bubblelabel.scss';
+const { wfsConfig } = require('./.setting.js');
 
 const LayerModal = (props) => {
   const { viewer, baseName, userBase } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
@@ -67,6 +69,73 @@ const LayerModal = (props) => {
         return index >= 0 && index < imageryLayers.length - 1;
     },
   });
+
+  const [coast, setCoast] = useState({
+    wfs: null,
+    hide: true,
+    forcestop: false,
+  });
+
+  const stopWFSlisten = async () => {
+    const force = !coast.forcestop;
+    const hide= coast.hide;
+    const wfs = coast.wfs;
+
+    if (force && !hide && wfs !== null) {
+        console.log("Disable WFS loading..")
+        await wfs.unsubscribeTicks();
+    } else if (!force && wfs !== null) {
+        console.log("Re-enable WFS loading..")
+        await wfs.addTicksTrig();
+    }
+    await setCoast((preState) => ({
+         ...preState,
+         forcestop: !coast.forcestop,
+    }));
+  };
+
+  const showCoastline = async () => {
+    const hide = !coast.hide;
+    const wfs = coast.wfs;
+    const force = coast.forcestop;
+
+    if (force) {
+      //alert("Note: You force WFS stopped, so now coastline or other features stop loading. Re-enable it if needed.")
+      if (wfs != null) {
+        if (!hide) {
+          console.log("Re-show WFS layer..")
+          await wfs.showCollection();
+        } else {
+          console.log("Disable WFS layer..")
+          await wfs.hideCollection();
+        }
+      }
+    } else {
+      if (!hide && wfs === null) {
+        await setCoast((preState) => ({
+          ...preState,
+          wfs: new WebFeatureServiceImageryProvider({
+             url: wfsConfig.coast,
+             layers: wfsConfig.coast_10m_layer,
+             viewer: viewer
+          }),
+        }));
+      } else if (!hide && wfs !== null) {
+        console.log("Re-show WFS layer..")
+        await wfs.showCollection();
+        await wfs.addTicksTrig();
+      } else if (hide && wfs !== null) {
+        console.log("Disable WFS layer..")
+        await wfs.unsubscribeTicks();
+        await wfs.hideCollection();
+      }
+    }
+    await setCoast((preState) => ({ //forcestop only stop WFS loading, not affect show/hide
+         ...preState,
+         hide: !coast.hide,
+    }));
+  }; //, [coast.hide]);
+
 
   const updateBaseLayer = () => { //BaseLayer changed from BasemapPicker, so need update viewModel
     if (baseName!==null && baseName!=viewModel.selbase && viewModel.layers.length) {
@@ -157,6 +226,9 @@ const LayerModal = (props) => {
       knockout.track(viewModel);
       knockout.applyBindings(viewModel, layerctrlRef.current);
       //setModel(kobind());
+
+      viewer.scene.globe.baseColor = Color.BLACK;
+
       setupLayers();
       updateLayerList(viewModel.selbase, viewModel.baselayer);
       setModel((preMdl) => ({ //setModel(kobind());
@@ -332,8 +404,8 @@ const LayerModal = (props) => {
     );
   }
 
-  return useMemo (() => {
-    return (
+//return useMemo (() => {
+  return (
     <div id="layerctrl" ref={layerctrlRef}>
       <table class={style.thinx}>
         <tbody data-bind="foreach: layers">
@@ -360,8 +432,14 @@ const LayerModal = (props) => {
           </tr>
         </tbody>
       </table>
+      <div class={style.smalltd} style="display:inline-flex;justify-content:center;flex-direction:row;">
+            <button style="padding:6px 6px;margin:6px" class="button" id="hidecoastbutn" onClick={showCoastline}>
+               {coast.hide? 'Show coastline': 'Hide coastline'}</button>
+            <button style="padding:6px 6px;margin:6px" class="button" id="stopwfsbutn" onClick={stopWFSlisten}>
+               {coast.forcestop? 'Remain WFS': 'Stop WFS'}</button>
+      </div>
     </div>
-    )
-  },[]);
+  )
+//},[]);
 };
 export default LayerModal;

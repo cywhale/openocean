@@ -149,7 +149,8 @@ const DataCube = (props) => {
               strokeWidth: 2,
               //zIndex: nlayers-selIdx //first selected will be upper layer
             //}
-            }).then(function(data) {
+            })
+            .then(function(data) {
               let leng = dataSources._dataSources.length;
               dataSources.add(data);
               //setDatasrc(datasrc.push(data));
@@ -168,7 +169,8 @@ const DataCube = (props) => {
                   index: [...loaded.index, leng],
               }))
               //);
-            });
+            })
+            .otherwise(err => console.log("Fetching region got load err: ", err));
       };
 
       const cubeLoad = (i) => {
@@ -190,7 +192,8 @@ const DataCube = (props) => {
 //              createSeriesSetter(seriesName)
 //            );
 //          }
-          });
+          })
+          .otherwise(err => console.log("Fetching data cube got load err: ", err));
 //        viewer.clock.shouldAnimate = false;
           let leng = dataSources._dataSources.length;
           dataSources.add(dataSource);
@@ -306,12 +309,16 @@ const DataCube = (props) => {
       if (promises) {
         Promise.all(promises)
            .then((results) => {
-               console.log("All Regions fetched");
+               console.log("All data layers fetched");
            })
            .catch((e) => {
-               console.log("Region fetched may wrong");
+               console.log("Data layers fetched may wrong: ", e);
            });
       }
+      //Wanna get which failed: https://stackoverflow.com/questions/30362733/handling-errors-in-promise-all
+      //const results = await Promise.all(promises.map(p => p.catch(e => console.log("Fetched layers promise err: ", e)));
+      //const errIdx = results.map((e,i) => e instanceof Error ? i : undefined).filter(x => x);
+      //if (errIdx && errIdx.length > 0) {}
 
       //Check De-select
       //let shownx = loaded.shown.filter(el => el === true)

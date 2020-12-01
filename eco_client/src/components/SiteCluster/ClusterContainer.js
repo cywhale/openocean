@@ -116,8 +116,8 @@ const ClusterContainer = (props) => {
     //  const dataSource = dataSources.get(dataSources.length-1);
     dataSourcePromise.then(dataSource => {
         //const { clusterEnable, clusterRange, minCluster } = clusterOpts;
-        const iconurl = defOpts.icon; //|'../../assets/icons/grey-ring-ss.png'; //'https://ecodata.odb.ntu.edu.tw/pub/$
-        const colorname = defOpts.color; //|'cyan';
+        const iconurl = opts.icon; //|'../../assets/icons/grey-ring-ss.png'; //'https://ecodata.odb.ntu.edu.tw/pub/$
+        const colorname = opts.color; //|'cyan';
         let palette = [];
         if (colorname==="cyan") {
           ['#E0FFFF','#00FFFF','#7FFFD4','#40E0D0','#20B2AA','#008080'].map(x => palette.push(x));
@@ -200,7 +200,7 @@ const ClusterContainer = (props) => {
           offset: new HeadingPitchRange(0, (-Math.PI / 2)+0.0000001, 8000000) //-Cesium.Math.PI_OVER_F$
         })
 
-        setOut({ dataSource: dataSource, dataURL: cluster.siteurl }); //Pins: Pins, removeListener: removeListener });
+        setOut({ dataSource: dataSource, dataURL: dataurl }); //Pins: Pins, removeListener: removeListener });
         setState({
           isLoading: false
           //svgClass: `${style.Redo} ${style.notbusy}`
@@ -242,6 +242,7 @@ const ClusterContainer = (props) => {
         };*/
         //waitBindStyling();
     }) // End of dataSourcePromise.then
+    .otherwise(err => console.log("Fetching site cluster got load err: ", err))
     //}/* has viewer &&  dataurl */
   }; // End of dataLoader
 /*
