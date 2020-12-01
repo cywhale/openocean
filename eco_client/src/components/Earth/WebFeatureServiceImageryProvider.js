@@ -726,7 +726,14 @@ define('Scene/WebFeatureServiceImageryProvider',[
         */
 
         function compute(that){
-
+/* modified by cywhale */
+            let viewrect = that._viewer.scene.camera.computeViewRectangle(that._viewer.scene.globe.ellipsoid);
+            //Rectangle: west, south, east, north
+            that.S_W.lng = 180.0 * viewrect.west / Math.PI;
+            that.S_W.lat = 180.0 * viewrect.south / Math.PI;
+            that.N_E.lng = 180.0 * viewrect.east / Math.PI;
+            that.N_E.lat = 180.0 * viewrect.north / Math.PI;
+/* modified by cywhale
             var width = that._viewer.scene.canvas.width;
             var height = that._viewer.scene.canvas.height;
             var sw = new Cartesian2(0,height);
@@ -754,10 +761,10 @@ define('Scene/WebFeatureServiceImageryProvider',[
 
             that.N_E.lng = CesiumMath.toDegrees(NE.longitude);
             that.N_E.lat = CesiumMath.toDegrees(NE.latitude);
-
+*/
             that._validBoundingBox = true;
 
-// modified by cywhale, compare current max/min of bbox //south,west,north,east
+// modified by cywhale, compare current max/min of bbox to track if all data is fetched from WFS //south,west,north,east
             if (that.S_W.lat < that.bboxmax[0]) { that.bboxmax[0] = that.S_W.lat; }
             if (that.S_W.lng < that.bboxmax[1]) { that.bboxmax[1] = that.S_W.lng; }
             if (that.N_E.lat > that.bboxmax[2]) { that.bboxmax[2] = that.N_E.lat; }

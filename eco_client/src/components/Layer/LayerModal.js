@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'preact/hooks'; //useCallback, useMemo
+import { useEffect, useState, useRef } from 'preact/hooks'; //useMemo, useCallback
 import Color from 'cesium/Source/Core/Color.js';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
@@ -80,19 +80,28 @@ const LayerModal = (props) => {
     const force = !coast.forcestop;
     const hide= coast.hide;
     const wfs = coast.wfs;
+    const intStop = coast.wfs.intStopWFS;
 
-    if (force && !hide && wfs !== null) {
+    if (intStop) {
+      console.log("Internally WFS stopped because all data fetched");
+      await setCoast((preState) => ({
+         ...preState,
+         forcestop: true,
+      }));
+    } else {
+      if (force && !hide && wfs !== null) {
         console.log("Disable WFS loading..")
         await wfs.unsubscribeTicks();
-    } else if (!force && wfs !== null) {
+      } else if (!force && wfs !== null) {
         console.log("Re-enable WFS loading..")
         await wfs.addTicksTrig();
-    }
-    await setCoast((preState) => ({
+      }
+      await setCoast((preState) => ({
          ...preState,
          forcestop: !coast.forcestop,
-    }));
-  };
+      }));
+    }
+  }; //, [coast.forcestop]);
 
   const showCoastline = async () => {
     const hide = !coast.hide;
