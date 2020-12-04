@@ -11,12 +11,12 @@
   "license": "MIT",
   "dependencies": {
     "boom": "^7.3.0",
-    "fastify": "^3.8.0",
+    "fastify": "^3.9.1",
     "fastify-plugin": "^3.0.0",
     "fastify-static": "^3.3.0",
     "fs": "^0.0.1-security",
     "loadash": "^1.0.0",
-    "mongoose": "^5.10.13",
+    "mongoose": "^5.11.3",
     "nconf": "^0.10.0",
     "path": "^0.12.7"
   },

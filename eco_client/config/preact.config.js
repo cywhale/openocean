@@ -215,6 +215,7 @@ const cesium_other_config = (config, env) => {
     optimization: {
        usedExports: true,
        runtimeChunk: true, //'single'
+       concatenateModules: true,
        minimizer:
        [
          new TerserPlugin({
@@ -340,6 +341,8 @@ const baseConfig = (config, env) => {
     );
 */
     config.plugins.push( new webpack.optimize.OccurrenceOrderPlugin() );
+    config.plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
+    config.plugins.push(new webpack.NoEmitOnErrorsPlugin());
     // Try to dedupe duplicated modules, if any:
     config.plugins.push( new DuplicatePackageCheckerPlugin() );
     //config.plugins.push( new ExtractTextPlugin(cssFilename) );

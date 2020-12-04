@@ -38,4 +38,6 @@
 .dropdown-content ul div div li label input {
   width: auto;
 }
-
+.node.leaf.disabled label .checkbox-item {
+  display: none;
+}

@@ -71,7 +71,7 @@ const Layer = (props) => {
     //const sitePickedLabel = () => {
     var handler = new ScreenSpaceEventHandler(scene.canvas);
     await handler.setInputAction(function (movement) {
-        let pickedLabel = scene.pick(movement.position);
+        let pickedLabel = scene.pick(movement.endPosition);
         if (defined(pickedLabel)) {
           const ids = pickedLabel.id;
           if (Array.isArray(ids)) {
@@ -80,6 +80,7 @@ const Layer = (props) => {
             }
           }
         }
+        scene.requestRender();
     }, ScreenSpaceEventType.LEFT_CLICK);
     //};
     //await sitePickedLabel();
@@ -188,10 +189,11 @@ const Layer = (props) => {
               </div>
             <label class="tablab" for="tab-3" tabindex="2" />
             <input id="tab-3" type="radio" name="tabs" aria-hidden="true" />
-            <h2 data-toggle="tab">Clustering</h2>
+            <h2 data-toggle="tab">Details</h2>
               <div class={style.ctrlwrapper}>
                   <section class={style.ctrlsect}>
                     <div class={style.ctrlcolumn}>
+                    <span style="font-size:0.8em;color:grey">Clustering</span>
                       <div id="ctrlsectdiv1" />
                     </div>
                   </section>
