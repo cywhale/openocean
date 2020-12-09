@@ -6,7 +6,6 @@
     The "start" method takes the bounds of the map at its current extent and starts the whole gridding,
     interpolation and animation process.
 */
-
 export default function Windy ( params ) {
   var VELOCITY_SCALE = 0.011;             // scale for wind velocity (completely arbitrary--this value looks nice)
   var INTENSITY_SCALE_STEP = 10;            // step size of particle intensity color scale
@@ -327,9 +326,7 @@ export default function Windy ( params ) {
     })();
   };
 
-
   var animate = function(bounds, field) {
-
     function asColorStyle(r, g, b, a) {
         return "rgba(" + 243 + ", " + 243 + ", " + 238 + ", " + a + ")";
     }
@@ -468,7 +465,7 @@ export default function Windy ( params ) {
             console.error(e);
         }
     })();
-  }
+  }//`);
 
   var start = function( bounds, width, height /*, extent */){
 

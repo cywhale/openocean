@@ -6,7 +6,7 @@ import Rectangle from 'cesium/Source/Core/Rectangle';
 //import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
 import GlobeSurfaceTileProvider from 'cesium/Source/Scene/GlobeSurfaceTileProvider.js';
-import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
+//import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
 import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
 import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
@@ -400,12 +400,27 @@ const LayerModal = (props) => {
         ),
       }),
       1.0
-    );*/
+    );
     addAdditionalLayerOption(
       "Grid",
       new GridImageryProvider(),
       1.0, false
+    );*/
+    addAdditionalLayerOption(
+      "ODB Copepod",
+      new WebMapServiceImageryProvider({
+            url : 'https://odbwms.oc.ntu.edu.tw/odbintl/rasters/odbwms/',
+            layers : 'odb_copepod_abund201808',
+            credit : 'ODB Bio-database',
+            parameters : {
+              transparent : 'true'//,
+              //format : 'image/png'
+            },
+            proxy : new DefaultProxy('/proxy/')
+          }),
+      1.0, false
     );
+
     addAdditionalLayerOption(
       "Tile Coordinates",
       new TileCoordinatesImageryProvider(),

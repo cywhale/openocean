@@ -1,5 +1,5 @@
 import windyGlobe from './windyGlobe';
-import Windy from './Windy';
+import Windy from './Windy'; //workerize-loader!
 //const { layerConfig } = require('../Layer/.setting.js');
 
 export default class WindyContainer {

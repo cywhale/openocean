@@ -42,7 +42,7 @@ const FlowContainer = (props) => {
     }
   };//,[]);
 
-  useEffect(() => {
+  useEffect( () => {
       render_windjs(flow);
   }, [flow]);
 

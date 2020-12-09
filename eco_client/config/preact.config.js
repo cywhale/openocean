@@ -145,13 +145,13 @@ const cesium_other_config = (config, env) => {
             use: [ 'url-loader' ],
             //name: 'static/media/[name].[hash:8].[ext]'
         }, /*{
-            test: /\.worker\.js$/,
+            test: /\.js$/, //\.worker\
             use: {
-              loader: 'worker-loader',
+              loader: 'workerize-loader',
               options: {
                 inline: true
               }
-            },
+            }
         },*/
         {
 // Remove pragmas https://github.com/CesiumGS/cesium-webpack-example/blob/master/webpack.release.config.js
