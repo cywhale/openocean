@@ -1,0 +1,6 @@
+/* fix some css in cesium */
+.cesium-credit-lightbox.cesium-credit-lightbox-mobile {
+  top:20%;
+  height:auto;
+  max-width:85%;
+}

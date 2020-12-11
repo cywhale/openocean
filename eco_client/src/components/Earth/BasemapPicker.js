@@ -5,10 +5,14 @@ import BaseLayerPicker from 'cesium/Source/Widgets/BaseLayerPicker/BaseLayerPick
 import createDefaultImageryProviderViewModels from 'cesium/Source/Widgets/BaseLayerPicker/createDefaultImageryProviderViewModels';
 import createDefaultTerrainProviderViewModels from 'cesium/Source/Widgets/BaseLayerPicker/createDefaultTerrainProviderViewModels';
 import buildModuleUrl from 'cesium/Source/Core/buildModuleUrl';
+//import Credit from 'cesium/Source/Core/Credit';
+//import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
+//import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme';
 import UrlTemplateImageryProvider from 'cesium/Source/Scene/UrlTemplateImageryProvider';
+//import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
 import ProviderViewModel from 'cesium/Source/Widgets/BaseLayerPicker/ProviderViewModel';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
-import 'cesium/Source/Widgets/widgets.css';
+//import 'cesium/Source/Widgets/widgets.css';
 import style from './style_basemapPicker';
 //import './csviewer.css'
 //const imageryViewModels = createDefaultImageryProviderViewModels()[8,10,11,12,14];
@@ -63,10 +67,53 @@ const BasemapPicker = (props) => {
             creationFunction : function() {
               return new UrlTemplateImageryProvider({
                 url : buildModuleUrl('https://gis.ngdc.noaa.gov/arcgis/rest/services/web_mercator/etopo1_hillshade/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
-                credit : '© NOAA etopo1 hillshade',
+                credit : 'NOAA etopo1 hillshade', //new Credit('©
               });
             }
         }));
+/* Sinica's Bing map work in QGIS, but strangely not work here
+        imgModels.push(new ProviderViewModel({
+           name : 'Bing Aerial',
+           iconUrl : buildModuleUrl('Widgets/Images/ImageryProviders/bingAerial.png'),
+            tooltip : 'Bing Aerial',
+            category: "Other",
+            creationFunction : function() {
+              return new WebMapTileServiceImageryProvider({
+                url : 'https://gis.sinica.edu.tw/worldmap/wmts',
+                layer : 'BingA',
+                style : 'default',
+                format : 'image/jpeg',
+                tileMatrixSetID : 'GoogleMapsCompatible',
+                // tileMatrixLabels : ['default028mm:0', 'default028mm:1', 'default028mm:2' ...],
+                //tilingScheme: new WebMercatorTilingScheme(),
+                //maximumLevel: 21,
+                credit : 'Microsoft® Bing™ Maps',
+                proxy : new DefaultProxy('/proxy/')
+              });
+            }
+        }));
+*/
+/* EMAP works but seems overlap with OpenStreet
+        imgModels.push(new ProviderViewModel({
+           name : 'Taiwan Emap',
+           iconUrl : buildModuleUrl('../../assets/icons/taiwan-map_s.png'),
+            tooltip : 'Taiwan Emap',
+            category: "Other",
+            creationFunction : function() {
+              return new WebMapTileServiceImageryProvider({
+                url : 'https://wmts.nlsc.gov.tw/wmts',
+                layer : 'EMAP',
+                style : 'default',
+                format : 'image/jpeg',
+                tileMatrixSetID : 'GoogleMapsCompatible',
+                tilingScheme: new WebMercatorTilingScheme(),
+                //maximumLevel: 21,
+                credit : '',
+                proxy : new DefaultProxy('/proxy/')
+              });
+            }
+        }));
+*/
 //https://github.com/cywhale/preact_cesium/commit/441d3735dfdd110a2cc9ae8e990f8790ab16a608
 //https://github.com/CesiumGS/cesium/blob/1.74/Source/Widgets/BaseLayerPicker/createDefaultImageryProviderViewModels.js
 //https://github.com/CesiumGS/cesium/issues/9211

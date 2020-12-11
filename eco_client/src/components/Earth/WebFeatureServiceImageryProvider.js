@@ -7,6 +7,7 @@
 import PolygonHierarchy from 'cesium/Source/Core/PolygonHierarchy';
 import CesiumMath from 'cesium/Source/Core/Math';
 import Color from 'cesium/Source/Core/Color';
+import Credit from "cesium/Source/Core/Credit.js";
 import PinBuilder from 'cesium/Source/Core/PinBuilder';
 import Cartographic from 'cesium/Source/Core/Cartographic';
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
@@ -402,7 +403,7 @@ define('Scene/WebFeatureServiceImageryProvider',[
         var gmlns = "http://www.opengis.net/gml";
 
         function getCrsProperties(node, crsProperties) {
-            var crsName = node.getAttribute('srsName');
+            var crsName = node.getAttribute('srsName') | node.getAttribute('SRSNAME');
             if(crsName) {
                 var crsFunction = crsNames[crsName];
                 if(!crsFunction) {
@@ -443,7 +444,7 @@ define('Scene/WebFeatureServiceImageryProvider',[
         }
 
 
-        function processFeature(that,feature, crsProperties) {
+        function processFeature(that, feature, crsProperties) {
 
             /*
             when using tiled startegy features need to be rendered again
@@ -796,10 +797,27 @@ export default function WebFeatureServiceImageryProvider(options) {
 
             if(!defined(options.viewer))
                 throw DeveloperError("viewer is required");
+// paramCaps, paramMore is actually no need, just try if a old-design WFS source (TGOS, Taiwan) cannot accept different case of parameters
+            if(!defined(options.paramCaps)) { //convert ?wfs/service=WFS&version=1.0.0& to upper case
+              this.paramCaps = false;
+            } else {
+              this.paramCaps = options.paramCaps === true? true : false;
+            }
 
+            if(!defined(options.paramMore)) { //add some other params in wfs url
+              this.paramMore = '';
+            } else {
+              this.paramMore = options.paramMore;
+            }
+//------------------------------------------------------------------------------
             //cesium viewer widget
             this._viewer = options.viewer;
 
+            var credit = options.credit;
+            this._credit = typeof credit === "string" ? new Credit(credit) : credit;
+/*          if (credit && credit !== '' && this._credit) {
+              this._viewer.scene.frameState.creditDisplay.addDefaultCredit(this._credit);
+            } */ // move to globe scope of viewer (LayerModal.js) to add Credit
             //address of server
             this._url = options.url;
 
@@ -826,7 +844,14 @@ export default function WebFeatureServiceImageryProvider(options) {
             this._maxFeatures = defaultValue(options.maxFeatures,100);
 
             //use bounding box
-            this._bboxRequired = defaultValue(options.BBOX,true);
+            let enableBBOX;
+            if(!defined(options.bboxDisable)) {
+              enableBBOX = true;
+            } else {
+              enableBBOX = options.bboxDisable === true? false : true;
+            }
+
+            this._bboxRequired = enableBBOX && defaultValue(options.BBOX,true);
 
             //found valid bounding box
             this._validBoundingBox = false;
@@ -900,6 +925,12 @@ export default function WebFeatureServiceImageryProvider(options) {
                 set : function(featureLimit){
                     this._maxFeatures = featureLimit;
                 }
+            },
+
+            credit: {
+              get: function () {
+                 return this._credit;
+              },
             }
         });
 
@@ -941,9 +972,9 @@ export default function WebFeatureServiceImageryProvider(options) {
         */
         WebFeatureServiceImageryProvider.prototype.buildCompleteRequestUrl = function(){
             var typeNameInfo = this._layers.split(":");
-            var request_url = this._url + "/" + "wfs?"; //GeoServer use ows?  not wfs?
-            var params = "service=WFS&version=1.0.0&";
-            this._getUrl = request_url + params;
+            var request_url = this._url + "/" + ((this.paramCaps)? "WFS?" : "wfs?"); //GeoServer use ows?  not wfs?
+            var params = this.paramCaps? "SERVICE=WFS&VERSION=1.0.0&": "service=WFS&version=1.0.0&";
+            this._getUrl = request_url + params + this.paramMore;
         };
 
         /*
@@ -999,7 +1030,7 @@ export default function WebFeatureServiceImageryProvider(options) {
         *   logs a string having the XML spec in the console.
         */
         WebFeatureServiceImageryProvider.prototype.GetCapabilities = function(){
-            var request = "request=GetCapabilities";
+            var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetCapabilities";
             request = this._getUrl + request;
             when(loadText(request),function(response){
                console.log(response);
@@ -1012,7 +1043,9 @@ export default function WebFeatureServiceImageryProvider(options) {
         *   values and coordinates
         */
         WebFeatureServiceImageryProvider.prototype.DescribeFeatureType = function(){
-            var request = "request=DescribeFeatureType&" +  "typeName=" + this._layers;
+            var request = ((this.paramCaps)? "REQUEST=" : "request=") + "DescribeFeatureType&" +
+                          ((this.paramCaps)? "TYPENAME=" : "typeName=") +
+                          this._layers;
             request = this._getUrl + request;
             when(loadText(request),function(response){
                 console.log(response);
@@ -1027,10 +1060,11 @@ export default function WebFeatureServiceImageryProvider(options) {
             if(this._bboxRequired)
                 compute(this);
             var that = this;
-            var request = "request=GetFeature&" + "typeName=" + this._layers;
+            var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
+                          ((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers;
             request = this._getUrl + request; // + "&maxFeatures=" + this._maxFeatures;
             if(this._bboxRequired && this._validBoundingBox){
-                var bbox = "&bbox=" + this.S_W.lng.toString() + "," + this.S_W.lat.toString() + ",";
+                var bbox = ((this.paramCaps)? "&BBOX=" : "&bbox=") + this.S_W.lng.toString() + "," + this.S_W.lat.toString() + ",";
                 bbox = bbox + this.N_E.lng.toString() + "," + this.N_E.lat.toString();
                 request = request + bbox;
             }
@@ -1097,8 +1131,9 @@ export default function WebFeatureServiceImageryProvider(options) {
             var f_list;
             var f_length = featureList.length;
             if(f_length === 1){
-                var request = "request=GetFeature&" + "typeName=" + this._layers
-                                + "&" + "featureID=" + featureList[0];
+                var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
+                              ((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers + "&" +
+                              ((this.paramCaps)? "FEATUREID=" : "featureID=") + featureList[0];
                 request = this._getUrl + request;
                 return getResponseFromServer(request);
             }else{
@@ -1106,8 +1141,9 @@ export default function WebFeatureServiceImageryProvider(options) {
                 for(var i = 1 ;i < f_length; i++){
                     f_list = f_list + "," + featureList[i];
                 }
-                var request = "request=GetFeature&" + "typeName=" + this._layers
-                                + "&" + "featureID=" + f_list;
+                var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
+                              ((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers + "&" +
+                              ((this.paramCaps)? "FEATUREID=" : "featureID=") + f_list;
                 request = this._getUrl + request;
                 return getResponseFromServer(this, request);
             }
@@ -1117,7 +1153,8 @@ export default function WebFeatureServiceImageryProvider(options) {
         *   Get Feature with ID
         */
         WebFeatureServiceImageryProvider.prototype.GetFeatureWithId = function(id){
-            var request = "request=GetFeature&" + "featureID=" + id;
+            var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
+                          ((this.paramCaps)? "FEATUREID=" : "featureID=") + id;
             request = this._getUrl + request;
             //getResponseFromServer(this,request);
             var that = this;

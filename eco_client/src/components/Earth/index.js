@@ -5,7 +5,8 @@ import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 //import Globe from 'cesium/Source/Scene/Globe';
 //import MapProjection from 'cesium/Source/Core/MapProjection';
 //import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
-//import createWorldTerrain from 'cesium/Source/Core/createWorldTerrain'
+//import createWorldTerrain from 'cesium/Source/Core/createWorldTerrain';
+//import Credit from 'cesium/Source/Core/Credit';
 import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
 import { render, Fragment } from 'preact'; //createContext seems can be used only within Parent DOM..
 import { useState, useEffect } from 'preact/hooks'; //useRef, useImperativeHandle
@@ -15,9 +16,9 @@ import Layer from 'async!../Layer';
 import { FlowContextProvider } from "../Flows/FlowContext"; //current, flow for Windjs
 import { ClusterContextProvider } from "../SiteCluster/ClusterContext";
 //import { UserContext } from '../UserHandler/UserContext';
-
 import style from './style';
 import 'cesium/Source/Widgets/widgets.css';
+import '../../style/style_earth.css';
 
 //var csLoader = { csloaded: false, csviewer: null };
 //export const csLoader = createContext({
@@ -129,6 +130,8 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   };
   const wait_until_viewer = async () => {
       await until(_ => globe.loaded? true: false);
+      //let wfsCredit = new Credit('Coastline');// 1:10m ©Natural Earth');//, showOnScreen: true});
+      //globe.viewer.scene.frameState.creditDisplay.addCredit(wfsCredit);
       let creditx = document.querySelector('.cesium-credit-textContainer')
       creditx.style.display = 'none';
   };

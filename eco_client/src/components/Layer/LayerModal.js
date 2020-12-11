@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'preact/hooks'; //useMemo, useCallback
 import Color from 'cesium/Source/Core/Color.js';
+//import Credit from 'cesium/Source/Core/Credit';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 //import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
@@ -8,6 +9,7 @@ import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProv
 import GlobeSurfaceTileProvider from 'cesium/Source/Scene/GlobeSurfaceTileProvider.js';
 //import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
 import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
+//import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
 import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
 import WebFeatureServiceImageryProvider from '../Earth/WebFeatureServiceImageryProvider';
@@ -103,6 +105,20 @@ const LayerModal = (props) => {
     }
   }; //, [coast.forcestop]);
 
+  const initCoastline = () => {
+    //let wfsCredit = new Credit('Coastline 1:10m ©Natural Earth');//, showOnScreen: true});
+    //viewer.scene.frameState.creditDisplay.addDefaultCredit(wfsCredit);
+    setCoast((preState) => ({
+          ...preState,
+          wfs: new WebFeatureServiceImageryProvider({
+             url: wfsConfig.coast,
+             layers: wfsConfig.coast_10m_layer,
+             viewer: viewer,
+             credit: 'Coastline 1:10m ©Natural Earth'
+          }),
+    }));
+  }
+
   const showCoastline = async () => {
     const hide = !coast.hide;
     const wfs = coast.wfs;
@@ -121,14 +137,8 @@ const LayerModal = (props) => {
       }
     } else {
       if (!hide && wfs === null) {
-        await setCoast((preState) => ({
-          ...preState,
-          wfs: new WebFeatureServiceImageryProvider({
-             url: wfsConfig.coast,
-             layers: wfsConfig.coast_10m_layer,
-             viewer: viewer
-          }),
-        }));
+        await initCoastline();
+
       } else if (!hide && wfs !== null) {
         console.log("Re-show WFS layer..")
         await wfs.showCollection();
@@ -406,7 +416,7 @@ const LayerModal = (props) => {
       new GridImageryProvider(),
       1.0, false
     );*/
-    addAdditionalLayerOption(
+/*  addAdditionalLayerOption(
       "ODB Copepod",
       new WebMapServiceImageryProvider({
             url : 'https://odbwms.oc.ntu.edu.tw/odbintl/rasters/odbwms/',
@@ -420,7 +430,37 @@ const LayerModal = (props) => {
           }),
       1.0, false
     );
+    addAdditionalLayerOption(
+      "Sea area of Dongsha Atoll National Park",
+      new WebMapServiceImageryProvider({
+            url : 'http://ogcmap.tgos.nat.gov.tw/TGOS_UserServices/2770/DongShaOcean/SimpleWMS.aspx', //?REQUEST=GetMap&SERVICE=WMS&VERSION=1.1.1',
+            //LAYERS=DongShaOcean&STYLES=&FORMAT=image/png&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&SRS=EPSG:4326&BBOX=115.924463110184,20.1528810111254,118.116972122111,21.2306444772295&WIDTH=1660&HEIGHT=816',
+            layers : 'DongShaOcean',
+            credit : '內政部營建署海洋國家公園管理處, Taiwan',
+            parameters : {
+              transparent : 'true',
+              format : 'image/png'
+            },
+            proxy : new DefaultProxy('/proxy/')
+          }),
+      1.0, false
+    );
+*/
 
+/* https://maps.nlsc.gov.tw/S09SOA/ (chrome) not work for cors
+    addAdditionalLayerOption(
+      "Taiwan administrative district",
+      new WebFeatureServiceImageryProvider({
+             url: 'https://wfs.nlsc.gov.tw',
+             layers: 'WFS:VILLAGE_NLSC', //need auth: 'EMAP_COASTLINE',
+             viewer: viewer,
+             paramCaps: true,
+             paramMore: 'SRSNAME=EPSG4326&outputFormat="GML"&',
+             bboxDisable: true
+      }),
+      1.0, false
+    );
+*/
     addAdditionalLayerOption(
       "Tile Coordinates",
       new TileCoordinatesImageryProvider(),
