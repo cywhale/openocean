@@ -6,7 +6,7 @@ import path from 'path';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 //const ExtractTextPlugin = require('extract-text-webpack-plugin');
 //const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const autoprefixer = require('autoprefixer');
+//const autoprefixer = require('autoprefixer');
 const { merge } = require('webpack-merge');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -19,7 +19,8 @@ const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack
 //const BrotliGzipPlugin = require('brotli-gzip-webpack-plugin');
 //https://github.com/webpack-contrib/compression-webpack-plugin
 const CompressionPlugin = require('compression-webpack-plugin');
-const zlib = require('zlib');
+//const OptimizePlugin = require('optimize-plugin'); //cannot work with copy-webpack-plugin
+//const zlib = require('zlib');
 
 // Cesium
 const cesiumSource = "../node_modules/cesium/Source";
@@ -41,17 +42,42 @@ const globOptions = {};
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 //https://github.com/preactjs/preact-cli/blob/81c7bb23e9c00ba96da1c4b9caec0350570b8929/src/lib/webpack/webpack-client-config.js
+
 const cesium_other_config = (config, env) => {
   var entryx;
+  var optzx = {
+       usedExports: true,
+       runtimeChunk: true, //'single'
+       concatenateModules: true,
+       minimizer:
+       [
+         new TerserPlugin({
+             cache: true,
+             parallel: true,
+             sourceMap: true,
+             terserOptions: {
+                compress: { drop_console: true },
+                output: { comments: false }
+             }, //https://github.com/preactjs/preact-cli/blob/master/packages/cli/lib/lib/webpack/webpack-clien$
+             extractComments: false //{
+               //filename: (fileData) => {
+               //  return `${fileData.filename}.OTHER.LICENSE.txt${fileData.query}`;
+               //}
+             //}
+         })
+      ]
+    };
+
   var outputx = {
       filename: '[name].[chunkhash:8].js', //'static/js/'
       sourceMapFilename: '[name].[chunkhash:8].map',
       chunkFilename: '[name].[chunkhash:8].chunk.[id].js',
       publicPath: publicPath,
       //path: path.resolve(__dirname, 'build'),
-      // Needed to compile multiline strings in Cesium
+      //Needed to compile multiline strings in Cesium
       sourcePrefix: ''
   };
+
 
   if (testenv.NODE_ENV === "production") {
     console.log("Node env in production...");
@@ -63,15 +89,13 @@ const cesium_other_config = (config, env) => {
     outputx = {...outputx,
       path: path.resolve(__dirname, 'build')
     };
+
   } else {
     console.log("Node env in development...");
 
     entryx = [
       'webpack-dev-server/client?https://0.0.0.0:3000/',
-      //'webpack-dev-server/client?https://localhost:3000/',
       //https://github.com/webpack/webpack-dev-server/issues/416
-      //'webpack-dev-server/client?https://' + require("os").hostname() + ':3000/',
-      //'webpack-dev-server/client?https://eco.odb.ntu.edu.tw:3000/',
       //'webpack-dev-server/client?https://' + require("ip").address() + ':3000/',
       './src/index.js'
     ];
@@ -111,7 +135,7 @@ const cesium_other_config = (config, env) => {
       Buffer: false,
       http: "empty",
       https: "empty",
-      zlib: "empty"
+      //zlib: "empty"
     },
     resolve: {
       fallback: path.resolve(__dirname, '..', 'src'),
@@ -213,40 +237,13 @@ const cesium_other_config = (config, env) => {
     },*/
 //https://github.com/CesiumGS/cesium-webpack-example/issues/7
     optimization: {
-       usedExports: true,
-       runtimeChunk: true, //'single'
-       concatenateModules: true,
-       minimizer:
-       [
-         new TerserPlugin({
-             cache: true,
-             parallel: true,
-             sourceMap: true,
-             terserOptions: {
-                compress: { drop_console: true },
-		output: { comments: false }
-             }, //https://github.com/preactjs/preact-cli/blob/master/packages/cli/lib/lib/webpack/webpack-client-config.js
-             extractComments: false //{
-               //filename: (fileData) => {
-               //  return `${fileData.filename}.OTHER.LICENSE.txt${fileData.query}`;
-               //}
-             //}
-         })
-      ],
+      ...optzx,
       splitChunks: {
         //name: 'vendors',
         chunks: "all",
         maxInitialRequests: Infinity,
 	//minSize: 0,
         cacheGroups: {
-        /*preactBase: {
-            name: 'preactBase',
-            test: (module) => {
-              return /preact|prop-types/.test(module.context);
-            },
-            chunks: 'pre',
-            priority: 10,
-          },*/
           vendors: {
             test: /[\\/]node_modules[\\/]/,
             priority: -10,
@@ -284,26 +281,58 @@ const baseConfig = (config, env) => {
         config.plugins = [];
   }
 
+// transform https://github.com/webpack-contrib/copy-webpack-plugin/issues/6
+  config.plugins.push(
+    new CopyWebpackPlugin({
+      patterns: [
+      {
+        from: path.join(cesiumSource, cesiumWorkers), //__dirname,
+        to: "Workers", //path.join(__dirname, "Workers"),
+      },
+      {
+        from: path.join(cesiumSource, "Assets"), //__dirname,
+        to: "Assets", //path.join(__dirname, "Assets"),
+        globOptions: globOptions,
+      },
+      {
+        from: path.join(cesiumSource, "Widgets"), //__dirname,
+        to: "Widgets", //path.join(__dirname, "Widgets"),
+      },
+      { from: path.join(cesiumSource, 'ThirdParty'),
+        to: 'ThirdParty',
+      }
+      ]
+    })
+  );
+
+  config.plugins.push(
+    new webpack.DefinePlugin({
+       // Define relative base path in cesium for loading assets
+       CESIUM_BASE_URL: JSON.stringify('')
+    })
+  );
+
   if (testenv.NODE_ENV === "production") {
     config.plugins.push(
       new HtmlWebpackPlugin({
          template: 'template.html',
          production : true,
          inject: true,
-      minify: {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true
-      }
+        minify: {
+          removeComments: true,
+          collapseWhitespace: true,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          keepClosingSlash: true,
+          minifyJS: true,
+          minifyCSS: true,
+          minifyURLs: true
+        }
       })
     );
+
 // see https://github.com/webpack-contrib/compression-webpack-plugin
 // can replace BrotliPlugin and BrotliGzipPlugin
     config.plugins.push(
@@ -331,6 +360,7 @@ const baseConfig = (config, env) => {
           minRatio: 0.8
         })
     );
+
 // https://blog.isquaredsoftware.com/2017/03/declarative-earth-part-1-cesium-webpack/
 /*
     config.plugins.push(
@@ -349,6 +379,14 @@ const baseConfig = (config, env) => {
     //config.plugins.push( new ManifestPlugin({
     //  fileName: 'asset-manifest.json'
     //}));
+/*
+    config.plugins.push( new OptimizePlugin({
+      concurrency: 8,
+      sourceMap: false,
+      minify: true,
+      modernize:false
+    }));
+*/
     config.plugins.push( new BundleAnalyzerPlugin({
       analyzerMode: 'static', //disabled
       generateStatsFile: true,
@@ -359,39 +397,6 @@ const baseConfig = (config, env) => {
   //config.plugins.push( new MiniCssExtractPlugin()); //{extractTextPluginOptions}) );
   //    filename: cssFilename
   //}) );
-
-  config.plugins.push(
-    new CopyWebpackPlugin({
-      patterns: [
-      {
-        from: path.join(cesiumSource, cesiumWorkers), //__dirname,
-        to: "Workers", //path.join(__dirname, "Workers"),
-      },
-      {
-        from: path.join(cesiumSource, "Assets"), //__dirname,
-        to: "Assets", //path.join(__dirname, "Assets"),
-        globOptions: globOptions
-      },
-      {
-        from: path.join(cesiumSource, "Widgets"), //__dirname,
-        to: "Widgets", //path.join(__dirname, "Widgets"),
-      },
-      { from: path.join(cesiumSource, 'ThirdParty'),
-        to: 'ThirdParty'
-      }/*,
-      { from: path.join('..', 'distdll/cesiumDll.js'),
-        to: 'cesium'
-      }*/
-      ]
-    })
-  );
-
-  config.plugins.push(
-    new webpack.DefinePlugin({
-       // Define relative base path in cesium for loading assets
-       CESIUM_BASE_URL: JSON.stringify('')
-    })
-  );
 /*
   config.plugins.push( new BundleAnalyzerPlugin({
       analyzerMode: 'static', //disabled
