@@ -1,4 +1,4 @@
-/*global define*/
+/* global define */
 // related discussion: https://community.cesium.com/t/wfs-support-in-cesium/3882
 // https://groups.google.com/g/cesium-dev/c/YJVt_-U9bxo/m/yJ5qP7dxAQAJ
 // https://github.com/CesiumGS/cesium/issues/6333
@@ -7,12 +7,13 @@
 import PolygonHierarchy from 'cesium/Source/Core/PolygonHierarchy';
 import CesiumMath from 'cesium/Source/Core/Math';
 import Color from 'cesium/Source/Core/Color';
-import Credit from "cesium/Source/Core/Credit.js";
+//import Credit from "cesium/Source/Core/Credit.js";
 import PinBuilder from 'cesium/Source/Core/PinBuilder';
 import Cartographic from 'cesium/Source/Core/Cartographic';
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 //import clone from 'cesium/Source/Core/clone';
+import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
 import defaultValue from 'cesium/Source/Core/defaultValue';
 import defined from 'cesium/Source/Core/defined';
 import DeveloperError from 'cesium/Source/Core/DeveloperError';
@@ -26,6 +27,7 @@ import BillboardCollection from 'cesium/Source/Scene/BillboardCollection';
 import Material from 'cesium/Source/Scene/Material';
 import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
 import PolygonGeometry from 'cesium/Source/Core/PolygonGeometry';
+//import proj4 from 'proj4';
 /* old version
 'cesium/Source/Core/defineProperties'
 'cesium/Source/Core/loadXML'
@@ -285,7 +287,7 @@ define([
      *
      * @exports loadXML
      *
-     * @param {String|Promise.<String>} url The URL to request, or a promise for the URL.
+     * @param {String|Promise.<String>} url The URL to request, or a promise for the URL
      * @param {Object} [headers] HTTP headers to send with the request.
      * @returns {Promise.<XMLDocument>} a promise that will resolve to the requested data when loaded.
      *
@@ -366,9 +368,20 @@ define('Scene/WebFeatureServiceImageryProvider',[
 
         function defaultCrsFunction(coordinates) {
             return Cartesian3.fromDegrees(coordinates[0], coordinates[1], coordinates[2]);
-        }
+        };
+/*
+        function proj4CrsFunction(coord, from='EPSG:3857') { //[lng, lat]
+          proj4.defs["EPSG:3826"] = "+title=TWD97 TM2+proj=tmerc +lat_0=0 +lon_0=121 +k=0.9999 +x_0=250000 +y_0=0 +ellps=GRS80 +units=m +no_defs"; //+units=公尺
+          proj4.defs["EPSG:3857"] = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs";
 
+          let crdx = proj4(proj4.defs[from], proj4.defs['EPSG:4326'],
+                     [parseFloat(coord[0]), parseFloat(coord[1])]);
+          return([crdx[0], crdx[1]])
+        };
+*/
         var crsNames = {
+//          'EPSG:3857' : proj4CrsFunction,
+//          'http://www.opengis.net/gml/srs/epsg.xml#3857': proj4CrsFunction,
             'EPSG:4326' : defaultCrsFunction,
             'urn:ogc:def:crs:EPSG::4326' : defaultCrsFunction,
             'urn:ogc:def:crs:EPSG:6.6:4326' : defaultCrsFunction,
@@ -410,13 +423,14 @@ define('Scene/WebFeatureServiceImageryProvider',[
                     return RuntimeError('Unknown crs name: ' + crsName);
                 }
                 crsProperties.crsFunction = crsFunction;
+                crsProperties.crsName = crsName; // modified by cywhale 202012 // should use grep
             }
 
-                var crsDimension = node.getAttribute('srsDimension');
-                if(crsDimension) {
-                    crsDimension = parseInt(crsDimension);
-                    crsProperties.crsDimension = crsDimension;
-                }
+            var crsDimension = node.getAttribute('srsDimension');
+            if(crsDimension) {
+                crsDimension = parseInt(crsDimension);
+                crsProperties.crsDimension = crsDimension;
+            }
             return crsProperties;
         }
 
@@ -429,8 +443,8 @@ define('Scene/WebFeatureServiceImageryProvider',[
                 featureCollection = documentNode.getElementsByTagNameNS(gmlns, "featureMembers");
             }
 
-            var crsProperties = {'crsFunction' : defaultCrsFunction, 'crsDimension' : 2};
-             var boundedByNode = documentNode.getElementsByTagNameNS(gmlns, "boundedBy")[0];
+            var crsProperties = {'crsFunction' : defaultCrsFunction, 'crsName': 'EPSG:4326', 'crsDimension' : 2};
+            var boundedByNode = documentNode.getElementsByTagNameNS(gmlns, "boundedBy")[0];
             if(boundedByNode) {
                 crsProperties = getCrsProperties(boundedByNode.firstElementChild, crsProperties);
             }
@@ -499,13 +513,16 @@ define('Scene/WebFeatureServiceImageryProvider',[
         }
 
         function renderLineStringAsPolyline(that){
-            var coords = [];
-            for(var i = 0 ; i < that._coords.length/2;i++){
-                var lat = parseFloat(that._coords[2*i]);
-                var lng = parseFloat(that._coords[2*i + 1]);
+            let coords = that._coords;
+/*          let coords = [];
+            for(let i = 0 ; i < that._coords.length/2;i++){
+                let lat = parseFloat(that._coords[2*i]);
+                let lng = parseFloat(that._coords[2*i + 1]);
                 coords.push(lat,lng);
-            }
-
+//              let crdx = proj4CrsFunction([parseFloat(that._coords[2*i + 1]), parseFloat(that._coords[2*i])],
+//                                          from='EPSG:3857');
+//              coords.push(crdx[1], crdx[0]);
+            }*/
             that._collectionVector.push(new PolylineCollection());
             var length = that._collectionVector.length;
             that._collectionVector[length - 1].add({
@@ -522,21 +539,34 @@ define('Scene/WebFeatureServiceImageryProvider',[
 
         function processLineString(that,lineString, properties, crsProperties, index) {
             crsProperties = getCrsProperties(lineString, crsProperties);
-            var coordString = lineString.firstElementChild.textContent;
-            var splitCoords = coordString.split(" ");
-            var coords_feature = [];
+            let coordString = lineString.firstElementChild.textContent;
+            let splitCoords = coordString.split(" ");
+            let coords_feature = [];
             that._coords.length = 0;
             //pushing lat/long values
-            for(var i = 0 ; i < splitCoords.length; i++){
-                var split = splitCoords[i].split(",");
+/* not yet
+            let coords = [];
+//          if (crsProperties.crsName === "EPSG:3857" || crsProperties.crsName === "http://www.opengis.net/gml/srs/epsg.xml#3857") {
+              for(let i = 0 ; i < splitCoords.length; i++){
+                let split = splitCoords[i].split(",");
                 that._coords.push(split[0],split[1]);
+                //let crdx = proj4CrsFunction([split[1], split[0]], "EPSG:3857"); //need [lng,lat]
+                //coords.push(crdx[1], crdx[0]);
+              }
+            } else { */
+            for(let i = 0 ; i < splitCoords.length; i++){
+                let split = splitCoords[i].split(",");
+                //let lat = parseFloat(split[0]);
+                //let lng = parseFloat(split[1]);
+                //that._coords.push(split[0],split[1]);
+                that._coords.push(parseFloat(split[0]), parseFloat(split[1])); //coords.push(lat,lng);
             }
+            //}
             /*that._coords.push({
                 contour : index,
                 positions : coords_feature.slice(0)
             });*/
             renderLineStringAsPolyline(that);
-
 
             //console.log(coordString);
             //var coordinates = processCoordinates(coordString, crsProperties);
@@ -766,10 +796,13 @@ define('Scene/WebFeatureServiceImageryProvider',[
             that._validBoundingBox = true;
 
 // modified by cywhale, compare current max/min of bbox to track if all data is fetched from WFS //south,west,north,east
-            if (that.S_W.lat < that.bboxmax[0]) { that.bboxmax[0] = that.S_W.lat; }
-            if (that.S_W.lng < that.bboxmax[1]) { that.bboxmax[1] = that.S_W.lng; }
-            if (that.N_E.lat > that.bboxmax[2]) { that.bboxmax[2] = that.N_E.lat; }
-            if (that.N_E.lng > that.bboxmax[3]) { that.bboxmax[3] = that.N_E.lng; }
+// modified 202012 that if has multiple scale, bboxmax update only at finest-scale so that all tiles can be loaded
+            if (!that.needScale || (that.pixelSize <= that.scaleSet[0])) {
+              if (that.S_W.lat < that.bboxmax[0]) { that.bboxmax[0] = that.S_W.lat; }
+              if (that.S_W.lng < that.bboxmax[1]) { that.bboxmax[1] = that.S_W.lng; }
+              if (that.N_E.lat > that.bboxmax[2]) { that.bboxmax[2] = that.N_E.lat; }
+              if (that.N_E.lng > that.bboxmax[3]) { that.bboxmax[3] = that.N_E.lng; }
+            }
         }
 
 /* from cesium/Source/Core, but add params, just for new Camera(Scene)
@@ -797,27 +830,39 @@ export default function WebFeatureServiceImageryProvider(options) {
 
             if(!defined(options.viewer))
                 throw DeveloperError("viewer is required");
-// paramCaps, paramMore is actually no need, just try if a old-design WFS source (TGOS, Taiwan) cannot accept different case of parameters
+/* paramCaps, paramMore is actually no need, just try if a old-design WFS source (TGOS, Taiwan) cannot accept different case of parameters
             if(!defined(options.paramCaps)) { //convert ?wfs/service=WFS&version=1.0.0& to upper case
               this.paramCaps = false;
             } else {
               this.paramCaps = options.paramCaps === true? true : false;
             }
-
+*/
             if(!defined(options.paramMore)) { //add some other params in wfs url
               this.paramMore = '';
             } else {
               this.paramMore = options.paramMore;
             }
+
+            if(!defined(options.scaleSet)) { //add current scale (pixelSize) in wfs url
+              this.needScale = false;
+              this.scaleSet = [];
+            } else if (options.scaleSet.length == 0) {
+              this.needScale = false;
+              this.scaleSet = [];
+            } else {
+              this.needScae = true;
+              this.scaleSet = options.scaleSet;
+            }
 //------------------------------------------------------------------------------
             //cesium viewer widget
             this._viewer = options.viewer;
 
-            var credit = options.credit;
-            this._credit = typeof credit === "string" ? new Credit(credit) : credit;
+//          var credit = options.credit;
+//          this._credit = typeof credit === "string" ? new Credit(credit) : credit;
 /*          if (credit && credit !== '' && this._credit) {
               this._viewer.scene.frameState.creditDisplay.addDefaultCredit(this._credit);
             } */ // move to globe scope of viewer (LayerModal.js) to add Credit
+//---- Credit not work yet, NOT really add to Cesium CreditDisplay --------------
             //address of server
             this._url = options.url;
 
@@ -852,6 +897,9 @@ export default function WebFeatureServiceImageryProvider(options) {
             }
 
             this._bboxRequired = enableBBOX && defaultValue(options.BBOX,true);
+
+            this.boundingSphere = new BoundingSphere();
+            this.pixelSize = this._viewer.camera.getPixelSize(this.boundingSphere, this._viewer.scene.drawingBufferWidth, this._viewer.scene.drawingBufferHeight);
 
             //found valid bounding box
             this._validBoundingBox = false;
@@ -925,13 +973,12 @@ export default function WebFeatureServiceImageryProvider(options) {
                 set : function(featureLimit){
                     this._maxFeatures = featureLimit;
                 }
-            },
-
-            credit: {
+            }//,
+/*          credit: {
               get: function () {
                  return this._credit;
               },
-            }
+            } */
         });
 
         /*
@@ -971,10 +1018,14 @@ export default function WebFeatureServiceImageryProvider(options) {
         *   http://localhost:8080/geoserver/wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=tiger:tiger_roads&maxFeatures=50
         */
         WebFeatureServiceImageryProvider.prototype.buildCompleteRequestUrl = function(){
-            var typeNameInfo = this._layers.split(":");
-            var request_url = this._url + "/" + ((this.paramCaps)? "WFS?" : "wfs?"); //GeoServer use ows?  not wfs?
-            var params = this.paramCaps? "SERVICE=WFS&VERSION=1.0.0&": "service=WFS&version=1.0.0&";
-            this._getUrl = request_url + params + this.paramMore;
+            let typeNameInfo = this._layers.split(":");
+            let request_url = this._url + "/" + "wfs?"; //((this.paramCaps)? "WFS?" : "wfs?");
+            let params = "service=WFS&version=1.0.0&";  //this.paramCaps? "SERVICE=WFS&VERSION=1.0.0&": "service=WFS&version=1.0.0&";
+            if (this.needScale) {
+              this._getUrl = request_url + params + 'viewparams=viewScale:' + this.pixelSize + '&' + this.paramMore;
+            } else {
+              this._getUrl = request_url + params + this.paramMore;
+            }
         };
 
         /*
@@ -997,6 +1048,10 @@ export default function WebFeatureServiceImageryProvider(options) {
                     !that.scratchCamera.transform.equals(that.scratchLastCamera.transform) ||
                     !that.scratchCamera.frustum.equals(that.scratchLastCamera.frustum)) {
                     that.GetFeature();
+
+            /* modified by cywhale 202012 to add scale parameter in wfs url */
+                    that.pixelSize = that._viewer.camera.getPixelSize(that.boundingSphere, that._viewer.scene.drawingBufferWidth, that._viewer.scene.drawingBufferHeight);
+
                     that.scratchLastCamera = { //clonex(that.scratchCamera, that._viewer.scene, true); //.clone();
                         position: that.scratchCamera.position.clone(),
                         direction: that.scratchCamera.direction.clone(),
@@ -1030,7 +1085,7 @@ export default function WebFeatureServiceImageryProvider(options) {
         *   logs a string having the XML spec in the console.
         */
         WebFeatureServiceImageryProvider.prototype.GetCapabilities = function(){
-            var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetCapabilities";
+            var request = "request=GetCapabilities"; //((this.paramCaps)? "REQUEST=" : "request=") + "GetCapabilities";
             request = this._getUrl + request;
             when(loadText(request),function(response){
                console.log(response);
@@ -1043,8 +1098,9 @@ export default function WebFeatureServiceImageryProvider(options) {
         *   values and coordinates
         */
         WebFeatureServiceImageryProvider.prototype.DescribeFeatureType = function(){
-            var request = ((this.paramCaps)? "REQUEST=" : "request=") + "DescribeFeatureType&" +
-                          ((this.paramCaps)? "TYPENAME=" : "typeName=") +
+            var request = "request=DescribeFeatureType&typeName=" +
+                          //((this.paramCaps)? "REQUEST=" : "request=") + "DescribeFeatureType&" +
+                          //((this.paramCaps)? "TYPENAME=" : "typeName=") +
                           this._layers;
             request = this._getUrl + request;
             when(loadText(request),function(response){
@@ -1060,11 +1116,13 @@ export default function WebFeatureServiceImageryProvider(options) {
             if(this._bboxRequired)
                 compute(this);
             var that = this;
-            var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
-                          ((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers;
+            var request = "request=GetFeature&typeName="+ this._layers;
+                          //((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
+                          //((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers;
             request = this._getUrl + request; // + "&maxFeatures=" + this._maxFeatures;
             if(this._bboxRequired && this._validBoundingBox){
-                var bbox = ((this.paramCaps)? "&BBOX=" : "&bbox=") + this.S_W.lng.toString() + "," + this.S_W.lat.toString() + ",";
+                var bbox = "&bbox=" + //((this.paramCaps)? "&BBOX=" : "&bbox=") +
+                           this.S_W.lng.toString() + "," + this.S_W.lat.toString() + ",";
                 bbox = bbox + this.N_E.lng.toString() + "," + this.N_E.lat.toString();
                 request = request + bbox;
             }
@@ -1131,9 +1189,10 @@ export default function WebFeatureServiceImageryProvider(options) {
             var f_list;
             var f_length = featureList.length;
             if(f_length === 1){
-                var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
-                              ((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers + "&" +
-                              ((this.paramCaps)? "FEATUREID=" : "featureID=") + featureList[0];
+                var request = "request=GetFeature&typeName=" + this._layers + "&featureID=" + featureList[0];
+                              //((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
+                              //((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers + "&" +
+                              //((this.paramCaps)? "FEATUREID=" : "featureID=") + featureList[0];
                 request = this._getUrl + request;
                 return getResponseFromServer(request);
             }else{
@@ -1141,9 +1200,10 @@ export default function WebFeatureServiceImageryProvider(options) {
                 for(var i = 1 ;i < f_length; i++){
                     f_list = f_list + "," + featureList[i];
                 }
-                var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
-                              ((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers + "&" +
-                              ((this.paramCaps)? "FEATUREID=" : "featureID=") + f_list;
+                var request = "request=GetFeature&typeName=" + this._layers + "&featureID=" + f_list;
+                              //((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
+                              //((this.paramCaps)? "TYPENAME=" : "typeName=") + this._layers + "&" +
+                              //((this.paramCaps)? "FEATUREID=" : "featureID=") + f_list;
                 request = this._getUrl + request;
                 return getResponseFromServer(this, request);
             }
@@ -1153,8 +1213,9 @@ export default function WebFeatureServiceImageryProvider(options) {
         *   Get Feature with ID
         */
         WebFeatureServiceImageryProvider.prototype.GetFeatureWithId = function(id){
-            var request = ((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
-                          ((this.paramCaps)? "FEATUREID=" : "featureID=") + id;
+            var request = "request=GetFeature&featureID=" + id;
+                          //((this.paramCaps)? "REQUEST=" : "request=") + "GetFeature&" +
+                          //((this.paramCaps)? "FEATUREID=" : "featureID=") + id;
             request = this._getUrl + request;
             //getResponseFromServer(this,request);
             var that = this;
@@ -1163,6 +1224,5 @@ export default function WebFeatureServiceImageryProvider(options) {
                 loadGML(that,that._response);
             });
         };
-
 //      return WebFeatureServiceImageryProvider;
 //  });

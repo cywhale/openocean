@@ -8,6 +8,14 @@
     "value": "flows"
   },
   {
+    "label": "Biodiversity",
+    "disabled": false,
+    "children": [
+      { "label": "GBIF Ocean","value": "gbifocean", "format": "wfs", "type": "site" }
+    ],
+    "value": "biodiversity"
+  },
+  {
     "label": "Natural Reserve, Taiwan",
     "children": [
       { "value": "whitedolphin", "label": "White Dolphin Reserve", "type": "region", "format": "geojson" },

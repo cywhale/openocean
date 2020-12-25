@@ -17,7 +17,7 @@ import { FlowContextProvider } from "../Flows/FlowContext"; //current, flow for 
 import { ClusterContextProvider } from "../SiteCluster/ClusterContext";
 //import { UserContext } from '../UserHandler/UserContext';
 import style from './style';
-import 'cesium/Source/Widgets/widgets.css';
+//import 'cesium/Source/Widgets/widgets.css';
 import '../../style/style_earth.css';
 
 //var csLoader = { csloaded: false, csviewer: null };

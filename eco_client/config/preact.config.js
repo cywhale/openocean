@@ -19,8 +19,10 @@ const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack
 //const BrotliGzipPlugin = require('brotli-gzip-webpack-plugin');
 //https://github.com/webpack-contrib/compression-webpack-plugin
 const CompressionPlugin = require('compression-webpack-plugin');
-//const OptimizePlugin = require('optimize-plugin'); //cannot work with copy-webpack-plugin
 //const zlib = require('zlib');
+
+const tryOptimize = false;
+const OptimizePlugin = require('optimize-plugin'); //cannot work with copy-webpack-plugin
 
 // Cesium
 const cesiumSource = "../node_modules/cesium/Source";
@@ -44,8 +46,35 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 //https://github.com/preactjs/preact-cli/blob/81c7bb23e9c00ba96da1c4b9caec0350570b8929/src/lib/webpack/webpack-client-config.js
 
 const cesium_other_config = (config, env) => {
+
   var entryx;
-  var optzx = {
+
+  if (tryOptimize) {
+    var optzx = {
+       usedExports: true,
+       runtimeChunk: true, //'single'
+       concatenateModules: true,
+    }
+    if (testenv.NODE_ENV !== "production") {
+      optzx = {
+         ...optzx,
+         minimizer:
+         [
+           new TerserPlugin({
+             cache: true,
+             parallel: true,
+             sourceMap: true,
+             terserOptions: {
+                compress: { drop_console: true },
+                output: { comments: false }
+             },
+             extractComments: false
+           })
+        ]
+      }
+    }
+  } else {
+    var optzx = {
        usedExports: true,
        runtimeChunk: true, //'single'
        concatenateModules: true,
@@ -67,7 +96,7 @@ const cesium_other_config = (config, env) => {
          })
       ]
     };
-
+  }
   var outputx = {
       filename: '[name].[chunkhash:8].js', //'static/js/'
       sourceMapFilename: '[name].[chunkhash:8].map',
@@ -147,8 +176,20 @@ const cesium_other_config = (config, env) => {
         "react-dom": "preact-compat"
       }
     },
-    module: {
-        rules: [{
+    module: { //https://github.com/CesiumGS/cesium/issues/8401
+        // Removes these errors: "Critical dependency: require function is used in a way in which dependencies cannot be statically extracted"
+        // https://github.com/AnalyticalGraphicsInc/cesium-webpack-example/issues/6
+        unknownContextCritical: false,
+        unknownContextRegExp: /\/cesium\/cesium\/Source\/Core\/buildModuleUrl\.js/,
+        rules: [
+        { test: /cesium\.js$/, loader: 'script' },
+        { //https://github.com/storybookjs/storybook/issues/1493
+            test: /\.(js|jsx)$/,
+            exclude: [/bower_components/, /node_modules/, /styles/],
+	    loader: 'babel-loader',
+	    //include: path.resolve(__dirname, '../../src')
+        },
+        {
             test: /\.(css|scss)$/,
             use: [//{
                 //loader: MiniCssExtractPlugin.loader,
@@ -313,25 +354,40 @@ const baseConfig = (config, env) => {
   );
 
   if (testenv.NODE_ENV === "production") {
-    config.plugins.push(
-      new HtmlWebpackPlugin({
-         template: 'template.html',
-         production : true,
-         inject: true,
-        minify: {
-          removeComments: true,
-          collapseWhitespace: true,
-          removeRedundantAttributes: true,
-          useShortDoctype: true,
-          removeEmptyAttributes: true,
-          removeStyleLinkTypeAttributes: true,
-          keepClosingSlash: true,
-          minifyJS: true,
-          minifyCSS: true,
-          minifyURLs: true
-        }
-      })
-    );
+
+    if (tryOptimize) {
+      console.log("!!Use LESS html-webpack-plugin args!!");
+      config.plugins.push(
+        new HtmlWebpackPlugin({
+           template: 'template.html',
+           production : true,
+           inject: false,
+           cache: false,
+           minify: false,
+        })
+      );
+    } else {
+      console.log("Use more html-webpack-plugin args");
+      config.plugins.push(
+        new HtmlWebpackPlugin({
+           template: 'template.html',
+           production : true,
+           inject: true,
+          minify: {
+            removeComments: true,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true
+          }
+        })
+      );
+    }
 
 // see https://github.com/webpack-contrib/compression-webpack-plugin
 // can replace BrotliPlugin and BrotliGzipPlugin
@@ -379,14 +435,15 @@ const baseConfig = (config, env) => {
     //config.plugins.push( new ManifestPlugin({
     //  fileName: 'asset-manifest.json'
     //}));
-/*
-    config.plugins.push( new OptimizePlugin({
-      concurrency: 8,
-      sourceMap: false,
-      minify: true,
-      modernize:false
-    }));
-*/
+
+    if (tryOptimize) {
+      config.plugins.push( new OptimizePlugin({
+        concurrency: 8,
+        sourceMap: false,
+        minify: true,
+        modernize:false
+      }));
+    }
     config.plugins.push( new BundleAnalyzerPlugin({
       analyzerMode: 'static', //disabled
       generateStatsFile: true,

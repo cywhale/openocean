@@ -3,14 +3,15 @@ import Color from 'cesium/Source/Core/Color.js';
 //import Credit from 'cesium/Source/Core/Credit';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
+//import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme';
 //import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 //import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
 import GlobeSurfaceTileProvider from 'cesium/Source/Scene/GlobeSurfaceTileProvider.js';
 //import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
 import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
-//import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
-import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
+import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
+//import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
 import WebFeatureServiceImageryProvider from '../Earth/WebFeatureServiceImageryProvider';
 // follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
@@ -18,7 +19,7 @@ import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
 import '../../style/style_layerctrl.scss';
 //import '../style/style_bubblelabel.scss';
-const { wfsConfig } = require('./.setting.js');
+const { wfsConfig, wmsConfig } = require('./.setting.js');
 
 const LayerModal = (props) => {
   const { viewer, baseName, userBase } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
@@ -114,7 +115,8 @@ const LayerModal = (props) => {
              url: wfsConfig.coast,
              layers: wfsConfig.coast_10m_layer,
              viewer: viewer,
-             credit: 'Coastline 1:10m ©Natural Earth'
+             //paramMore: 'SRSNAME=EPSG:3857&',
+             //credit: 'Coastline 1:10m ©Natural Earth'
           }),
     }));
   }
@@ -176,7 +178,8 @@ const LayerModal = (props) => {
   };
   //if add a new layer...
   //const evlay01url = 'https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png';
-  const add_gbloverlay = (url, name, alpha, show, rectangle) => {
+  const add_gbloverlay = (url, name, alpha, show, rectangle=null, credit='', provider='SingleTileImageryProvider',
+                          layer='', style='default', format='image/png', tileMatrixSetID='default028mm') => {
     //baseLayer.colorToAlpha = new Color(0.0, 0.016, 0.059);
     //baseLayer.colorToAlphaThreshold = 0.5;
     /* layer = layers.addImageryProvider(imageryProvider);
@@ -189,8 +192,23 @@ const LayerModal = (props) => {
            rectangle : Cesium.Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0)
          }));
        }*/
-    const lay = //new ImageryLayer(name, //imageryLayers.addImageryProvider(
-      new SingleTileImageryProvider({
+    let lay;
+    if (provider=='WebMapTileServiceImageryProvider') {
+      lay = new WebMapTileServiceImageryProvider({
+                url : url,
+                layer : layer,
+                style : style,
+                format : format,
+                tileMatrixSetID : tileMatrixSetID,
+                //tileMatrixLabels : ['default028mm:0', 'default028mm:1', 'default028mm:2' ...],
+                //tilingScheme: new WebMercatorTilingScheme(),
+                //maximumLevel: 21,
+                credit : credit,
+                proxy : new DefaultProxy('/proxy/')
+      });
+    } else {
+      lay = //new ImageryLayer(name, //imageryLayers.addImageryProvider(
+        new SingleTileImageryProvider({
           url: url,
           //rectangle: new Cesium.Rectangle(bnds[0], bnds[1], bnds[2], bnds[3]),
           rectangle: rectangle, //| Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0),
@@ -200,9 +218,10 @@ const LayerModal = (props) => {
           //parameters: {transparent : 'true',
           //           //alpha: 0.5,
           //             format : 'image/png'},
+          credit: credit,
           proxy : new DefaultProxy('/proxy/')
-      });
-    //);
+        });
+    }
     lay.alpha= alpha| 0.5;  //Cesium.defaultValue(alpha, 0.5);
     lay.show = show | false;//Cesium.defaultValue(show, true);
     lay.name = name;
@@ -358,14 +377,23 @@ const LayerModal = (props) => {
     }));
     */
     const grect = Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0);
-    add_gbloverlay('https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png',
-                   'NASA_NEO_Chla', 0.5, false, grect);
-
+/* move to single checkbox item
+    add_gbloverlay('https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/GEBCO_contours/MapServer/WMTS',
+                   'GEBCO contours', 1.0, false, grect,
+                   'General Bathymetric Chart of the Oceans (GEBCO); NOAA National Centers for Environmental Information (NCEI)',
+                   'WebMapTileServiceImageryProvider',
+                   'GEBCO_contours', //layer
+                   'default', 'image/png', 'default028mm');
+*/
+    //add_gbloverlay('ftp://ftp.sos.noaa.gov/sosrt/rt/noaa/sat/linear/raw/linear_rgb_cyl_20201114_1440.jpg',
+    //               'Clouds Earth, NOAA', 0.5, false, grect);
+    //'https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png'
     add_gbloverlay('https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&width=3600&height=1800',
-                   'NASA_NEO_Chla_origin', 0.5, false, grect);
+                   'NASA_NEO_Chla_origin', 0.5, false, grect, 'NASA Earth Observations (NEO)');
 
     add_gbloverlay('https://ecodata.odb.ntu.edu.tw/pub/img/neo_AQUA_MODIS_20200628.png',
-                   'NASA_false_color', 0.5, false, grect);
+                   'NASA_false_color', 0.5, false, grect, 'NASA Earth Observations (NEO)');
+
 
     /* Create the additional layers
     addAdditionalLayerOption(
@@ -384,8 +412,7 @@ const LayerModal = (props) => {
     addAdditionalLayerOption(
       "United States Weather Radar",
       new WebMapServiceImageryProvider({
-        url:
-          "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?",
+        url: "https://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi?",
         layers: "nexrad-n0r",
         credit: "Radar data courtesy Iowa Environmental Mesonet",
         parameters: {
@@ -394,6 +421,46 @@ const LayerModal = (props) => {
         },
       })
     );
+
+    let sbbox = wmsConfig.tw_substrate_area_bbox;
+    addAdditionalLayerOption(
+      "Taiwan offshore substrate (Area)",
+      new WebMapServiceImageryProvider({
+        url: wmsConfig.tw_substrate_area_url,
+        layers: wmsConfig.tw_substrate_area_layer,
+        //credit: "臺灣電子航行圖中心及海軍大氣海洋局",
+        rectangle:Rectangle.fromDegrees(sbbox[0], sbbox[1], sbbox[2], sbbox[3]),
+        //tilingScheme: new WebMercatorTilingScheme(),
+        parameters: {
+          transparent: "true",
+          style: 'substrate', //'Polygon_near_white',
+          format: "image/png",
+          //bbox: wmsConfig.tw_substrate_area_bbox.toString(),
+          width: 749,
+          height: 768
+        },
+        proxy : new DefaultProxy('/proxy/')
+      }),
+      1.0, false
+    );
+
+    addAdditionalLayerOption(
+      'GEBCO contours',
+      new WebMapTileServiceImageryProvider({
+                url : 'https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/GEBCO_contours/MapServer/WMTS',
+                layer : 'GEBCO_contours',
+                style : 'default',
+                format : 'image/png',
+                tileMatrixSetID : 'default028mm',
+                //tileMatrixLabels : ['default028mm:0', 'default028mm:1', 'default028mm:2' ...],
+                //tilingScheme: new WebMercatorTilingScheme(),
+                //maximumLevel: 21,
+                credit : 'General Bathymetric Chart of the Oceans (GEBCO); NOAA National Centers for Environmental Information (NCEI)',
+                proxy : new DefaultProxy('/proxy/')
+      }),
+      1.0, false
+    );
+
 /*  addAdditionalLayerOption(
       "TileMapService Image",
       new Cesium.TileMapServiceImageryProvider({
@@ -461,11 +528,11 @@ const LayerModal = (props) => {
       1.0, false
     );
 */
-    addAdditionalLayerOption(
+/*  addAdditionalLayerOption(
       "Tile Coordinates",
       new TileCoordinatesImageryProvider(),
       1.0, false
-    );
+    );*/
   }
 
 //return useMemo (() => {
@@ -499,7 +566,7 @@ const LayerModal = (props) => {
       <div class={style.smalltd} style="display:inline-flex;justify-content:center;flex-direction:row;">
             <button class={style.coastbutn} id="hidecoastbutn" onClick={showCoastline}>
                {coast.hide? 'Show coastline': 'Hide coastline'}</button>
-            <button class={style.coastbutn} id="stopwfsbutn" onClick={stopWFSlisten}>
+            <button style="display:none;" class={style.coastbutn} id="stopwfsbutn" onClick={stopWFSlisten}>
                {coast.forcestop? 'Remain WFS': 'Stop WFS'}</button>
       </div>
     </div>
