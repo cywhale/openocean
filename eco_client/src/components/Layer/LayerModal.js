@@ -11,6 +11,7 @@ import GlobeSurfaceTileProvider from 'cesium/Source/Scene/GlobeSurfaceTileProvid
 //import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
 import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
 import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
+import ArcGisMapServerImageryProvider from 'cesium/Source/Scene/ArcGisMapServerImageryProvider';
 //import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
 import WebFeatureServiceImageryProvider from '../Earth/WebFeatureServiceImageryProvider';
@@ -193,7 +194,13 @@ const LayerModal = (props) => {
          }));
        }*/
     let lay;
-    if (provider=='WebMapTileServiceImageryProvider') {
+    if (provider=='ArcGisMapServerImageryProvider') {
+      lay = new ArcGisMapServerImageryProvider({
+                url : url,
+                credit : credit,
+                proxy : new DefaultProxy('/proxy/')
+      });
+    } else if (provider=='WebMapTileServiceImageryProvider') {
       lay = new WebMapTileServiceImageryProvider({
                 url : url,
                 layer : layer,
@@ -385,6 +392,10 @@ const LayerModal = (props) => {
                    'GEBCO_contours', //layer
                    'default', 'image/png', 'default028mm');
 */
+
+    add_gbloverlay('https://maps.ccom.unh.edu/server/rest/services/GEBCO2020/GEBCO_2020_Depths/MapServer',
+                   'GEBCO 2020 Depths', 0.5, false, grect, 'GEBCO 2020 Depths',
+                   'ArcGisMapServerImageryProvider');
     //add_gbloverlay('ftp://ftp.sos.noaa.gov/sosrt/rt/noaa/sat/linear/raw/linear_rgb_cyl_20201114_1440.jpg',
     //               'Clouds Earth, NOAA', 0.5, false, grect);
     //'https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png'
