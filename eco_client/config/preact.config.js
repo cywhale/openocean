@@ -45,6 +45,10 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 //https://github.com/preactjs/preact-cli/blob/81c7bb23e9c00ba96da1c4b9caec0350570b8929/src/lib/webpack/webpack-client-config.js
 
+if (typeof XMLHttpRequest === 'undefined') {
+  global.XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
+}
+
 const cesium_other_config = (config, env) => {
 
   var entryx;

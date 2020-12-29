@@ -6,7 +6,8 @@ import style from './style_signin';
 
 const SignIn = (props) => {
   const { ucode, rurl } = props; //handleSSOChange
-  const { user, setUser } = useContext(UserContext);
+  const { upars } = useContext(UserContext);
+  const { user, setUser } = upars;
   const [state, setState] = useState({
     //ssostate: '',
     redirect: '',
