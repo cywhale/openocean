@@ -2,36 +2,86 @@
 //https://github.com/arqex/react-datetime/issues/105
 //https://github.com/NateRadebaugh/react-datetime/
 //import Timeline from 'cesium/Source/Widgets/Timeline/Timeline.js';
+//import ClockRange from 'cesium/Source/Core/ClockRange';
 import JulianDate from 'cesium/Source/Core/JulianDate';
-import { useState, useEffect, useRef } from 'preact/hooks';
+import TimeIntervalCollection from 'cesium/Source/Core/TimeIntervalCollection';
+import { useState, useEffect, useRef, useContext } from 'preact/hooks';
 //import "react-datetime/css/react-datetime.css";
 //import Datetime from "react-datetime";
 //import DateTime from "@nateradebaugh/react-datetime";
 //import "@nateradebaugh/react-datetime/scss/styles.scss";
 //import moment from "moment";
+import { DateContext } from "./DateContext";
+
 import style from './style';
 
 const Datepicker = (props) => {
   const { viewer } = props;
   const { clock, timeline } = viewer;
-  const formatYmd = date => date.toISOString().slice(0, 10); //2020-01-01T00:00:00
-  const formatTime= date => date.toISOString().slice(11,19);
+
+//Note: toISOSTring will ignore timezone ofset
+//const formatYmd = date => date.toISOString().slice(0, 10); //2020-01-01T00:00:00
+//const formatTime= date => date.toISOString().slice(11,19);
+//let tdt = new Date();
+//let utct = new Date(tdt.toLocaleString('en-US', { timeZone: 'UTC' }));
+  let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+  let localTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+
+  const today = localTime.slice(0, 10);
+  const currt = localTime.slice(11,19);
+  //console.log("Get today: ",today);
+  //console.log("Get time: ", currt);
+
   const isValidDate = (date) => { return date.toString() !== 'Invalid Date'; }
-  const today = formatYmd(new Date());
-  const currt = formatTime(new Date());
   const starttimeRef = useRef(null);
   const endtimeRef = useRef(null);
 
-  const [datetime, setDatetime] = useState({
+  const { tkpars } = useContext(DateContext);
+  const { clocktime, setClocktime } = tkpars;
+  const [ datetime, setDatetime ] = useState({
     startdate: today,
     starttime: '00:00:00',
     enddate: today,
-    endtime: currt
+    endtime: currt,
   })
+  const [state, setState] = useState({
+    enableAnimate: false,
+  })
+
+  const toggleAnimate = e => {
+    let shouldAnimate = !state.enableAnimate
+
+    if (shouldAnimate) {
+      clock.currentTime = clock.startTime;
+      clock.clockRange = clocktime.clockRange //.LOOP_STOP;
+      clock.multiplier = clocktime.clockMultiplier;
+    } else {
+      clock.currentTime = clock.stopTime;
+    }
+    clock.shouldAnimate = shouldAnimate;
+
+    setState((preState) => ({
+        ...preState,
+        enableAnimate: shouldAnimate,
+    }));
+  }
+
+  const clockdataCallback = (interval, index) => {
+    let time;
+    if (index === 0) {
+      // leading
+      time = JulianDate.toIso8601(interval.stop);
+    } else {
+      time = JulianDate.toIso8601(interval.start);
+    }
+    return { Time: time, };
+  }
 
   useEffect(() => {
     const startt = new Date(datetime.startdate+'T'+datetime.starttime);
     const endt = new Date(datetime.enddate+'T'+datetime.endtime);
+    let startd = datetime.startdate;
+    let endd = datetime.enddate;
     let stt, ett, start_julian, end_julian;
     if (starttimeRef.current && isValidDate(startt) &&
         endtimeRef.current && isValidDate(endt)) {
@@ -40,19 +90,37 @@ const Datepicker = (props) => {
       if (stt>ett) {
         start_julian = new JulianDate.fromDate(endt);
         end_julian = new JulianDate.fromDate(startt);
+        startd = datetime.enddate;
+        endd = datetime.startdate;
       } else {
         start_julian = new JulianDate.fromDate(startt);
         end_julian = new JulianDate.fromDate(endt);
       }
+
       clock.startTime = start_julian;
-      clock.currentTime = start_julian;
+      clock.currentTime = end_julian;
       clock.stopTime = end_julian;
       timeline.zoomTo(start_julian, end_julian);
-      console.log("Start time now: ", start_julian);
-      console.log("End time now: ", end_julian);
+      //console.log("To start date: ", JulianDate.toDate(clock.startTime));
+      //console.log("To end date: ", JulianDate.toDate(clock.stopTime));
+
+      let times = TimeIntervalCollection.fromIso8601({
+          iso8601: startd + "/" + endd + "/P1D",
+          leadingInterval: true,
+          trailingInterval: true,
+          isStopIncluded: true,
+          dataCallback: clockdataCallback,
+        });
+      console.log("In Datepicker:", startd, endd);
+
+      setClocktime((preState) => ({
+        ...preState,
+        starttime: start_julian,
+        endtime: end_julian,
+        times: times,
+      }));
     }
   }, [datetime]);
-
 /*
   const myrenderView = (mode, renderDefault) => {
     // Only for years, months and days view
@@ -127,6 +195,12 @@ const Datepicker = (props) => {
                  ...preState,
                  endtime: e.target.value,
                }))}} />
+      </div>
+      <div style="display:block;">
+        <label>
+          <input style="width:auto;" id="enableAnimate" type="checkbox" checked={state.enableAnimate} onClick={toggleAnimate} />
+          <span style="font-size:small">Time-interval animation</span>
+        </label>
       </div>
     </div>
   );

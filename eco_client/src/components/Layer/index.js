@@ -6,7 +6,7 @@ import defined from 'cesium/Source/Core/defined.js';
 //import Rectangle from 'cesium/Source/Core/Rectangle';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
-import Datepicker from 'async!../Compo/Datepicker';
+import Datepicker from 'async!../Datepicker';
 import LayerModal from 'async!./LayerModal';
 import DataCube from 'async!../DataCube'; //Region (old) + MultiSelectSort
 import Flows from 'async!../Flows';
@@ -14,6 +14,7 @@ import SiteCluster from 'async!../SiteCluster';
 import { EarthContext } from "../Earth/EarthContext";
 import { FlowContext } from "../Flows/FlowContext";
 import { ClusterContext } from "../SiteCluster/ClusterContext";
+import { DateContext } from "../Datepicker/DateContext";
 
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
@@ -29,6 +30,8 @@ const Layer = (props) => {
   const { cluster, setCluster } = clpars;
   const { fpars } = useContext(FlowContext);
   const { flow, setFlow } = fpars;
+  const { tkpars } = useContext(DateContext);
+  const { clocktime, setClocktime } = tkpars;
 /*
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&wi$
   const sTileImg = new SingleTileImageryProvider({
@@ -110,13 +113,15 @@ const Layer = (props) => {
     }
     return null;
   };*/
-/*
-  const render_ImgLayer = (props) => {
-    //render(<LayerModal viewer={viewer} />, document.getElementById('ctrlsectdiv2'));
-    //userBase: default baselayer, but can be changed after user cookies set
-    return(<LayerModal {...props} />);
+
+  const render_Layermodal = () => {
+    if (earth.loaded) {
+      console.log("Pass to layer: ", clocktime.times);
+      return(<LayerModal {...props} clocktimes={clocktime.times} />);
+    }
+    return null;
   };
-*/
+
   const set_searchingtext= (elem_search, dom, evt) => {
     let x = elem_search.value;
     if (x && x.trim() !== "" && x !== dom.dataset.search) {
@@ -151,6 +156,8 @@ const Layer = (props) => {
   //<div id="regionsectdiv"><Region viewer={viewer} /></div>
   /*                    <FlowContextProvider><ClusterContextProvider>
                         </ClusterContextProvider></FlowContextProvider>*/
+  //console.log("in Layer start: ", clocktime.starttime);
+  //console.log("in Layer times: ", clocktime.times);
   return (
     <Fragment>
       <div id="toolToggle" class={style.toolToggle}>
@@ -172,7 +179,7 @@ const Layer = (props) => {
                           <DataCube viewer={viewer} />
                       </div>
                       <div id="ctrlsectdiv2">
-                        <LayerModal {...props} />
+                        {render_Layermodal()}
                       </div>
                     </div>
                   </section>

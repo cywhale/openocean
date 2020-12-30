@@ -1,6 +1,8 @@
-import { useEffect, useState, useRef } from 'preact/hooks'; //useMemo, useCallback
+import { useEffect, useState, useRef, useContext } from 'preact/hooks'; //useMemo, useCallback
 import Color from 'cesium/Source/Core/Color.js';
 //import Credit from 'cesium/Source/Core/Credit';
+//import JulianDate from 'cesium/Source/Core/JulianDate';
+//import TimeIntervalCollection from 'cesium/Source/Core/TimeIntervalCollection';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 //import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme';
@@ -20,10 +22,11 @@ import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
 import '../../style/style_layerctrl.scss';
 //import '../style/style_bubblelabel.scss';
+//import { DateContext } from "../Datepicker/DateContext";
 const { wfsConfig, wmsConfig } = require('./.setting.js');
 
 const LayerModal = (props) => {
-  const { viewer, baseName, userBase } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
+  const { viewer, baseName, userBase, clocktimes } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
   const { imageryLayers } = viewer; //basemapLayerPicker
   const layerctrlRef = useRef(null);
   /*const [state, setState] = useState(false); //cannot be used inside viewModel function
@@ -31,6 +34,10 @@ const LayerModal = (props) => {
     name: userBase,
     layer: null,
   });*/
+//const [clocktime, setClocktime] = useState(null);
+//const { tkpars } = useContext(DateContext);
+//const { clocktime, setClocktime } = tkpars;
+
   const [viewModel, setModel] = useState({
     loaded: false,
     layers: [],
@@ -38,6 +45,8 @@ const LayerModal = (props) => {
     selectedLayer: null,
     selbase: userBase,
     baselayer: imageryLayers.get(0),
+    //selwmts: '', //for WMTS layer with time-dimension that can animate
+    //wmtslayer: null,
     //selectedImagery: null, //move to BasemapPicker
     //selectedTerrain: null,
     upLayer: null,
@@ -72,6 +81,20 @@ const LayerModal = (props) => {
     canLower: function (index) {
         return index >= 0 && index < imageryLayers.length - 1;
     },
+  });
+
+  const [wmts, setWmts] = useState({
+    url: 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{Time}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg',
+    name: 'GIBS (Himawari)', //default value
+    layer: "MODIS_Terra_CorrectedReflectance_TrueColor",
+    tileMatrixSetID : '250m',
+    style : 'default',
+    format : 'image/jpg',
+    maximumLevel: 5,
+    times: clocktimes,
+    credit : 'Global Imagery Browse Services (GIBS)',
+    imglayer: null,
+    //index: -1,
   });
 
   const [coast, setCoast] = useState({
@@ -157,6 +180,50 @@ const LayerModal = (props) => {
          hide: !coast.hide,
     }));
   }; //, [coast.hide]);
+
+  const updateWmtsLayer = (times) => { //WMTS layer that may change with time setting or layer changed by user
+    let wlayidx = imageryLayers.indexOf(wmts.imglayer)
+    if (wlayidx >= 0) {
+      let wlay = imageryLayers.get(wlayidx);
+      let show = wlay.show
+      let alpha= wlay.alpha
+      wlay.show= false;
+      imageryLayers.remove(wlay, false);
+
+      let wmtslay = addAdditionalLayerOption(
+        wmts.name,
+        new WebMapTileServiceImageryProvider({
+//        url : 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/all/wmts.cgi',
+          url : wmts.url,
+//        url : 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/all/Himawari_AHI_Band13_Clean_Infrared/...
+//        layer : 'Himawari_AHI_Band13_Clean_Infrared',
+//        tileMatrixSetID : '2km',
+//        format : 'image/png',
+          layer: wmts.layer, //"MODIS_Terra_CorrectedReflectance_TrueColor",
+          tileMatrixSetID : wmts.tileMatrixSetID, //'250m',
+          style : wmts.style, //'default',
+          format : wmts.format, //'image/jpg',
+          maximumLevel: wmts.maximumLevel, //5,
+          clock: viewer.clock,
+          times: times,
+          credit : wmts.credit,
+          proxy : new DefaultProxy('/proxy/')
+        }),
+        alpha, show
+      );
+      console.log("Updated WMTS layer with index: ", imageryLayers.indexOf(wmtslay));
+
+      setWmts((preState) => ({
+        ...preState,
+        imglayer: wmtslay,
+        tims: times,
+      }));
+      updateLayerList(viewModel.selbase, viewModel.baselayer);
+
+    } else {
+      console.log("Error because non-existed WMTS layer. Check it");
+    }
+  };
 
 
   const updateBaseLayer = () => { //BaseLayer changed from BasemapPicker, so need update viewModel
@@ -261,6 +328,7 @@ const LayerModal = (props) => {
     layer.alpha= alpha| 0.5; //Cesium.defaultValue(alpha, 0.5);
     layer.name = name;
     knockout.track(layer, ["alpha", "show", "name"]);
+    return(layer);
   }
 
   useEffect(() => {
@@ -284,9 +352,13 @@ const LayerModal = (props) => {
       //bubble_labeler(".ctrlrange-wrap2");
       //setState(true);
     } else {
+      if (clocktimes !== null && wmts.times !== null && clocktimes !== wmts.times) {
+        console.log("Update WMTS layer because viewer time setting: ", clocktimes);
+        updateWmtsLayer(clocktimes);
+      }
       updateBaseLayer();
     }
-  }, [viewModel.loaded, baseName]);
+  }, [viewModel.loaded, baseName, clocktimes]);
 /*
   const kobind = () => {
     function subscribeParameter() {
@@ -392,7 +464,6 @@ const LayerModal = (props) => {
                    'GEBCO_contours', //layer
                    'default', 'image/png', 'default028mm');
 */
-
     add_gbloverlay('https://maps.ccom.unh.edu/server/rest/services/GEBCO2020/GEBCO_2020_Depths/MapServer',
                    'GEBCO 2020 Depths', 0.5, false, grect, 'GEBCO 2020 Depths',
                    'ArcGisMapServerImageryProvider');
@@ -404,7 +475,6 @@ const LayerModal = (props) => {
 
     add_gbloverlay('https://ecodata.odb.ntu.edu.tw/pub/img/neo_AQUA_MODIS_20200628.png',
                    'NASA_false_color', 0.5, false, grect, 'NASA Earth Observations (NEO)');
-
 
     /* Create the additional layers
     addAdditionalLayerOption(
@@ -420,6 +490,7 @@ const LayerModal = (props) => {
         },
       })
     );*/
+/*
     addAdditionalLayerOption(
       "United States Weather Radar",
       new WebMapServiceImageryProvider({
@@ -432,6 +503,50 @@ const LayerModal = (props) => {
         },
       })
     );
+*/
+// https://sandcastle.cesium.com/index.html?src=Web%2520Map%2520Tile%2520Service%2520with%2520Time.html
+/*
+    Date.prototype.today = function () {
+      return ((this.getDate() < 10)?"0":"") + this.getDate() +"-"+(((this.getMonth()+1) < 10)?"0":"") + (this.getMonth()+1) +"-"+ this.getFullYear();
+    }
+// For the time now, use currdtime.today(), currdtime.timeNow()
+    Date.prototype.timeNow = function () {
+      return ((this.getHours() < 10)?"0":"") + this.getHours() +":"+ ((this.getMinutes() < 10)?"0":"") + this.getMinutes() +":"+ ((this.getSeconds() < 10)?"0":"") + this.getSeconds();
+    }
+    let currdtime = new Date();
+*/
+//  let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+//  let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+//  https://wiki.earthdata.nasa.gov/display/GIBS/GIBS+Available+Imagery+Products
+//  console.log("In Layer times:", clocktimes);
+    let wmtslay = addAdditionalLayerOption(
+      wmts.name,
+      new WebMapTileServiceImageryProvider({
+//        url : 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/all/wmts.cgi',
+          url : wmts.url,
+//        url : 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/all/Himawari_AHI_Band13_Clean_Infrared/...
+//        layer : 'Himawari_AHI_Band13_Clean_Infrared',
+//        tileMatrixSetID : '2km',
+//        format : 'image/png',
+          layer: wmts.layer, //"MODIS_Terra_CorrectedReflectance_TrueColor",
+          tileMatrixSetID : wmts.tileMatrixSetID, //'250m',
+          style : wmts.style, //'default',
+          format : wmts.format, //'image/jpg',
+          maximumLevel: wmts.maximumLevel, //5,
+          clock: viewer.clock,
+          times: wmts.times,
+          credit : wmts.credit,
+          proxy : new DefaultProxy('/proxy/')
+      }),
+      0.5, false
+    );
+
+    setWmts((preState) => ({
+        ...preState,
+        imglayer: wmtslay,
+        //index: imageryLayers.indexOf(wmtslay)
+    }));
+    //console.log("Wmtslay index: ", imageryLayers.indexOf(wmtslay));
 
     let sbbox = wmsConfig.tw_substrate_area_bbox;
     addAdditionalLayerOption(

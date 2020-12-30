@@ -13,6 +13,7 @@ import { useState, useEffect } from 'preact/hooks'; //useRef, useImperativeHandl
 //import { forwardRef } from 'preact/compat';
 import BasemapPicker from 'async!./BasemapPicker';
 import Layer from 'async!../Layer';
+import { DateContextProvider } from "../Datepicker/DateContext";
 import { FlowContextProvider } from "../Flows/FlowContext"; //current, flow for Windjs
 import { ClusterContextProvider } from "../SiteCluster/ClusterContext";
 //import { UserContext } from '../UserHandler/UserContext';
@@ -92,9 +93,9 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   const render_layer = () => {
     if (globe.loaded & globe.baseLoaded) {
       return (
-        <FlowContextProvider><ClusterContextProvider>
+        <DateContextProvider><FlowContextProvider><ClusterContextProvider>
           <Layer viewer={globe.viewer} baseName={basePick.name} userBase={userScene.baseLayer} />
-        </ClusterContextProvider></FlowContextProvider>
+        </ClusterContextProvider></FlowContextProvider></DateContextProvider>
       );
     }
     return null;
