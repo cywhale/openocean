@@ -22,11 +22,11 @@ import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
 import '../../style/style_layerctrl.scss';
 //import '../style/style_bubblelabel.scss';
-//import { DateContext } from "../Datepicker/DateContext";
+import { DateContext } from "../Datepicker/DateContext";
 const { wfsConfig, wmsConfig } = require('./.setting.js');
 
 const LayerModal = (props) => {
-  const { viewer, baseName, userBase, clocktimes } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
+  const { viewer, baseName, userBase } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
   const { imageryLayers } = viewer; //basemapLayerPicker
   const layerctrlRef = useRef(null);
   /*const [state, setState] = useState(false); //cannot be used inside viewModel function
@@ -35,8 +35,9 @@ const LayerModal = (props) => {
     layer: null,
   });*/
 //const [clocktime, setClocktime] = useState(null);
-//const { tkpars } = useContext(DateContext);
-//const { clocktime, setClocktime } = tkpars;
+  const { tkpars } = useContext(DateContext);
+  const { clocktime, setClocktime } = tkpars;
+  const clocktimes = clocktime.times;
 
   const [viewModel, setModel] = useState({
     loaded: false,
@@ -181,17 +182,24 @@ const LayerModal = (props) => {
     }));
   }; //, [coast.hide]);
 
+  const applyClocktime = () => {
+    if (clocktimes !== null && wmts.times !== null && clocktimes !== wmts.times) {
+        console.log("Update WMTS layer because viewer time setting: ", clocktimes);
+        updateWmtsLayer(clocktimes);
+    }
+  }
+
   const updateWmtsLayer = (times) => { //WMTS layer that may change with time setting or layer changed by user
     let wlayidx = imageryLayers.indexOf(wmts.imglayer)
     if (wlayidx >= 0) {
       let wlay = imageryLayers.get(wlayidx);
       let show = wlay.show
       let alpha= wlay.alpha
-      wlay.show= false;
-      imageryLayers.remove(wlay, false);
+      wlay.show = false;
+      imageryLayers.remove(wlay); //false //true default to destroy
 
-      let wmtslay = addAdditionalLayerOption(
-        wmts.name,
+      let wmtslay = imageryLayers.addImageryProvider( //addAdditionalLayerOption(
+        //wmts.name,
         new WebMapTileServiceImageryProvider({
 //        url : 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/all/wmts.cgi',
           url : wmts.url,
@@ -208,15 +216,20 @@ const LayerModal = (props) => {
           times: times,
           credit : wmts.credit,
           proxy : new DefaultProxy('/proxy/')
-        }),
-        alpha, show
+        }), wlayidx //insert in original index
+        //alpha, show
       );
-      console.log("Updated WMTS layer with index: ", imageryLayers.indexOf(wmtslay));
+
+      wmtslay.show = show | false;
+      wmtslay.alpha= alpha| 0.5;
+      wmtslay.name = wmts.name;
+      knockout.track(wmtslay, ["alpha", "show", "name"]);
+      console.log("Update WMTS layer OK with index: ", imageryLayers.indexOf(wmtslay));
 
       setWmts((preState) => ({
         ...preState,
         imglayer: wmtslay,
-        tims: times,
+        times: times,
       }));
       updateLayerList(viewModel.selbase, viewModel.baselayer);
 
@@ -224,7 +237,6 @@ const LayerModal = (props) => {
       console.log("Error because non-existed WMTS layer. Check it");
     }
   };
-
 
   const updateBaseLayer = () => { //BaseLayer changed from BasemapPicker, so need update viewModel
     if (baseName!==null && baseName!=viewModel.selbase && viewModel.layers.length) {
@@ -352,13 +364,9 @@ const LayerModal = (props) => {
       //bubble_labeler(".ctrlrange-wrap2");
       //setState(true);
     } else {
-      if (clocktimes !== null && wmts.times !== null && clocktimes !== wmts.times) {
-        console.log("Update WMTS layer because viewer time setting: ", clocktimes);
-        updateWmtsLayer(clocktimes);
-      }
       updateBaseLayer();
     }
-  }, [viewModel.loaded, baseName, clocktimes]);
+  }, [viewModel.loaded, baseName]);
 /*
   const kobind = () => {
     function subscribeParameter() {
@@ -518,7 +526,7 @@ const LayerModal = (props) => {
 //  let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
 //  let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
 //  https://wiki.earthdata.nasa.gov/display/GIBS/GIBS+Available+Imagery+Products
-//  console.log("In Layer times:", clocktimes);
+    console.log("In Layer times:", wmts.times);
     let wmtslay = addAdditionalLayerOption(
       wmts.name,
       new WebMapTileServiceImageryProvider({
@@ -673,7 +681,7 @@ const LayerModal = (props) => {
               <select class={style.simgsel} data-bind="visible: $parent.isSelectableLayer($data), options: $parent.sImg, optionsText: 'name', value: $parent.selectedLayer"></select>
             </td>
             <td class={style.mediumtd}><span class="ctrlrange-wrap2">
-              <input type="range" class="range" style="height:20px;" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
+              <input type="range" class="range" style="height:20px;" min="0.0" max="1.0" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
               <output class="bubble" style="font-size:9px;position:relative;top:-6px;" /></span>
             </td>
             <td class={style.smalltd}>
@@ -694,6 +702,8 @@ const LayerModal = (props) => {
                {coast.hide? 'Show coastline': 'Hide coastline'}</button>
             <button style="display:none;" class={style.coastbutn} id="stopwfsbutn" onClick={stopWFSlisten}>
                {coast.forcestop? 'Remain WFS': 'Stop WFS'}</button>
+            <button class={style.coastbutn} id="applyclocktime" onClick={applyClocktime}>
+               Apply time setting</button>
       </div>
     </div>
   )

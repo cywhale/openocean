@@ -14,7 +14,7 @@ import SiteCluster from 'async!../SiteCluster';
 import { EarthContext } from "../Earth/EarthContext";
 import { FlowContext } from "../Flows/FlowContext";
 import { ClusterContext } from "../SiteCluster/ClusterContext";
-import { DateContext } from "../Datepicker/DateContext";
+//import { DateContext } from "../Datepicker/DateContext"; //move into LayerModal, otherwise choose date'll update panel
 
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
@@ -30,8 +30,8 @@ const Layer = (props) => {
   const { cluster, setCluster } = clpars;
   const { fpars } = useContext(FlowContext);
   const { flow, setFlow } = fpars;
-  const { tkpars } = useContext(DateContext);
-  const { clocktime, setClocktime } = tkpars;
+//const { tkpars } = useContext(DateContext);
+//const { clocktime, setClocktime } = tkpars;
 /*
   const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&wi$
   const sTileImg = new SingleTileImageryProvider({
@@ -116,8 +116,8 @@ const Layer = (props) => {
 
   const render_Layermodal = () => {
     if (earth.loaded) {
-      console.log("Pass to layer: ", clocktime.times);
-      return(<LayerModal {...props} clocktimes={clocktime.times} />);
+      //console.log("Pass to layer: ", clocktime.times);
+      return(<LayerModal {...props} />); //clocktimes={clocktime.times} />);
     }
     return null;
   };

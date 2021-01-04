@@ -11,6 +11,7 @@ const DateContextProvider = (props) => {
     times: null,
     clockRange: ClockRange.LOOP_STOP,
     clockMultiplier: 1200, // 20 mins
+    secInterval: 14400,   // 4 hours * 3 (to fetch another WMTS source, for ex)
   });
 
   const tkpars = useMemo(() => ({ clocktime, setClocktime }), [clocktime]);
