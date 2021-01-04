@@ -4,7 +4,7 @@
 //import Timeline from 'cesium/Source/Widgets/Timeline/Timeline.js';
 //import ClockRange from 'cesium/Source/Core/ClockRange';
 import JulianDate from 'cesium/Source/Core/JulianDate';
-import TimeInterval from 'cesium/Source/Core/TimeInterval';
+//import TimeInterval from 'cesium/Source/Core/TimeInterval';
 import TimeIntervalCollection from 'cesium/Source/Core/TimeIntervalCollection';
 import { useState, useEffect, useRef, useContext } from 'preact/hooks';
 //import "react-datetime/css/react-datetime.css";

@@ -37,7 +37,7 @@ const LayerModal = (props) => {
 //const [clocktime, setClocktime] = useState(null);
   const { tkpars } = useContext(DateContext);
   const { clocktime, setClocktime } = tkpars;
-  const clocktimes = clocktime.times;
+  //const clocktimes = clocktime.times;
 
   const [viewModel, setModel] = useState({
     loaded: false,
@@ -92,7 +92,7 @@ const LayerModal = (props) => {
     style : 'default',
     format : 'image/jpg',
     maximumLevel: 5,
-    times: clocktimes,
+    times: clocktime.times,
     credit : 'Global Imagery Browse Services (GIBS)',
     imglayer: null,
     //index: -1,
@@ -183,9 +183,9 @@ const LayerModal = (props) => {
   }; //, [coast.hide]);
 
   const applyClocktime = () => {
-    if (clocktimes !== null && wmts.times !== null && clocktimes !== wmts.times) {
-        console.log("Update WMTS layer because viewer time setting: ", clocktimes);
-        updateWmtsLayer(clocktimes);
+    if (clocktime.times !== null && wmts.times !== null && clocktime.times !== wmts.times) {
+        console.log("Update WMTS layer because viewer time setting: ", clocktime.times);
+        updateWmtsLayer(clocktime.times);
     }
   }
 
