@@ -11,7 +11,7 @@
     "label": "Biodiversity",
     "disabled": false,
     "children": [
-      { "label": "GBIF Ocean","value": "gbifocean", "format": "wfs", "type": "site" }
+      { "label": "GBIF Ocean","value": "gbifocean", "format": "image/png", "type": "wfs" }
     ],
     "value": "biodiversity"
   },

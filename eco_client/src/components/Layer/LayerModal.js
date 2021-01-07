@@ -6,6 +6,7 @@ import Color from 'cesium/Source/Core/Color.js';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 //import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme';
+//import GeographicTilingScheme from 'cesium/Source/Core/GeographicTilingScheme';
 //import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 //import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
@@ -18,6 +19,7 @@ import ArcGisMapServerImageryProvider from 'cesium/Source/Scene/ArcGisMapServerI
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
 import WebFeatureServiceImageryProvider from '../Earth/WebFeatureServiceImageryProvider';
 // follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
+import gibsGeographicTilingScheme from './gibs';
 import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
 import '../../style/style_layerctrl.scss';
@@ -91,7 +93,7 @@ const LayerModal = (props) => {
     tileMatrixSetID : '250m',
     style : 'default',
     format : 'image/jpg',
-    maximumLevel: 5,
+    maximumLevel: 6,
     times: clocktime.times,
     credit : 'Global Imagery Browse Services (GIBS)',
     imglayer: null,
@@ -214,6 +216,9 @@ const LayerModal = (props) => {
           maximumLevel: wmts.maximumLevel, //5,
           clock: viewer.clock,
           times: times,
+          tileWidth: 512,
+          tileHeight: 512,
+          tilingScheme: gibsGeographicTilingScheme(),
           credit : wmts.credit,
           proxy : new DefaultProxy('/proxy/')
         }), wlayidx //insert in original index
@@ -544,6 +549,9 @@ const LayerModal = (props) => {
           clock: viewer.clock,
           times: wmts.times,
           credit : wmts.credit,
+          tileWidth: 512,
+          tileHeight: 512,
+          tilingScheme: gibsGeographicTilingScheme(),
           proxy : new DefaultProxy('/proxy/')
       }),
       0.5, false

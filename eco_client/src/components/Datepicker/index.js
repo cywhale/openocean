@@ -13,7 +13,6 @@ import { useState, useEffect, useRef, useContext } from 'preact/hooks';
 //import "@nateradebaugh/react-datetime/scss/styles.scss";
 //import moment from "moment";
 import { DateContext } from "./DateContext";
-
 import style from './style';
 
 const Datepicker = (props) => {
@@ -49,6 +48,23 @@ const Datepicker = (props) => {
     enableAnimate: false,
   })
 
+/*click clock timeline and update timer for WMTS, or click button of apply clock time
+//console.log("Debug (unknown issue), first got times before setup layer: ", exttimes);
+  const [updateTimer, setUpdateTimer] = useState(null);
+
+  const onClockUpdate = () => {
+    var isoDateTime = clock.currentTime.toString();
+    var time = isoDate(isoDateTime);
+    if (time !== previousTime) {
+      previousTime = time;
+      clearTimeout(updateTimer);
+      updateTimer = setTimeout(doClockUpdate, 250);
+    }
+  }
+  viewer.clock.onTick.addEventListener(onClockUpdate);
+  onClockUpdate();
+};
+*/
   const toggleAnimate = e => {
     let shouldAnimate = !state.enableAnimate
 

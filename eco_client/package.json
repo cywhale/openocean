@@ -50,7 +50,7 @@
     "webpack-merge": "^5.0.9"
   },
   "dependencies": {
-    "cesium": "1.76",
+    "cesium": "^1.77.0",
     "firebase": "^8.2.0",
     "nanoid": "^3.1.16",
     "preact": "^10.5.9",
