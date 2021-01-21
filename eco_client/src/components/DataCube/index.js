@@ -7,6 +7,7 @@ import GeoJsonDataSource from 'cesium/Source/DataSources/GeoJsonDataSource.js';
 //import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { ClusterContext } from "../SiteCluster/ClusterContext";
 import { FlowContext } from "../Flows/FlowContext";
+import { OccurContext } from "../Biodiv/OccurContext";
 import { MultiSelectContainer } from './MultiSelectContainer';
 import WebGLGlobeDataSource from './WebGLGlobeDataSource';
 
@@ -22,6 +23,8 @@ const DataCube = (props) => {
   const { cluster, setCluster } = clpars;
   const { fpars } = useContext(FlowContext);
   const { flow, setFlow } = fpars;
+  const { opars } = useContext(OccurContext);
+  const { occur, setOccur } = opars;
 /*const regionOptions = [
     { value: 0, label: 'White Dolphin Reserve' },
     { value: 1, label: 'Wild Animal Habitat' },
@@ -56,6 +59,7 @@ const DataCube = (props) => {
     //initCurrEvent: false,
     cube_idx: -1, // index in state, for demo data_cube (population temp)
     cube: null,
+    occur_idx: -1,
   });
 
   const rdata = [...data]; //data.map(v => ({...v, loaded: false, show: false, index: -1}));
@@ -223,8 +227,17 @@ const DataCube = (props) => {
 
           } else {
             let leng = dataSources._dataSources.length;
+            if (selected.type[i] === 'wfs') {
+              setOccur((preState) => ({
+                ...preState,
+                selgbif: true,
+              }));
 
-            if (selected.format[i] === 'geojson' && selected.type[i] === 'sitecluster') {
+              setModel3d((preMdl) => ({
+                ...preMdl,
+                occur_idx: loaded.value.length,
+              }));
+            } else if (selected.format[i] === 'geojson' && selected.type[i] === 'sitecluster') {
               //SiteCluster will also add dataSource into viewer.dataSources, but will cause collision if also handle here
               setCluster((preState) => ({
                 ...preState,
@@ -279,12 +292,17 @@ const DataCube = (props) => {
                 }));
               }
             } else {
-              if (selected.format[i] === 'geojson' && selected.type[i] === 'sitecluster') {
+              if (selected.type[i] === 'wfs') {
+                setOccur((preState) => ({
+                  ...preState,
+                  selgbif: true,
+                }));
+              } else if (selected.format[i] === 'geojson' && selected.type[i] === 'sitecluster') {
                 setCluster((preState) => ({
                   ...preState,
                   showCluster: true,
                 }));
-              } if (selected.format[i] === 'json' && selected.type[i] === 'flows') {
+              } else if (selected.format[i] === 'json' && selected.type[i] === 'flows') {
                 setFlow((preState) => ({
                   ...preState,
                   selgfs: true,
@@ -341,7 +359,12 @@ const DataCube = (props) => {
                     index: [...loaded.index.slice(0, chkidx), -1, ...loaded.index.slice(vidx+1, loaded.index.length)],
                 }));
               } else {
-                if (chkidx === model3d.wind_idx) {
+                if (chkidx === model3d.occur_idx) {
+                  setOccur((preState) => ({
+                    ...preState,
+                    selgbif: false,
+                  }));
+                } else if (chkidx === model3d.wind_idx) {
                   setFlow((preState) => ({
                     ...preState,
                     selgfs: false,

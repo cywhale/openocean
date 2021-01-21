@@ -3,6 +3,7 @@ import Color from 'cesium/Source/Core/Color.js';
 //import Credit from 'cesium/Source/Core/Credit';
 //import JulianDate from 'cesium/Source/Core/JulianDate';
 //import TimeIntervalCollection from 'cesium/Source/Core/TimeIntervalCollection';
+//import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
 import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 //import WebMercatorTilingScheme from 'cesium/Source/Core/WebMercatorTilingScheme';
@@ -587,7 +588,28 @@ const LayerModal = (props) => {
       }),
       1.0, false
     );
-
+/*
+    let boundingSphere = new BoundingSphere();
+    addAdditionalLayerOption(
+      "GBIF ocean occurrence",
+      new WebMapServiceImageryProvider({
+        url: wmsConfig.gbifocean_url,
+        layers: wmsConfig.gbifocean_layer,
+        credit: "GBIF.org (25 March 2020) GBIF Occurrence Download https://doi.org/10.15468/dl.lnpxuq",
+        rectangle: grect,
+        parameters: {
+          transparent: "true",
+          styles: "gbifocean_vary", //'Polygon_near_white',
+          format: "image/png",
+          width: 768,
+          height: 358,
+          viewparams: 'viewScale:' + viewer.camera.getPixelSize(boundingSphere, viewer.scene.drawingBufferWidth, viewer.scene.drawingBufferHeight)
+        },
+        proxy : new DefaultProxy('/proxy/')
+      }),
+      1.0, false
+    );
+*/
 //  let scbox = wmsConfig.tw_shipwreck_ne_bbox;
 /*  let terrx = //new WebMapServiceImageryProvider({
           new GeoserverTerrainProvider({

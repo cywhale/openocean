@@ -16,6 +16,7 @@ import Layer from 'async!../Layer';
 import { DateContextProvider } from "../Datepicker/DateContext";
 import { FlowContextProvider } from "../Flows/FlowContext"; //current, flow for Windjs
 import { ClusterContextProvider } from "../SiteCluster/ClusterContext";
+import { OccurContextProvider } from "../Biodiv/OccurContext"; //for GBIF occurrence
 //import { UserContext } from '../UserHandler/UserContext';
 import style from './style';
 //import 'cesium/Source/Widgets/widgets.css';
@@ -43,7 +44,8 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   useEffect(() => {
     console.log('Initialize Viewer after appstate'); // + appstate);
     if (!globe.loaded) {
-      setUserScene({ baseLayer: "NOAA ETOPO\u00a0I" });
+      //setUserScene({ baseLayer: "NOAA ETOPO\u00a0I" });
+      setUserScene({ baseLayer: "Esri Firefly" });
       initGlobe();
     } else {
       render(render_basemap(), document.getElementById('rightarea'))
@@ -93,9 +95,9 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   const render_layer = () => {
     if (globe.loaded & globe.baseLoaded) {
       return (
-        <DateContextProvider><FlowContextProvider><ClusterContextProvider>
+        <DateContextProvider><FlowContextProvider><ClusterContextProvider><OccurContextProvider>
           <Layer viewer={globe.viewer} baseName={basePick.name} userBase={userScene.baseLayer} />
-        </ClusterContextProvider></FlowContextProvider></DateContextProvider>
+        </OccurContextProvider></ClusterContextProvider></FlowContextProvider></DateContextProvider>
       );
     }
     return null;

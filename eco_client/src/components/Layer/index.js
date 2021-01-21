@@ -11,9 +11,11 @@ import LayerModal from 'async!./LayerModal';
 import DataCube from 'async!../DataCube'; //Region (old) + MultiSelectSort
 import Flows from 'async!../Flows';
 import SiteCluster from 'async!../SiteCluster';
+import Biodiv from 'async!../Biodiv';
 import { EarthContext } from "../Earth/EarthContext";
 import { FlowContext } from "../Flows/FlowContext";
 import { ClusterContext } from "../SiteCluster/ClusterContext";
+import { OccurContext } from "../Biodiv/OccurContext";
 //import { DateContext } from "../Datepicker/DateContext"; //move into LayerModal, otherwise choose date'll update panel
 
 import draggable_element from '../Compo/draggable_element';
@@ -30,6 +32,8 @@ const Layer = (props) => {
   const { cluster, setCluster } = clpars;
   const { fpars } = useContext(FlowContext);
   const { flow, setFlow } = fpars;
+  const { opars } = useContext(OccurContext);
+  const { occur, setOccur } = opars;
 //const { tkpars } = useContext(DateContext);
 //const { clocktime, setClocktime } = tkpars;
 /*
@@ -210,6 +214,7 @@ const Layer = (props) => {
       </div>
       <Flows viewer={viewer} flow={flow} />
       <SiteCluster viewer={viewer} cluster={cluster} />
+      <Biodiv viewer={viewer} occur={occur} />
       { <div class="cesium-widget-credits" id="searchx" data-searchin="" data-searchout="" style="display:none">
            Now searching: {searchLayer}</div> }
     </Fragment>

@@ -13,7 +13,7 @@ import Cartographic from 'cesium/Source/Core/Cartographic';
 import Cartesian2 from 'cesium/Source/Core/Cartesian2';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 //import clone from 'cesium/Source/Core/clone';
-import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
+//import BoundingSphere from 'cesium/Source/Core/BoundingSphere';
 import defaultValue from 'cesium/Source/Core/defaultValue';
 import defined from 'cesium/Source/Core/defined';
 import DeveloperError from 'cesium/Source/Core/DeveloperError';
@@ -26,7 +26,14 @@ import when from 'cesium/Source/ThirdParty/when';
 import BillboardCollection from 'cesium/Source/Scene/BillboardCollection';
 import Material from 'cesium/Source/Scene/Material';
 import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
+import Primitive from 'cesium/Source/Scene/Primitive';
+import MaterialAppearance from 'cesium/Source/Scene/MaterialAppearance';
+//import PerInstanceColorAppearance from 'cesium/Source/Scene/PerInstanceColorAppearance';
+import GeometryInstance from 'cesium/Source/Core/GeometryInstance';
+//import EntityCollection from 'cesium/Source/DataSources/EntityCollection';
 import PolygonGeometry from 'cesium/Source/Core/PolygonGeometry';
+//import PolygonOutlineGeometry from 'cesium/Source/Core/PolygonOutlineGeometry';
+//import ColorGeometryInstanceAttribute from 'cesium/Source/Core/ColorGeometryInstanceAttribute';
 //import proj4 from 'proj4';
 /* old version
 'cesium/Source/Core/defineProperties'
@@ -644,7 +651,7 @@ define('Scene/WebFeatureServiceImageryProvider',[
         }
 
         function createPolygon(that, hierarchy, properties) {
-            var polygon = new PolygonGeometry({
+          /*var polygon = new PolygonGeometry({
                 polygonHierarchy: hierarchy
             });
             polygon.material.uniforms.color = {
@@ -652,9 +659,47 @@ define('Scene/WebFeatureServiceImageryProvider',[
                 green: CesiumMath.nextRandomNumber(),
                 blue: CesiumMath.nextRandomNumber(),
                 alpha: 1.0
-            };
-
-            that._viewer.scene.primitives.add(polygon);
+            };*/
+            //that._collectionVector.push(new EntityCollection());
+            //let length = that._collectionVector.length;
+            //that._collectionVector[length - 1].add({
+            //that._viewer.entities.add({ //scene.primitives.add({//polygon);
+            //that._viewer.entities.add(that._collectionVector[length - 1]);
+//https://reurl.cc/mqqRk9
+//Note: use PolygonGeometry, no outline, but use PolygonOulineGeometry, cannot use Material.fromType... not fully work yet
+          let polyPrimitive = new Primitive({
+            geometryInstances: new GeometryInstance({
+              id: properties.fid,
+              geometry: PolygonGeometry.createGeometry( //Outline
+                new PolygonGeometry({
+                  polygonHierarchy: hierarchy
+                })
+              ),/*
+              attributes : {
+                color : ColorGeometryInstanceAttribute.fromColor(Color.LAVENDER.withAlpha(0.75)),
+                show: true
+              }*/
+            }),
+            //polygon: {
+            //  hierarchy: hierarchy,
+            appearance: new MaterialAppearance({
+              material: Material.fromType('Color', {
+                color: Color.LAVENDER.withAlpha(0.75)
+              })
+            }), /*
+            appearance : new PerInstanceColorAppearance({
+              flat: true,
+              translucent: false
+            }), */
+            asynchronous: false
+                //extrudedHeight: 50000,
+                //material: Color.LAVENDER.withAlpha(0.75),
+                //outline: true,
+                //outlineColor: Color.GREY,
+                //arcType: Cesium.ArcType.RHUMB,
+            //}
+          });
+          that._viewer.scene.primitives.add(polyPrimitive);
         }
 
         function processPolygon(that, polygon, properties, crsProperties) {
@@ -699,25 +744,28 @@ define('Scene/WebFeatureServiceImageryProvider',[
         }
 
         function processCoordinates(that,coordString) {
-            var splitString = coordString.split(" ");
-            var coordinates = [];
-            for(var i = 0 ; i < splitString.length;i++){
-                var coords = splitString[i].split(",");
+            let splitString = coordString.split(" ");
+            let coordinates = [];
+            for(let i = 0 ; i < splitString.length;i++){
+                let coords = splitString[i].split(",");
                 coordinates.push(coords[0],coords[1]);
             }
             return coordinates;
         }
 
         function processLinearRing(that,linearRing, holes, crsProperties) {
-            var coordString = linearRing.firstElementChild.textContent;
-            var coords = processCoordinates(that,coordString);
-            var ll_coords = [];
-            for(var i = 0 ; i < coords.length; i++ ){
-                ll_coords.push(parseFloat(coords[i]));
+            let coordString = linearRing.firstElementChild.textContent;
+          //let coords = processCoordinates(that,coordString);
+            let splitString = coordString.split(" ");
+            let ll_coords = [];
+            for(let i = 0 ; i < splitString.length; i++ ){ //coords.length
+                let coords = splitString[i].split(",");
+              //ll_coords.push(parseFloat(coords[i]));
+                ll_coords.push(parseFloat(coords[0]), parseFloat(coords[1]));
             }
             that._coords = Cartesian3.fromDegreesArray(ll_coords);
 
-            var hierarchy = new PolygonHierarchy(that._coords, holes);
+            let hierarchy = new PolygonHierarchy(that._coords, holes);
             return hierarchy;
         }
 
@@ -797,7 +845,7 @@ define('Scene/WebFeatureServiceImageryProvider',[
 
 // modified by cywhale, compare current max/min of bbox to track if all data is fetched from WFS //south,west,north,east
 // modified 202012 that if has multiple scale, bboxmax update only at finest-scale so that all tiles can be loaded
-            if (!that.needScale || (that.pixelSize <= that.scaleSet[0])) {
+            if (!that.needScale || (that.scaleSet.length && that.pixelSize <= that.scaleSet[0])) {
               if (that.S_W.lat < that.bboxmax[0]) { that.bboxmax[0] = that.S_W.lat; }
               if (that.S_W.lng < that.bboxmax[1]) { that.bboxmax[1] = that.S_W.lng; }
               if (that.N_E.lat > that.bboxmax[2]) { that.bboxmax[2] = that.N_E.lat; }
@@ -850,7 +898,7 @@ export default function WebFeatureServiceImageryProvider(options) {
               this.needScale = false;
               this.scaleSet = [];
             } else {
-              this.needScae = true;
+              this.needScale = true;
               this.scaleSet = options.scaleSet;
             }
 //------------------------------------------------------------------------------
@@ -897,9 +945,13 @@ export default function WebFeatureServiceImageryProvider(options) {
             }
 
             this._bboxRequired = enableBBOX && defaultValue(options.BBOX,true);
-
-            this.boundingSphere = new BoundingSphere();
-            this.pixelSize = this._viewer.camera.getPixelSize(this.boundingSphere, this._viewer.scene.drawingBufferWidth, this._viewer.scene.drawingBufferHeight);
+/* pixelSize works, but CANNOT correctly clear or re-fetch drawn features when viewScale changes, and also slow
+   so only used in WMS, which returns image/png, not features, pre-defined styles thus can be used */
+            //this.boundingSphere = new BoundingSphere();
+// so disable pixelSize by giving a dummy value
+            this.pixelSize = 50000.0 //this._viewer.camera.getPixelSize(new BoundingSphere(), //this.boundingSphere,
+                             //this._viewer.scene.drawingBufferWidth, this._viewer.scene.drawingBufferHeight);
+            this.lastSize = this.pixelSize;
 
             //found valid bounding box
             this._validBoundingBox = false;
@@ -1022,6 +1074,8 @@ export default function WebFeatureServiceImageryProvider(options) {
             let request_url = this._url + "/" + "wfs?"; //((this.paramCaps)? "WFS?" : "wfs?");
             let params = "service=WFS&version=1.0.0&";  //this.paramCaps? "SERVICE=WFS&VERSION=1.0.0&": "service=WFS&version=1.0.0&";
             if (this.needScale) {
+              //this.pixelSize = this._viewer.camera.getPixelSize(new BoundingSphere(), //that.boundingSphere,
+              //                   this._viewer.scene.drawingBufferWidth, this._viewer.scene.drawingBufferHeight);
               this._getUrl = request_url + params + 'viewparams=viewScale:' + this.pixelSize + '&' + this.paramMore;
             } else {
               this._getUrl = request_url + params + this.paramMore;
@@ -1035,12 +1089,27 @@ export default function WebFeatureServiceImageryProvider(options) {
         //change equals test to equalsEpsilon to avoid multiple updates for small changes
         WebFeatureServiceImageryProvider.prototype.addTicksTrig = function(){
             var that = this;
-
-            //this._viewer.camera.moveStart.addEventListener(function () {
-            //});
-
             this.unsubscribeTicks = this._viewer.camera.moveEnd.addEventListener(function () {
             //this.unsubscribeTicks = this._viewer.clock.onTick.addEventListener(function() {
+            /* modified by cywhale 202012 to add scale parameter in wfs url */
+                if (that.needScale) {
+// works but disable pixelSize function
+//                that.pixelSize = that._viewer.camera.getPixelSize(new BoundingSphere(), //that.boundingSphere,
+//                                 that._viewer.scene.drawingBufferWidth, that._viewer.scene.drawingBufferHeight);
+                  if (that.lastSize != that.pixelSize) {
+                    if ((that.lastSize < that.scaleSet[0] && that.pixelSize >= that.scaleSet[0]) ||
+                        (that.lastSize < that.scaleSet[1] && that.pixelSize >= that.scaleSet[1]) ||
+                        (that.lastSize >= that.scaleSet[1] && that.pixelSize < that.scaleSet[1]) ||
+                        (that.lastSize >= that.scaleSet[0] && that.pixelSize < that.scaleSet[0])) {
+/* Not work, clean primitives cannot be re-fetched? why? */
+//                    that._viewer.scene.primitives.removeAll();
+                      console.log("Warning: WFS remove pre-drawn features due to viewparams changes")
+                    }
+                    that.buildCompleteRequestUrl();
+                    that.lastSize = that.pixelSize;
+                  }
+                }
+
                 if (!that.scratchCamera.position.equals(that.scratchLastCamera.position) ||
                     !that.scratchCamera.direction.equals(that.scratchLastCamera.direction) ||
                     !that.scratchCamera.up.equals(that.scratchLastCamera.up) ||
@@ -1048,9 +1117,6 @@ export default function WebFeatureServiceImageryProvider(options) {
                     !that.scratchCamera.transform.equals(that.scratchLastCamera.transform) ||
                     !that.scratchCamera.frustum.equals(that.scratchLastCamera.frustum)) {
                     that.GetFeature();
-
-            /* modified by cywhale 202012 to add scale parameter in wfs url */
-                    that.pixelSize = that._viewer.camera.getPixelSize(that.boundingSphere, that._viewer.scene.drawingBufferWidth, that._viewer.scene.drawingBufferHeight);
 
                     that.scratchLastCamera = { //clonex(that.scratchCamera, that._viewer.scene, true); //.clone();
                         position: that.scratchCamera.position.clone(),
@@ -1137,6 +1203,7 @@ export default function WebFeatureServiceImageryProvider(options) {
 // modified by cywhale, watch if current max/min of bbox reach [-90, -180, 90, 180] //south,west,north,east
             if (this.bboxmax[0] <= -89.99 && this.bboxmax[1] <= -179.99 &&
                 this.bboxmax[2] >= 89.99 && this.bboxmax[3] >= 179.99) {
+              console.log("Warning: Note internally WFS stopped...");
               this.intStopWFS = true;
               this.unsubscribeTicks();
             }
