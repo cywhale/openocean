@@ -12,9 +12,12 @@ export default function GbifContainer(props) {
       this.url = wmsConfig.gbifocean_url;
       this.layer = wmsConfig.gbifocean_layer;
       this.scaleSet = wmsConfig.gbifocean_scaleSet;
-      //this.boundingSphere = new BoundingSphere();
-      this.pixelSize = this._viewer.camera.getPixelSize(new BoundingSphere(), //this.boundingSphere,
-                       this._viewer.scene.drawingBufferWidth, this._viewer.scene.drawingBufferHeight);
+      this.boundingSphere = new BoundingSphere();
+      let ori_pixelSz = this._viewer.camera.getPixelSize(this.boundingSphere,
+                        this._viewer.scene.drawingBufferWidth, this._viewer.scene.drawingBufferHeight);
+      let totpixelr = ori_pixelSz * this._viewer.canvas.width/1080.0;
+      let whratio = this._viewer.canvas.height <=540? 613.0 : 750.0;
+      this.pixelSize= this._viewer.canvas.width >= whratio? totpixelr : totpixelr * whratio/this._viewer.canvas.width;
       this.lastSize = this.pixelSize;
       this.provider = null;
       this.imagery = null;
@@ -32,7 +35,7 @@ export default function GbifContainer(props) {
             rectangle: Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0),
             parameters: {
               transparent: "true",
-              styles: "gbifocean_vary",
+              styles: "gbifspnum",
               format: "image/png",
               width: 768,
               height: 358,
@@ -54,8 +57,12 @@ export default function GbifContainer(props) {
           if (that.layeridx >= 0) {
             let wlay = that.imageryLayers.get(that.layeridx);
             if (wlay.show) {
-              that.pixelSize = that._viewer.camera.getPixelSize(new BoundingSphere(), //that.boundingSphere,
-                               that._viewer.scene.drawingBufferWidth, that._viewer.scene.drawingBufferHeight);
+              let ori_pixelSz = that._viewer.camera.getPixelSize(that.boundingSphere, //new BoundingSphere(),
+                                that._viewer.scene.drawingBufferWidth, that._viewer.scene.drawingBufferHeight);
+              let totpixelr = ori_pixelSz * that._viewer.canvas.width/1080.0;
+              let whratio = that._viewer.canvas.height <=540? 613.0 : 750.0;
+              that.pixelSize= that._viewer.canvas.width >= whratio? totpixelr : totpixelr * whratio/that._viewer.canvas.width;
+
               if (that.lastSize != that.pixelSize) {
                 if ((that.lastSize < that.scaleSet[0] && that.pixelSize >= that.scaleSet[0]) ||
                     (that.lastSize < that.scaleSet[1] && that.pixelSize >= that.scaleSet[1]) ||
@@ -72,7 +79,7 @@ export default function GbifContainer(props) {
                       rectangle: Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0),
                       parameters: {
                         transparent: "true",
-                        styles: "gbifocean_vary",
+                        styles: "gbifspnum",
                         format: "image/png",
                         width: 768,
                         height: 358,
