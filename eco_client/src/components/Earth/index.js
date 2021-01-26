@@ -5,6 +5,9 @@ import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 //import Globe from 'cesium/Source/Scene/Globe';
 //import MapProjection from 'cesium/Source/Core/MapProjection';
 //import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
+import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider';
+import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
+import Rectangle from 'cesium/Source/Core/Rectangle';
 //import createWorldTerrain from 'cesium/Source/Core/createWorldTerrain';
 //import Credit from 'cesium/Source/Core/Credit';
 import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
@@ -49,6 +52,9 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
       initGlobe();
     } else {
       render(render_basemap(), document.getElementById('rightarea'))
+      globe.viewer.camera.flyTo({
+        destination: Rectangle.fromDegrees(120.393319, 22.34583600000001, 120.399052, 22.351569)
+      });
     }
     //const { loaded: csloaded, viewer: csviewer } = {...globe};
     //csLoader = Object.assign({}, { csloaded, csviewer });
@@ -56,21 +62,31 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
 
 //https://github.com/preactjs/preact/issues/1788
   const initGlobe = () => {
-    setGlobe({
-      loaded: true,
-      //baseLoaded: false,
-      viewer: new Viewer(ref.current, {
+    let gviewer = new Viewer(ref.current, {
         timeline: true,
         animation: true,
         geocoder: true,
         baseLayerPicker: false, //basemapPicker,
         imageryProvider: false, //sTileImg,
         mapProjection : new WebMercatorProjection,
-        requestRenderMode : true, //https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/#handling-simulation-time-changes
-        maximumRenderTimeChange : Infinity
-        //terrainProvider: createWorldTerrain(),
+        requestRenderMode : true, //https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/#handling-simulation-$
+        maximumRenderTimeChange : Infinity,
+        terrainProvider: new CesiumTerrainProvider({ //createWorldTerrain(),
+            url: "https://eco.odb.ntu.edu.tw/tilesets/wreckareef",
+              //requestWaterMask: false,
+              requestVertexNormals: true,
+        })
         //globe: new Globe(MapProjection.ellipsoid),
-      }),
+    });
+    gviewer.scene.globe.enableLighting = true;
+    gviewer.scene.screenSpaceCameraController.enableCollisionDetection = false;
+    gviewer.scene.globe.translucencyEnabled = true;
+    gviewer.scene.globe.frontFaceAlphaByDistance = new NearFarScalar(400.0, 0.0, 800.0, 0.5); //(50, 0.0, 100, 1.0)
+
+    setGlobe({
+      loaded: true,
+      //baseLoaded: false,
+      viewer: gviewer,
     });
   };
 

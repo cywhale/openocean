@@ -11,7 +11,7 @@ import Rectangle from 'cesium/Source/Core/Rectangle';
 //import ImageryLayer from 'cesium/Source/Scene/ImageryLayer';
 //import ImageryLayerCollection from 'cesium/Source/Scene/ImageryLayerCollection';
 import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
-import GlobeSurfaceTileProvider from 'cesium/Source/Scene/GlobeSurfaceTileProvider.js';
+//import GlobeSurfaceTileProvider from 'cesium/Source/Scene/GlobeSurfaceTileProvider.js';
 //import GridImageryProvider from 'cesium/Source/Scene/GridImageryProvider';
 import WebMapServiceImageryProvider from 'cesium/Source/Scene/WebMapServiceImageryProvider';
 import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
@@ -609,16 +609,17 @@ const LayerModal = (props) => {
       }),
       1.0, false
     );
-*/
-//  let scbox = wmsConfig.tw_shipwreck_ne_bbox;
-/*  let terrx = //new WebMapServiceImageryProvider({
-          new GeoserverTerrainProvider({
+
+  let scbox = wmsConfig.tw_shipwreck_ne_bbox;
+  console.log("bbox: ", scbox, Rectangle.fromDegrees(scbox[0], scbox[1], scbox[2], scbox[3]));
+  let terrx = new WebMapServiceImageryProvider({
+          //new GeoserverTerrainProvider({
             url: wmsConfig.tw_shipwreck_ne_url,
-            layerName: wmsConfig.tw_shipwreck_ne_layer, //layers
-            styleName: 'terrain_0_shipwreck',
-            waterMask: false,
+            layers: wmsConfig.tw_shipwreck_ne_layer, //layerName
+            //styleName: 'default',//'terrain_0_shipwreck',
+            //waterMask: false,
             credit: "IONTU, Taiwan",
-            //rectangle:Rectangle.fromDegrees(scbox[0], scbox[1], scbox[2], scbox[3]),
+            rectangle:Rectangle.fromDegrees(scbox[0], scbox[1], scbox[2], scbox[3]),
             //tilingScheme: new WebMercatorTilingScheme(), //GeographicTilingScheme({
               //numberOfLevelZeroTilesX: 2,
               //numberOfLevelZeroTilesY: 1
@@ -627,13 +628,13 @@ const LayerModal = (props) => {
             //tileWidth: 512,
             parameters: {
                transparent: "true",
-               //styles: '', //terrain_0_shipwreck',
-               //bbox: "120.393319,22.34583600000001,120.399052,22.351569",
+               styles: '', //terrain_0_shipwreck',
+               bbox: "120.393319,22.346852998720003,120.39905199712001,22.351569",
                format: "image/png",
-               //width: 768,
-               //height: 768
+               width: 768,
+               height: 631
             },
-            //proxy : new DefaultProxy('/proxy/')
+            proxy : new DefaultProxy('/proxy/')
           });
 
     //viewer.scene.globe.terrainProvider = terrx;
@@ -643,7 +644,8 @@ const LayerModal = (props) => {
       "Shipwrecks off NorthEast Taiwan",
       terrx,
       1.0, false
-    ); */
+    );
+*/
     //viewer.terrainProvider = terrx;
 /*  var hand = new Cesium.ScreenSpaceEventHandler(canvas);
   	// return altitude with double click in console.log!!
@@ -659,7 +661,6 @@ const LayerModal = (props) => {
                 }
             }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
 */
-
     addAdditionalLayerOption(
       'GEBCO contours',
       new WebMapTileServiceImageryProvider({
