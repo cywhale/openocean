@@ -1,6 +1,6 @@
 import { useContext, useState, useCallback } from "preact/hooks";
 import { UserContext } from "./UserContext"
-import { auth, googleAuthProvider } from '../firebase';
+import { auth, googleAuthProvider } from './firebase';
 import Popup from 'async!../Compo/Popup';
 import style from './style_signin';
 

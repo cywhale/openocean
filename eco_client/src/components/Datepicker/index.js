@@ -73,7 +73,7 @@ const Datepicker = (props) => {
       clock.clockRange = clocktime.clockRange //.LOOP_STOP;
       clock.multiplier = clocktime.clockMultiplier;
     } else {
-      clock.currentTime = clock.stopTime;
+      clock.currentTime = clock.startTime;
     }
     clock.shouldAnimate = shouldAnimate;
 
@@ -114,7 +114,7 @@ const Datepicker = (props) => {
       }
 
       clock.startTime = start_julian;
-      clock.currentTime = end_julian;
+      clock.currentTime = start_julian;
       clock.stopTime = end_julian;
       timeline.zoomTo(start_julian, end_julian);
       //console.log("To end date: ", JulianDate.toDate(clock.stopTime));

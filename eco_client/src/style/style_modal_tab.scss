@@ -2,108 +2,111 @@
    https://codepen.io/andornagy/pen/RNeydj */
 .nav-tabs {
   position: relative;
-  label.tablab, h2 {
-    display:block;
-    color:#fff;
-    font-size:1em;
-    font-weight: 600;
-    text-decoration:none;
-    text-align: center;
-    width: 6.0em;
-  }
-  h2 {
-    position: relative;
-    padding:14px 20px;
+}
+
+
+label.tablab {
+    max-width: 5.5em;
+    width: 5.5em;
+}
+
+.nav-tabs > h2 {
+}
+
+.nav-tabs > h2 {
+    position: absolute;
+    padding: 14px 20px;
     margin: 0;
-  }
-  label.tablab {
+    top: 0;
+    color: #fff;
+    font-size: 1em;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    max-width: 5.5em;
+    width: 5.5em;
+}
+
+.nav-tabs:hover > h2 {
+  outline: none !important;
+}
+
+label.tablab {
     position: absolute;
     padding: 24px 20px;
     border-radius: 10px;
     z-index: 1;
-  }
-  label.tablab:hover {
+}
+
+label.tablab:hover {
     cursor: pointer;
-  }
-  label.tablab ~ label.tablab, h2 ~ h2 {
+}
+
+label.tablab ~ label.tablab {
     position: absolute;
     top: 0;
-  }
-  label.tablab:nth-child(1), input:nth-child(2), h2:nth-child(3) {
-    left: 0.2em;
-  }
-  label.tablab:nth-child(5), input:nth-child(6), h2:nth-child(7) {
-    left: 6.2em;
-  }
-  label:nth-child(9), input:nth-child(10), h2:nth-child(11) {
-    left: 12.2em;
-  }
-  input[name="tabs"] {
+}
+
+input[name="tabs"] {
     opacity: 0;
-    position: absolute;
     width: 6em;
-  }
-  input[name="tabs"]:focus + h2 {
+}
+
+label.tablab + input ~ input {
+    position: absolute;
+    top: 0;
+}
+
+.nav-tabs > h2 ~ h2 {
+    position: absolute;
+    top: 0;
+}
+
+.nav-tabs label.tablab:nth-child(1), .nav-tabs input:nth-child(2), .nav-tabs h2:nth-child(3) {
+    left: 0.2em;
+}
+
+.nav-tabs label.tablab:nth-child(5), .nav-tabs h2:nth-child(7) {
+    left: 6.2em;
+}
+
+.nav-tabs input:nth-child(6) {
+    left: 6.2em;
+}
+
+.nav-tabs label:nth-child(9), .nav-tabs h2:nth-child(11) {
+    left: 12.2em;
+}
+
+.nav-tabs input:nth-child(10) {
+    left: 12.2em;
+}
+
+input[name="tabs"]:focus + h2 {
     outline: 1px dotted #000;
     outline-offset: 10px;
-  }
-  input[name="tabs"]:checked + h2 {
-    background: rgba(0,25,40,0.8);
+}
+
+input[name="tabs"]:checked + h2 {
+    background: rgba(0, 25, 40, 0.8);
     border-radius: 5px;
-  }
-/*input[name="tabs"]:checked + h2:after {
-    content: '';
-    margin: auto;
-    position: absolute;
-    bottom: -10px;
-    left: 0;
-    right: 0;
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #333;
-  }*/
-  input + h2 + div {
+}
+
+input + h2 + div {
     position: absolute !important;
     clip: rect(1px, 1px, 1px, 1px);
-    padding:0 !important;
-    border:0 !important;
-    height: 1px !important; 
-    width: 1px !important; 
+
+    padding: 0 !important;
+    border: 0 !important;
+    height: 1px !important;
+    width: 1px !important;
     overflow: hidden;
-  }
-  input:checked + h2 + div {
+}
+
+input:checked + h2 + div {
     position: static !important;
     padding: 0.25em !important;
-    height: auto !important; 
-    width: auto !important; 
-    min-width:20.5em !important;
-  }
+    height: auto !important;
+    width: auto !important;
+    min-width: 20.5em !important;
 }
-.nav-tabs:hover h2 {
-  outline: none !important;
-}
-/*
-@media screen and (max-width: 18em) {
-  .nav_tabs {
-    label.tablab, input[name="tabs"] {
-      display: none;
-    }
-    input + h2 + div {
-      display: block !important;
-      position: static !important;
-      padding: 1em !important;
-      height: auto !important; 
-      width: auto !important; 
-    } 
-    h2 {
-      width: auto;
-      position: static !important;
-    } 
-    h2:after {
-      display: none !important;
-    }
-  }
-}
-*/

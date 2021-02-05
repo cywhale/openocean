@@ -2,11 +2,10 @@ import { useState, useMemo } from 'preact/hooks'
 import { createContext } from 'preact';
 
 const EarthContext = createContext();
-const EarthContextProvider = (props) => {//,...children
+const EarthContextProvider = (props) => { //,...children
   const [earth, setEarth] = useState({
     loaded: false,
-    //base: '',
-    //layers: '',
+  //layerNoKnock: [], //move to LayerContext
   });
 
   const gpars = useMemo(() => ({ earth, setEarth }), [earth]);

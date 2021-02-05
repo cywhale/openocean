@@ -1,13 +1,5 @@
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
-//var Cesium = require('cesium/Source/Cesium');
-//import CesiumWidget from 'cesium/Source/Widgets/CesiumWidget/CesiumWidget';
-//import { Scene } from 'cesium/Source/Scene/Scene';
-//import Globe from 'cesium/Source/Scene/Globe';
-//import MapProjection from 'cesium/Source/Core/MapProjection';
-//import SingleTileImageryProvider from 'cesium/Source/Scene/SingleTileImageryProvider';
-import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider';
-import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
-import Rectangle from 'cesium/Source/Core/Rectangle';
+//import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider'; //Move to Bathymetry/
 //import createWorldTerrain from 'cesium/Source/Core/createWorldTerrain';
 //import Credit from 'cesium/Source/Core/Credit';
 import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
@@ -19,10 +11,13 @@ import Layer from 'async!../Layer';
 import { DateContextProvider } from "../Datepicker/DateContext";
 import { FlowContextProvider } from "../Flows/FlowContext"; //current, flow for Windjs
 import { ClusterContextProvider } from "../SiteCluster/ClusterContext";
+import { TerrainContextProvider } from "../Bathymetry/TerrainContext"; //for 3D terrain
 import { OccurContextProvider } from "../Biodiv/OccurContext"; //for GBIF occurrence
+import { SateContextProvider } from "../Satellite/SateContext"; //for WMTS, sateliite layers
+import { LayerContextProvider } from "../Layer/LayerContext";
 //import { UserContext } from '../UserHandler/UserContext';
 import style from './style';
-//import 'cesium/Source/Widgets/widgets.css';
+//import 'cesium/Source/Widgets/widgets.css'; //move to ../../index.js
 import '../../style/style_earth.css';
 
 //var csLoader = { csloaded: false, csviewer: null };
@@ -33,8 +28,6 @@ import '../../style/style_earth.css';
 
 const Earth = (props, ref) => { //forwardRef((props, ref) => {
   //const ref = useRef(null);
-  //const [state, setState] = useState(false);
-  //const {appstate} = props;
   //const { Provider, Consumer } = csLoader;
   const [userScene, setUserScene] = useState({ baseLayer: "" });
   const [globe, setGlobe] = useState({
@@ -47,14 +40,11 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   useEffect(() => {
     console.log('Initialize Viewer after appstate'); // + appstate);
     if (!globe.loaded) {
-      //setUserScene({ baseLayer: "NOAA ETOPO\u00a0I" });
-      setUserScene({ baseLayer: "Esri Firefly" });
+      //setUserScene({ baseLayer: "Esri Firefly" });
+      setUserScene({ baseLayer: "NOAA ETOPO\u00a0I" });
       initGlobe();
     } else {
       render(render_basemap(), document.getElementById('rightarea'))
-      globe.viewer.camera.flyTo({
-        destination: Rectangle.fromDegrees(120.393319, 22.34583600000001, 120.399052, 22.351569)
-      });
     }
     //const { loaded: csloaded, viewer: csviewer } = {...globe};
     //csLoader = Object.assign({}, { csloaded, csviewer });
@@ -68,24 +58,19 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
         geocoder: true,
         baseLayerPicker: false, //basemapPicker,
         imageryProvider: false, //sTileImg,
-        mapProjection : new WebMercatorProjection,
+        mapProjection : new WebMercatorProjection, //used in 2D/2.5D
         requestRenderMode : true, //https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/#handling-simulation-$
         maximumRenderTimeChange : Infinity,
-        terrainProvider: new CesiumTerrainProvider({ //createWorldTerrain(),
-            url: "https://eco.odb.ntu.edu.tw/tilesets/wreckareef",
-              //requestWaterMask: false,
-              requestVertexNormals: true,
-        })
+        //terrainProvider: new CesiumTerrainProvider({ //createWorldTerrain(),
+        //    url: "https://eco.odb.ntu.edu.tw/tilesets/wreckareef",
+        //      //requestWaterMask: false,
+        //     requestVertexNormals: true,
+        //})
         //globe: new Globe(MapProjection.ellipsoid),
     });
-    gviewer.scene.globe.enableLighting = true;
-    gviewer.scene.screenSpaceCameraController.enableCollisionDetection = false;
-    gviewer.scene.globe.translucencyEnabled = true;
-    gviewer.scene.globe.frontFaceAlphaByDistance = new NearFarScalar(400.0, 0.0, 800.0, 0.5); //(50, 0.0, 100, 1.0)
 
     setGlobe({
       loaded: true,
-      //baseLoaded: false,
       viewer: gviewer,
     });
   };
@@ -94,10 +79,9 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
     if (globe.loaded) {
       //const {_scene} = viewer.viewer._cesiumWidget;
       const {scene} = globe.viewer;
-      //const {globe} = scene.globe;
       setGlobe((preState) => ({
         ...preState,
-      //  baseLayerPicker: basemap_module(globe.viewer),
+      //baseLayerPicker: basemap_module(globe.viewer),
         baseLoaded: true,
       }));
 
@@ -111,9 +95,9 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   const render_layer = () => {
     if (globe.loaded & globe.baseLoaded) {
       return (
-        <DateContextProvider><FlowContextProvider><ClusterContextProvider><OccurContextProvider>
+        <DateContextProvider><FlowContextProvider><ClusterContextProvider><TerrainContextProvider><OccurContextProvider><LayerContextProvider><SateContextProvider>
           <Layer viewer={globe.viewer} baseName={basePick.name} userBase={userScene.baseLayer} />
-        </OccurContextProvider></ClusterContextProvider></FlowContextProvider></DateContextProvider>
+        </SateContextProvider></LayerContextProvider></OccurContextProvider></TerrainContextProvider></ClusterContextProvider></FlowContextProvider></DateContextProvider>
       );
     }
     return null;

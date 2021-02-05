@@ -63,19 +63,6 @@ const BasemapPicker = (props) => {
       const getImgModels = () => {
         const defModels = createDefaultImageryProviderViewModels();
         let imgModels = [];
-        imgModels.push(new ProviderViewModel({
-           name : 'Esri Firefly',
-           iconUrl : buildModuleUrl('https://www.arcgis.com/sharing/rest/content/items/a66bfb7dd3b14228bf7ba42b138fe2ea/info/thumbnail/thumbnail1578354023212.jpeg'),
-            tooltip : 'Esri World Imagery (Firefly)',
-            category: 'Other', //'Cesium ion'
-            creationFunction : function() {
-              return new UrlTemplateImageryProvider({
-                url : buildModuleUrl('https://fly.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Firefly/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
-                credit : '© Esri', //new Credit('Esri', 'https://downloads.esri.com/blogs/arcgisonline/esrilogo_new.png', 'https://www.arc$
-                proxy : new DefaultProxy('/proxy/')
-              });
-            }
-        }));
 
 //https://noaa.maps.arcgis.com/home/item.html?id=89dbb3a8eb294652adae4e8a7c92ad24
         imgModels.push(new ProviderViewModel({
@@ -87,6 +74,20 @@ const BasemapPicker = (props) => {
               return new UrlTemplateImageryProvider({
                 url : buildModuleUrl('https://gis.ngdc.noaa.gov/arcgis/rest/services/web_mercator/etopo1_hillshade/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
                 credit : 'NOAA etopo1 hillshade', //new Credit('©
+                proxy : new DefaultProxy('/proxy/')
+              });
+            }
+        }));
+
+        imgModels.push(new ProviderViewModel({
+           name : 'Esri Firefly',
+           iconUrl : buildModuleUrl('https://www.arcgis.com/sharing/rest/content/items/a66bfb7dd3b14228bf7ba42b138fe2ea/info/thumbnail/thumbnail1578354023212.jpeg'),
+            tooltip : 'Esri World Imagery (Firefly)',
+            category: 'Other', //'Cesium ion'
+            creationFunction : function() {
+              return new UrlTemplateImageryProvider({
+                url : buildModuleUrl('https://fly.maptiles.arcgis.com/arcgis/rest/services/World_Imagery_Firefly/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
+                credit : '© Esri', //new Credit('Esri', 'https://downloads.esri.com/blogs/arcgisonline/esrilogo_new.png', 'https://www.arc$
                 proxy : new DefaultProxy('/proxy/')
               });
             }

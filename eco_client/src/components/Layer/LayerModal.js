@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef, useContext } from 'preact/hooks'; //useMemo, useCallback
+import { useEffect, useState, useRef, useContext } from 'preact/hooks';
+import { Fragment, render } from 'preact';
 import Color from 'cesium/Source/Core/Color.js';
 //import Credit from 'cesium/Source/Core/Credit';
 //import JulianDate from 'cesium/Source/Core/JulianDate';
@@ -18,36 +19,40 @@ import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServ
 import ArcGisMapServerImageryProvider from 'cesium/Source/Scene/ArcGisMapServerImageryProvider';
 //import TileCoordinatesImageryProvider from 'cesium/Source/Scene/TileCoordinatesImageryProvider';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
-import WebFeatureServiceImageryProvider from '../Earth/WebFeatureServiceImageryProvider';
+//import Biodiv from 'async!../Biodiv';
+import WmtsLayer from 'async!../Satellite/WmtsLayer';
 // follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
-import gibsGeographicTilingScheme from './gibs';
 import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
 import '../../style/style_layerctrl.scss';
 //import '../style/style_bubblelabel.scss';
-import { DateContext } from "../Datepicker/DateContext";
-const { wfsConfig, wmsConfig } = require('./.setting.js');
-//import GeoserverTerrainProvider from '../Earth/GeoserverTerrainProvider';
-//import windyGlobe from '../Flows/windyGlobe';
+//import { LayerContext } from './LayerContext';
+import { DateContext } from '../Datepicker/DateContext';
+import { SateContext } from '../Satellite/SateContext';
+const { wmsConfig } = require('./.setting.js');
 
 const LayerModal = (props) => {
-  const { viewer, baseName, userBase } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
+  const { viewer, baseName, userBase, laypars } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
   const { imageryLayers } = viewer; //basemapLayerPicker
   const layerctrlRef = useRef(null);
-  /*const [state, setState] = useState(false); //cannot be used inside viewModel function
-  const [base, setBase] = useState({
+//const [state, setState] = useState(false);
+/*const [base, setBase] = useState({
     name: userBase,
     layer: null,
   });*/
+//const { laypars } = useContext(LayerContext);
+  const { layerprops, setLayerprops } = laypars;
+  const { satepars } = useContext(SateContext);
+  const { satellite, setSatellite } = satepars;
 //const [clocktime, setClocktime] = useState(null);
   const { tkpars } = useContext(DateContext);
   const { clocktime, setClocktime } = tkpars;
-  //const clocktimes = clocktime.times;
 
   const [viewModel, setModel] = useState({
     loaded: false,
     layers: [],
     sImg: [],
+    excludedLayer: [],
     selectedLayer: null,
     selbase: userBase,
     baselayer: imageryLayers.get(0),
@@ -57,6 +62,7 @@ const LayerModal = (props) => {
     //selectedTerrain: null,
     upLayer: null,
     downLayer: null,
+    onLayerChange: function () { updateLayerList(this.selbase, this.baselayer, this.excludedLayer) },
     isSelectableLayer: function (layer) {
         return this.sImg.indexOf(layer.imageryProvider) >= 0;
     },
@@ -64,7 +70,7 @@ const LayerModal = (props) => {
         imageryLayers.raise(layer);
         viewModel.upLayer = layer;
         viewModel.downLayer = viewModel.layers[Math.max(0, index - 1)];
-        updateLayerList(this.selbase, this.baselayer); // call from here will lost other states outside viewModel
+        this.onLayerChange(); //call from here will lost other states outside viewModel
         window.setTimeout(function () {
           viewModel.upLayer = viewModel.downLayer = null;
         }, 10);
@@ -76,7 +82,7 @@ const LayerModal = (props) => {
             Math.min(viewModel.layers.length - 1, index + 1)
           ];
         viewModel.downLayer = layer;
-        updateLayerList(this.selbase, this.baselayer);
+        this.onLayerChange();
         window.setTimeout(function () {
           viewModel.upLayer = viewModel.downLayer = null;
         }, 10);
@@ -85,169 +91,12 @@ const LayerModal = (props) => {
         return index > 0;
     },
     canLower: function (index) {
-        return index >= 0 && index < imageryLayers.length - 1;
+        return index >= 0 && index < this.layers.length - 1;
     },
   });
 
-  const [wmts, setWmts] = useState({
-    url: 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{Time}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.jpg',
-    name: 'GIBS (Himawari)', //default value
-    layer: "MODIS_Terra_CorrectedReflectance_TrueColor",
-    tileMatrixSetID : '250m',
-    style : 'default',
-    format : 'image/jpg',
-    maximumLevel: 6,
-    times: clocktime.times,
-    credit : 'Global Imagery Browse Services (GIBS)',
-    imglayer: null,
-    //index: -1,
-  });
-
-  const [coast, setCoast] = useState({
-    wfs: null,
-    hide: true,
-    forcestop: false,
-  });
-
-  const stopWFSlisten = async () => {
-    const force = !coast.forcestop;
-    const hide= coast.hide;
-    const wfs = coast.wfs;
-    const intStop = coast.wfs.intStopWFS;
-
-    if (intStop) {
-      console.log("Internally WFS stopped because all data fetched");
-      await setCoast((preState) => ({
-         ...preState,
-         forcestop: true,
-      }));
-    } else {
-      if (force && !hide && wfs !== null) {
-        console.log("Disable WFS loading..")
-        await wfs.unsubscribeTicks();
-      } else if (!force && wfs !== null) {
-        console.log("Re-enable WFS loading..")
-        await wfs.addTicksTrig();
-      }
-      await setCoast((preState) => ({
-         ...preState,
-         forcestop: !coast.forcestop,
-      }));
-    }
-  }; //, [coast.forcestop]);
-
-  const initCoastline = () => {
-    //let wfsCredit = new Credit('Coastline 1:10m ©Natural Earth');//, showOnScreen: true});
-    //viewer.scene.frameState.creditDisplay.addDefaultCredit(wfsCredit);
-    setCoast((preState) => ({
-          ...preState,
-          wfs: new WebFeatureServiceImageryProvider({
-             url: wfsConfig.coast,
-             layers: wfsConfig.coast_10m_layer,
-             viewer: viewer,
-             //paramMore: 'SRSNAME=EPSG:3857&',
-             //credit: 'Coastline 1:10m ©Natural Earth'
-          }),
-    }));
-  }
-
-  const showCoastline = async () => {
-    const hide = !coast.hide;
-    const wfs = coast.wfs;
-    const force = coast.forcestop;
-
-    if (force) {
-      //alert("Note: You force WFS stopped, so now coastline or other features stop loading. Re-enable it if needed.")
-      if (wfs != null) {
-        if (!hide) {
-          console.log("Re-show WFS layer..")
-          await wfs.showCollection();
-        } else {
-          console.log("Disable WFS layer..")
-          await wfs.hideCollection();
-        }
-      }
-    } else {
-      if (!hide && wfs === null) {
-        await initCoastline();
-
-      } else if (!hide && wfs !== null) {
-        console.log("Re-show WFS layer..")
-        await wfs.showCollection();
-        await wfs.addTicksTrig();
-      } else if (hide && wfs !== null) {
-        console.log("Disable WFS layer..")
-        await wfs.unsubscribeTicks();
-        await wfs.hideCollection();
-      }
-    }
-    await setCoast((preState) => ({ //forcestop only stop WFS loading, not affect show/hide
-         ...preState,
-         hide: !coast.hide,
-    }));
-  }; //, [coast.hide]);
-
-  const applyClocktime = () => {
-    if (clocktime.times !== null && wmts.times !== null && clocktime.times !== wmts.times) {
-        console.log("Update WMTS layer because viewer time setting: ", clocktime.times);
-        updateWmtsLayer(clocktime.times);
-    }
-  }
-
-  const updateWmtsLayer = (times) => { //WMTS layer that may change with time setting or layer changed by user
-    let wlayidx = imageryLayers.indexOf(wmts.imglayer)
-    if (wlayidx >= 0) {
-      let wlay = imageryLayers.get(wlayidx);
-      let show = wlay.show
-      let alpha= wlay.alpha
-      wlay.show = false;
-      imageryLayers.remove(wlay); //false //true default to destroy
-
-      let wmtslay = imageryLayers.addImageryProvider( //addAdditionalLayerOption(
-        //wmts.name,
-        new WebMapTileServiceImageryProvider({
-//        url : 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/all/wmts.cgi',
-          url : wmts.url,
-//        url : 'https://gibs.earthdata.nasa.gov/wmts/epsg4326/all/Himawari_AHI_Band13_Clean_Infrared/...
-//        layer : 'Himawari_AHI_Band13_Clean_Infrared',
-//        tileMatrixSetID : '2km',
-//        format : 'image/png',
-          layer: wmts.layer, //"MODIS_Terra_CorrectedReflectance_TrueColor",
-          tileMatrixSetID : wmts.tileMatrixSetID, //'250m',
-          style : wmts.style, //'default',
-          format : wmts.format, //'image/jpg',
-          maximumLevel: wmts.maximumLevel, //5,
-          clock: viewer.clock,
-          times: times,
-          tileWidth: 512,
-          tileHeight: 512,
-          tilingScheme: gibsGeographicTilingScheme(),
-          credit : wmts.credit,
-          proxy : new DefaultProxy('/proxy/')
-        }), wlayidx //insert in original index
-        //alpha, show
-      );
-
-      wmtslay.show = show | false;
-      wmtslay.alpha= alpha| 0.5;
-      wmtslay.name = wmts.name;
-      knockout.track(wmtslay, ["alpha", "show", "name"]);
-      console.log("Update WMTS layer OK with index: ", imageryLayers.indexOf(wmtslay));
-
-      setWmts((preState) => ({
-        ...preState,
-        imglayer: wmtslay,
-        times: times,
-      }));
-      updateLayerList(viewModel.selbase, viewModel.baselayer);
-
-    } else {
-      console.log("Error because non-existed WMTS layer. Check it");
-    }
-  };
-
   const updateBaseLayer = () => { //BaseLayer changed from BasemapPicker, so need update viewModel
-    if (baseName!==null && baseName!=viewModel.selbase && viewModel.layers.length) {
+    if (baseName !== viewModel.selbase && viewModel.layers.length) {
       let vlay = viewModel.layers;
       let blay = imageryLayers.get(0);
       let bidx = vlay.indexOf(viewModel.baselayer);
@@ -255,6 +104,12 @@ const LayerModal = (props) => {
       //blay.show = vlay[bidx].show;
       //blay.alpha= vlay[bidx].alpha;
       vlay.splice(bidx, 1, blay);
+
+      setLayerprops((preMdl) => ({ //dynamically add/remove layer from WMTS & set base name correctly when update
+        ...preMdl,
+        basename: baseName,
+        baselayer: blay,
+      }));
       setModel((preMdl) => ({
         ...preMdl,
         selbase: baseName,
@@ -357,24 +212,34 @@ const LayerModal = (props) => {
     }*/
     if (!viewModel.loaded) {
       knockout.track(viewModel);
-      knockout.applyBindings(viewModel, layerctrlRef.current);
       //setModel(kobind());
-
       viewer.scene.globe.baseColor = Color.BLACK;
 
       setupLayers();
-      updateLayerList(viewModel.selbase, viewModel.baselayer);
+      viewModel.onLayerChange();
+      render_kocomp();
+      knockout.applyBindings(viewModel, layerctrlRef.current);
+
+      setLayerprops((preMdl) => ({ //dynamically add/remove layer from WMTS & set base name correctly when update
+          ...preMdl,
+          basename: viewModel.selbase,
+          baselayer: viewModel.baselayer,
+      }));
       setModel((preMdl) => ({ //setModel(kobind());
         ...preMdl,
         ...bindSelLayer(),
         loaded: true,
       }));
-      //bubble_labeler(".ctrlrange-wrap2");
-      //setState(true);
-    } else {
+    } else if (JSON.stringify(layerprops.layerNoKnock) !== JSON.stringify(viewModel.excludedLayer)) {
+      setModel((state) => {
+        state.excludedLayer = [...layerprops.layerNoKnock];
+      });
+    } else if (baseName !== null && baseName !== '') {
       updateBaseLayer();
+    } else {
+      console.log("Debug excludedLayer: ", viewModel.excludedLayer);
     }
-  }, [viewModel.loaded, baseName]);
+  }, [viewModel.loaded, baseName, layerprops.layerNoKnock]);
 /*
   const kobind = () => {
     function subscribeParameter() {
@@ -387,7 +252,7 @@ const LayerModal = (props) => {
     return({ imgalpha: subscribeParameter("imgalpha") })
   };
 */
-  const updateLayerList = (selBase, baseLayer) => {
+  const updateLayerList = (selBase, baseLayer, excludedLayer) => {
     const nlayers = imageryLayers.length;
     let vlay = viewModel.layers;
     let blay, bidx;
@@ -405,7 +270,9 @@ const LayerModal = (props) => {
       for (var i = nlayers - 1; i >= 0; --i) {
         blay = imageryLayers.get(i);
         if (i===bidx) { blay.name = selBase }
-        vlay.push(blay);
+        if (excludedLayer.indexOf(blay.name) === -1) {
+          vlay.push(blay);
+        }
       }
     }
     setModel((preMdl) => ({
@@ -454,7 +321,7 @@ const LayerModal = (props) => {
           //simg.splice(selidx, 1, nowLayer);
           //let vlay = viewModel.layers;
           //vlay.splice(activeLayerIndex, 1, nowLayer);
-          updateLayerList(viewModel.selbase, viewModel.baselayer); //selidx, activeLayerIndex);
+          viewModel.onLayerChange();
           return ({ selectedLayer: nowLayer, //imageryLayers.get(activeLayerIndex),
                     //sImg: simg,
                     //layers: vlay
@@ -534,7 +401,7 @@ const LayerModal = (props) => {
 //  let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
 //  let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
 //  https://wiki.earthdata.nasa.gov/display/GIBS/GIBS+Available+Imagery+Products
-    console.log("In Layer times:", wmts.times);
+/*  console.log("In Layer times:", wmts.times);
     let wmtslay = addAdditionalLayerOption(
       wmts.name,
       new WebMapTileServiceImageryProvider({
@@ -566,7 +433,7 @@ const LayerModal = (props) => {
         //index: imageryLayers.indexOf(wmtslay)
     }));
     //console.log("Wmtslay index: ", imageryLayers.indexOf(wmtslay));
-
+*/
     let sbbox = wmsConfig.tw_substrate_area_bbox;
     addAdditionalLayerOption(
       "Taiwan offshore substrate (Area)",
@@ -751,10 +618,26 @@ const LayerModal = (props) => {
       1.0, false
     );*/
   }
+/*Move to upper (Layer/) to modify layerprops.layerNoKnock in LayerContext
+  const render_gbifoccur = () => {
+    return(<Biodiv viewer={viewer} />)
+  }
+*/
+  const render_satellite = () => {
+    //if (satellite.selmodis_truecolor) {
+      return(
+        render(<WmtsLayer viewer={viewer} clocktime={clocktime} satellite={satellite} layerprops={layerprops}
+               addLayer={addAdditionalLayerOption} updateLayer={updateLayerList} />,
+               document.getElementById('ctrlwmtslayer'))
+      )
+    //}
+    //return null;
+  };
 
-//return useMemo (() => {
-  return (
-    <div id="layerctrl" ref={layerctrlRef}>
+/*Note that if Biodiv here, cannot render async after Satellite/WmtsLayer, that cause some asyn_load problem
+  { render_gbifoccur() }, then { render_satellite() } */
+  const render_kocomp = () => {
+    return render(
       <table class={style.thinx}>
         <tbody data-bind="foreach: layers">
           <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
@@ -779,17 +662,15 @@ const LayerModal = (props) => {
             </td>
           </tr>
         </tbody>
-      </table>
-      <div class={style.smalltd} style="display:inline-flex;justify-content:center;flex-direction:row;">
-            <button class={style.coastbutn} id="hidecoastbutn" onClick={showCoastline}>
-               {coast.hide? 'Show coastline': 'Hide coastline'}</button>
-            <button style="display:none;" class={style.coastbutn} id="stopwfsbutn" onClick={stopWFSlisten}>
-               {coast.forcestop? 'Remain WFS': 'Stop WFS'}</button>
-            <button class={style.coastbutn} id="applyclocktime" onClick={applyClocktime}>
-               Apply time setting</button>
-      </div>
-    </div>
+      </table>,
+    layerctrlRef.current);
+  }
+
+  return (
+    <Fragment>
+      <div id="layerctrl" ref={layerctrlRef} />
+      { render_satellite() }
+    </Fragment>
   )
-//},[]);
 };
 export default LayerModal;

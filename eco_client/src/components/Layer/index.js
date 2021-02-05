@@ -12,12 +12,17 @@ import DataCube from 'async!../DataCube'; //Region (old) + MultiSelectSort
 import Flows from 'async!../Flows';
 import SiteCluster from 'async!../SiteCluster';
 import Biodiv from 'async!../Biodiv';
+import Bathymetry from 'async!../Bathymetry';
+import Coast from 'async!./Coast';
 import { EarthContext } from "../Earth/EarthContext";
 import { FlowContext } from "../Flows/FlowContext";
 import { ClusterContext } from "../SiteCluster/ClusterContext";
+import { TerrainContext } from "../Bathymetry/TerrainContext";
 import { OccurContext } from "../Biodiv/OccurContext";
+import { LayerContext } from "./LayerContext";
+//import { LayerContextProvider } from "./LayerContext";
+//import { SateContextProvider } from "../Satellite/SateContext"; //for WMTS, sateliite layers
 //import { DateContext } from "../Datepicker/DateContext"; //move into LayerModal, otherwise choose date'll update panel
-
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
 import '../../style/style_modal_tab.scss'
@@ -34,6 +39,10 @@ const Layer = (props) => {
   const { flow, setFlow } = fpars;
   const { opars } = useContext(OccurContext);
   const { occur, setOccur } = opars;
+  const { terrpars } = useContext(TerrainContext);
+  const { terrain, setTerrain } = terrpars;
+  const { laypars } = useContext(LayerContext);
+  const { layerprops, setLayerprops } = laypars;
 //const { tkpars } = useContext(DateContext);
 //const { clocktime, setClocktime } = tkpars;
 /*
@@ -120,8 +129,8 @@ const Layer = (props) => {
 
   const render_Layermodal = () => {
     if (earth.loaded) {
-      //console.log("Pass to layer: ", clocktime.times);
-      return(<LayerModal {...props} />); //clocktimes={clocktime.times} />);
+      //<LayerContextProvider>
+      return(<LayerModal {...props} laypars={laypars} />); //clocktimes={clocktime.times} />);
     }
     return null;
   };
@@ -157,11 +166,6 @@ const Layer = (props) => {
   }
   //console.log("Toggle modal: " + modalClass + " when isOpen is: " + isOpen);
   //<a href="#ctrl" and in css use &:target{display:block} to show modal
-  //<div id="regionsectdiv"><Region viewer={viewer} /></div>
-  /*                    <FlowContextProvider><ClusterContextProvider>
-                        </ClusterContextProvider></FlowContextProvider>*/
-  //console.log("in Layer start: ", clocktime.starttime);
-  //console.log("in Layer times: ", clocktime.times);
   return (
     <Fragment>
       <div id="toolToggle" class={style.toolToggle}>
@@ -185,6 +189,9 @@ const Layer = (props) => {
                       <div id="ctrlsectdiv2">
                         {render_Layermodal()}
                       </div>
+                      <div id="ctrllayerbut" style="display:inline-flex;justify-content:center;flex-direction:row;">
+                        <div><Coast viewer={viewer} /></div>
+                      </div>
                     </div>
                   </section>
               </div>
@@ -195,6 +202,7 @@ const Layer = (props) => {
                   <section class={style.ctrlsect}>
                     <div class={style.ctrlcolumn}>
                       <Datepicker viewer={viewer} />
+                      <div id="ctrlwmtslayer" />
                     </div>
                   </section>
               </div>
@@ -204,8 +212,10 @@ const Layer = (props) => {
               <div class={style.ctrlwrapper}>
                   <section class={style.ctrlsect}>
                     <div class={style.ctrlcolumn}>
-                    <span style="font-size:0.8em;color:grey">Clustering</span>
+                    { cluster.showCluster && <span style="font-size:0.8em;color:grey">Clustering</span> }
                       <div id="ctrlsectdiv1" />
+                    { terrain.selwreck && <span style="font-size:0.8em;color:grey">3D-Terrain view</span> }
+                      <div id="ctrlsectdiv1_terr" />
                     </div>
                   </section>
               </div>
@@ -214,6 +224,7 @@ const Layer = (props) => {
       </div>
       <Flows viewer={viewer} flow={flow} />
       <SiteCluster viewer={viewer} cluster={cluster} />
+      <Bathymetry viewer={viewer} terrain={terrain} />
       <Biodiv viewer={viewer} occur={occur} />
       { <div class="cesium-widget-credits" id="searchx" data-searchin="" data-searchout="" style="display:none">
            Now searching: {searchLayer}</div> }

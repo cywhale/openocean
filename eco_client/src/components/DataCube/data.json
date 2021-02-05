@@ -8,10 +8,16 @@
     "value": "flows"
   },
   {
-    "label": "Biodiversity",
-    "disabled": false,
+    "label": "Global Imagery Browse Services (GIBS)",
     "children": [
-      { "label": "GBIF Ocean","value": "gbifocean", "format": "image/png", "type": "wfs" }
+      { "value": "MODIS_Terra_CorrectedReflectance_TrueColor", "label": "MODIS Terra TrueColor", "type": "wmts", "format": "image/jpg", "resolution": "250m" }
+    ],
+    "value": "GBIS"
+  },
+  {
+    "label": "Biodiversity",
+    "children": [
+      { "label": "GBIF Ocean","value": "gbifocean", "format": "image/png", "type": "wms" }
     ],
     "value": "biodiversity"
   },
@@ -23,6 +29,13 @@
       { "value": "naturalreserve", "label": "Natural Reserve", "type": "region", "format": "geojson" }
     ],
     "value": "taiwannaturalreserve"
+  },
+  {
+    "label": "Bathymetry, Taiwan",
+    "children": [
+      { "value": "wreckareef", "label": "Artificial reef (shipwreck)", "type": "terrain", "format": "xyz" }
+    ],
+    "value": "taiwanbathymetry"
   },
   { "label": "-------- Socioeconomics --------", "disabled": true, "value": "socioeconomics"},
   {

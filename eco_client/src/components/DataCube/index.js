@@ -8,6 +8,8 @@ import GeoJsonDataSource from 'cesium/Source/DataSources/GeoJsonDataSource.js';
 import { ClusterContext } from "../SiteCluster/ClusterContext";
 import { FlowContext } from "../Flows/FlowContext";
 import { OccurContext } from "../Biodiv/OccurContext";
+import { TerrainContext } from "../Bathymetry/TerrainContext";
+import { SateContext } from "../Satellite/SateContext";
 import { MultiSelectContainer } from './MultiSelectContainer';
 import WebGLGlobeDataSource from './WebGLGlobeDataSource';
 
@@ -25,6 +27,10 @@ const DataCube = (props) => {
   const { flow, setFlow } = fpars;
   const { opars } = useContext(OccurContext);
   const { occur, setOccur } = opars;
+  const { terrpars } = useContext(TerrainContext);
+  const { terrain, setTerrain } = terrpars;
+  const { satepars } = useContext(SateContext);
+  const { satellite, setSatellite } = satepars;
 /*const regionOptions = [
     { value: 0, label: 'White Dolphin Reserve' },
     { value: 1, label: 'Wild Animal Habitat' },
@@ -60,6 +66,8 @@ const DataCube = (props) => {
     cube_idx: -1, // index in state, for demo data_cube (population temp)
     cube: null,
     occur_idx: -1,
+    terr_idx: -1,
+    sate_idx: -1,
   });
 
   const rdata = [...data]; //data.map(v => ({...v, loaded: false, show: false, index: -1}));
@@ -155,7 +163,8 @@ const DataCube = (props) => {
             //}
             })
             .then(function(data) {
-              let leng = dataSources._dataSources.length;
+              //let leng = dataSources._dataSources.length;
+              data.name = selected.val[i];
               dataSources.add(data);
               //setDatasrc(datasrc.push(data));
               /*setLoaded((state) => {
@@ -165,14 +174,12 @@ const DataCube = (props) => {
                 return(state);
               });
               */
-              //return(
               setLoaded((preState) => ({
                   ...preState,
                   value: [...loaded.value, selected.val[i]],
                   shown: [...loaded.shown, 1],
-                  index: [...loaded.index, leng],
+                  index: [...loaded.index, loaded.value.length], //leng, but cannot be leng. dataSources.length != loaded.value.length
               }))
-              //);
             })
             .otherwise(err => console.log("Fetching region got load err: ", err));
       };
@@ -184,6 +191,7 @@ const DataCube = (props) => {
                    selected.val[i] + '.json') //selected.format[i]
           .then(function () {
           //After the initial load, create buttons to let the user switch among series.
+            dataSource.name = selected.val[i];
             function createSeriesSetter(seriesName) {
               return function () {
                 dataSource.seriesToDisplay = seriesName;
@@ -199,7 +207,7 @@ const DataCube = (props) => {
           })
           .otherwise(err => console.log("Fetching data cube got load err: ", err));
 //        viewer.clock.shouldAnimate = false;
-          let leng = dataSources._dataSources.length;
+        //let leng = dataSources._dataSources.length;
           dataSources.add(dataSource);
 
           setModel3d((preMdl) => ({
@@ -208,12 +216,11 @@ const DataCube = (props) => {
                 cube: dataSource, //layername can use __seriesToDisplay,
           }));
 
-          //return(
           setLoaded((preState) => ({
                   ...preState,
                   value: [...loaded.value, selected.val[i]],
                   shown: [...loaded.shown, 1],
-                  index: [...loaded.index, leng],
+                  index: [...loaded.index, loaded.value.length],
           }));
       };
 
@@ -224,10 +231,30 @@ const DataCube = (props) => {
             promises.push(regionLoad(i));//, selIdx));
           } else if (selected.format[i] === 'json' && selected.type[i] === 'cube') {
             promises.push(cubeLoad(i));
-
           } else {
-            let leng = dataSources._dataSources.length;
-            if (selected.type[i] === 'wfs') {
+            //let leng = dataSources._dataSources.length;
+            if (selected.type[i] === 'terrain') {
+              setTerrain((preState) => ({
+                ...preState,
+                selwreck: true,
+              }));
+              setModel3d((preMdl) => ({
+                ...preMdl,
+                terr_idx: loaded.value.length,
+              }));
+
+            } else if (selected.type[i] === 'wmts') {
+              setSatellite((preState) => ({
+                ...preState,
+                selmodis_truecolor: true,
+              }));
+
+              setModel3d((preMdl) => ({
+                ...preMdl,
+                sate_idx: loaded.value.length,
+              }));
+
+            } else if (selected.type[i] === 'wms') {
               setOccur((preState) => ({
                 ...preState,
                 selgbif: true,
@@ -261,38 +288,45 @@ const DataCube = (props) => {
                 wind_idx: loaded.value.length,
               }));
             }
+            // These source are NOT in cesium's dataSources
             setLoaded((preState) => ({
               ...preState,
               value: [...loaded.value, selected.val[i]],
               shown: [...loaded.shown, 1],
-              index: [...loaded.index, leng],
+              index: [...loaded.index, loaded.value.length], //leng
             }));
           }
         } else { // already loaded, just show
           let showx = !!loaded.shown[vidx];
-          didx = loaded.index[vidx];
+          didx = loaded.value[vidx]; //loaded.index[vidx];
           if (!showx) {
             if (selected.format[i] === 'json' && selected.type[i] === 'cube') {
               if (!dataSources.contains(model3d.cube)) {
-                let leng = dataSources._dataSources.length;
+                //let leng = dataSources._dataSources.length;
                 dataSources.add(model3d.cube);
-
-                setLoaded((preState) => ({
-                  ...preState,
-                  shown: [...loaded.shown.slice(0, vidx), 1, ...loaded.shown.slice(vidx+1, loaded.shown.length)],
-                  index: [...loaded.index.slice(0, vidx), leng, ...loaded.index.slice(vidx+1, loaded.index.length)],
-                }));
               } else {
                 console.log("Warning: Uncertain err, cube data already in, but not shown...");
-                dataSources._dataSources[didx].show = true;
-
-                setLoaded((preState) => ({
+              //dataSources._dataSources[didx].show = true;
+                dataSources.getByName(didx)[0].show = true;
+              }
+              //let tmps = loaded.shown.splice(vidx, 1, 1); //splice() return only removed items!!
+              setLoaded((preState) => ({
                   ...preState,
                   shown: [...loaded.shown.slice(0, vidx), 1, ...loaded.shown.slice(vidx+1, loaded.shown.length)],
-                }));
-              }
+                //index: [...loaded.index.slice(0, vidx), leng, ...loaded.index.slice(vidx+1, loaded.index.lengt$
+              }));
             } else {
-              if (selected.type[i] === 'wfs') {
+              if (selected.type[i] === 'terrain') {
+                setTerrain((preState) => ({
+                  ...preState,
+                  selwreck: true,
+                }));
+              } else if (selected.type[i] === 'wmts') {
+                setSatellite((preState) => ({
+                  ...preState,
+                  selmodis_truecolor: true,
+                }));
+              } else if (selected.type[i] === 'wms') {
                 setOccur((preState) => ({
                   ...preState,
                   selgbif: true,
@@ -307,10 +341,12 @@ const DataCube = (props) => {
                   ...preState,
                   selgfs: true,
                 }));
-              } else {
+              } else { //geojson data in cesium's dataSources
                 //dataSources._dataSources[loadk[i].index].zIndex = nlayers-selIdx;
-                dataSources._dataSources[didx].show = true;
+                //dataSources._dataSources[didx].show = true;
+                dataSources.getByName(didx)[0].show = true;
               }
+              //let tmps = loaded.shown.splice(vidx, 1, 1);
               setLoaded((preState) => ({
                   ...preState,
                   shown: [...loaded.shown.slice(0, vidx), 1, ...loaded.shown.slice(vidx+1, loaded.shown.length)],
@@ -353,13 +389,24 @@ const DataCube = (props) => {
                 } else {
                   console.log("Warning: Uncertain err, cube data not in, but say shown...");
                 }
+                //let tmps = loaded.shown.splice(chkidx, 1, 0);
                 setLoaded((preState) => ({
                     ...preState,
-                    shown: [...loaded.shown.slice(0, chkidx), 0, ...loaded.shown.slice(vidx+1, loaded.shown.length)],
-                    index: [...loaded.index.slice(0, chkidx), -1, ...loaded.index.slice(vidx+1, loaded.index.length)],
+                    shown: [...loaded.shown.slice(0, chkidx), 0, ...loaded.shown.slice(chkidx+1, loaded.shown.length)],
+                  //index: [...loaded.index.slice(0, chkidx),-1, ...loaded.index.slice(chkidx+1, loaded.index.length)],
                 }));
               } else {
-                if (chkidx === model3d.occur_idx) {
+                if (chkidx === model3d.terr_idx) {
+                  setTerrain((preState) => ({
+                    ...preState,
+                    selwreck: false,
+                  }));
+                } else if (chkidx === model3d.sate_idx) {
+                  setSatellite((preState) => ({
+                    ...preState,
+                    selmodis_truecolor: false,
+                  }));
+                } else if (chkidx === model3d.occur_idx) {
                   setOccur((preState) => ({
                     ...preState,
                     selgbif: false,
@@ -375,12 +422,14 @@ const DataCube = (props) => {
                     showCluster: false,
                   }));
                 } else {
-                  didx = loaded.index[chkidx];
-                  dataSources._dataSources[didx].show = false;
+                  didx = loaded.value[chkidx] //loaded.index[chkidx]; //loaded.index !== index in dataSources
+                  //dataSources._dataSources[didx].show = false;
+                  dataSources.getByName(didx)[0].show = false;
                 }
+                //let tmps = loaded.shown.splice(chkidx, 1, 0);
                 setLoaded((preState) => ({
                     ...preState,
-                    shown: [...loaded.shown.slice(0, chkidx), 0, ...loaded.shown.slice(vidx+1, loaded.shown.length)],
+                    shown: [...loaded.shown.slice(0, chkidx), 0, ...loaded.shown.slice(chkidx+1, loaded.shown.length)],
                 }));
               }
             }
