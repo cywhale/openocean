@@ -31,10 +31,10 @@ const Biodiv = (props) => {
     layer.show = show;
     layer.alpha= alpha;
     layer.name = name;
-    setLayerprops((prev) => ({
+/*  setLayerprops((prev) => ({
       ...prev,
-      layerNoKnock: [...prev.layerNoKnock, name],
-    }));
+      layerNoKnock: layerprops.layerNoKnock.push(name),
+    })); */
   //knockout.track(layer, ["alpha", "show", "name"]);
     return(layer);
   }
@@ -57,8 +57,13 @@ const Biodiv = (props) => {
         gbif.imagery = addLayer("GBIF ocean occurrence", gbif.provider, 0.75, true);
         gbif.imageryLayers = imageryLayers;
         gbif.layeridx = imageryLayers.length - 1;
-        console.log("GBIF imagery initialized: ", layerprops.layerNoKnock);
       }
+      setLayerprops((prev) => ({
+        ...prev,
+        layerNoKnock: [...prev.layerNoKnock, gbif.imagery.name],
+      }));
+      console.log("GBIF imagery initialized: ", layerprops.layerNoKnock);
+
       setState((preState) => ({
            ...preState,
            isLoading: false,

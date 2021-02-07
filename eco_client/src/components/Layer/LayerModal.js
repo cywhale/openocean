@@ -32,19 +32,14 @@ import { SateContext } from '../Satellite/SateContext';
 const { wmsConfig } = require('./.setting.js');
 
 const LayerModal = (props) => {
-  const { viewer, baseName, userBase, laypars } = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
+  const { viewer, baseName, userBase, laypars} = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
   const { imageryLayers } = viewer; //basemapLayerPicker
   const layerctrlRef = useRef(null);
 //const [state, setState] = useState(false);
-/*const [base, setBase] = useState({
-    name: userBase,
-    layer: null,
-  });*/
 //const { laypars } = useContext(LayerContext);
   const { layerprops, setLayerprops } = laypars;
   const { satepars } = useContext(SateContext);
   const { satellite, setSatellite } = satepars;
-//const [clocktime, setClocktime] = useState(null);
   const { tkpars } = useContext(DateContext);
   const { clocktime, setClocktime } = tkpars;
 
@@ -62,7 +57,9 @@ const LayerModal = (props) => {
     //selectedTerrain: null,
     upLayer: null,
     downLayer: null,
-    onLayerChange: function () { updateLayerList(this.selbase, this.baselayer, this.excludedLayer) },
+    onLayerChange: function (init=false, excludedLayer=[]) {
+      updateLayerList(this.selbase, this.baselayer, excludedLayer, init)
+    },
     isSelectableLayer: function (layer) {
         return this.sImg.indexOf(layer.imageryProvider) >= 0;
     },
@@ -70,7 +67,7 @@ const LayerModal = (props) => {
         imageryLayers.raise(layer);
         viewModel.upLayer = layer;
         viewModel.downLayer = viewModel.layers[Math.max(0, index - 1)];
-        this.onLayerChange(); //call from here will lost other states outside viewModel
+        viewModel.onLayerChange(); //call from here will lost other states outside viewModel
         window.setTimeout(function () {
           viewModel.upLayer = viewModel.downLayer = null;
         }, 10);
@@ -82,7 +79,7 @@ const LayerModal = (props) => {
             Math.min(viewModel.layers.length - 1, index + 1)
           ];
         viewModel.downLayer = layer;
-        this.onLayerChange();
+        viewModel.onLayerChange();
         window.setTimeout(function () {
           viewModel.upLayer = viewModel.downLayer = null;
         }, 10);
@@ -216,7 +213,7 @@ const LayerModal = (props) => {
       viewer.scene.globe.baseColor = Color.BLACK;
 
       setupLayers();
-      viewModel.onLayerChange();
+      viewModel.onLayerChange(true);
       render_kocomp();
       knockout.applyBindings(viewModel, layerctrlRef.current);
 
@@ -230,33 +227,28 @@ const LayerModal = (props) => {
         ...bindSelLayer(),
         loaded: true,
       }));
-    } else if (JSON.stringify(layerprops.layerNoKnock) !== JSON.stringify(viewModel.excludedLayer)) {
-      setModel((state) => {
-        state.excludedLayer = [...layerprops.layerNoKnock];
-      });
+//  } else if (JSON.stringify(layerprops.layerNoKnock) !== JSON.stringify(viewModel.excludedLayer)) {
+// For-loop cause each state update and when next push, lost viewModel.loaded (become unknown)
+/*    let layt = viewModel.excludedLayer.splice(0, viewModel.excludedLayer.length);
+      for (let i = 0; i < layerprops.layerNoKnock; i++) {
+        layt.push(layerprops.layerNoKnock[i])
+      } */
+//    setModel((state) => {
+//      state.excludedLayer = [...layerprops.layerNoKnock]
+//    });
+    //console.log("Debug excludedLayer (layt): ", viewModel.excludedLayer, layerprops.layerNoKnock);
     } else if (baseName !== null && baseName !== '') {
       updateBaseLayer();
-    } else {
-      console.log("Debug excludedLayer: ", viewModel.excludedLayer);
-    }
-  }, [viewModel.loaded, baseName, layerprops.layerNoKnock]);
-/*
-  const kobind = () => {
-    function subscribeParameter() {
-      knockout
-        .getObservable(viewModel, "imgalpha")
-        .subscribe(function () {
-           sTileImg.alpha = newValue;
-        });
-    }
-    return({ imgalpha: subscribeParameter("imgalpha") })
-  };
-*/
-  const updateLayerList = (selBase, baseLayer, excludedLayer) => {
+    } //else {
+      //console.log("Debug excludedLayer: ", viewModel.excludedLayer);
+    //}
+  }, [viewModel.loaded, baseName]);//, layerprops.layerNoKnock]);
+
+  const updateLayerList = (selBase, baseLayer, excludedLayer=[], init=false) => {
     const nlayers = imageryLayers.length;
     let vlay = viewModel.layers;
     let blay, bidx;
-    if (!vlay.length) {
+    if (init) { //(!vlay.length) {
       blay = imageryLayers.get(0);
       blay.name = selBase;
       vlay.splice(0, vlay.length);
@@ -264,13 +256,15 @@ const LayerModal = (props) => {
         vlay.push(imageryLayers.get(i));
       }
       vlay.push(blay);
-    } else {
-      bidx = imageryLayers.indexOf(baseLayer);
+    } else { //seems when raise/lower call updateLayerList cannot get correct external variable baseLayer/...
+    //bidx = imageryLayers.indexOf(baseLayer);
       vlay.splice(0, vlay.length);
-      for (var i = nlayers - 1; i >= 0; --i) {
+      let excluded = excludedLayer.length==0? layerprops.layerNoKnock : excludedLayer;
+    //console.log("Debug in updateLayer for excludedLayer: ", viewModel.excludedLayer, excludedLayer);
+      for (let i = nlayers - 1; i >= 0; --i) {
         blay = imageryLayers.get(i);
-        if (i===bidx) { blay.name = selBase }
-        if (excludedLayer.indexOf(blay.name) === -1) {
+      //if (i===bidx) { blay.name = selBase }
+        if (excluded.length === 0 || excluded.indexOf(blay.name) === -1) {
           vlay.push(blay);
         }
       }
@@ -544,7 +538,6 @@ const LayerModal = (props) => {
       }),
       1.0, false
     );
-
 /*  addAdditionalLayerOption(
       "TileMapService Image",
       new Cesium.TileMapServiceImageryProvider({

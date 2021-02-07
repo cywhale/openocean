@@ -19,8 +19,7 @@ import { FlowContext } from "../Flows/FlowContext";
 import { ClusterContext } from "../SiteCluster/ClusterContext";
 import { TerrainContext } from "../Bathymetry/TerrainContext";
 import { OccurContext } from "../Biodiv/OccurContext";
-import { LayerContext } from "./LayerContext";
-//import { LayerContextProvider } from "./LayerContext";
+import { LayerContext, LayerContextProvider } from "./LayerContext";
 //import { SateContextProvider } from "../Satellite/SateContext"; //for WMTS, sateliite layers
 //import { DateContext } from "../Datepicker/DateContext"; //move into LayerModal, otherwise choose date'll update panel
 import draggable_element from '../Compo/draggable_element';
@@ -45,17 +44,7 @@ const Layer = (props) => {
   const { layerprops, setLayerprops } = laypars;
 //const { tkpars } = useContext(DateContext);
 //const { clocktime, setClocktime } = tkpars;
-/*
-  const evlay01url = 'https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&wi$
-  const sTileImg = new SingleTileImageryProvider({
-    url: evlay01url,
-    //rectangle: new Rectangle(bnds[0], bnds[1], bnds[2], bnds[3]),
-    rectangle: Rectangle.fromDegrees(-180.0, -90.0, 180.0, 90.0),
-    //numberOfLevelZeroTilesX: 1,
-    //numberOfLevelZeroTilesY: 1,
-    proxy : new DefaultProxy('/proxy/') //https://github.com/CesiumGS/EarthKAMExplorer/blob/master/ser$
-  });
-*/
+
   const toggleBtnx = () => {setIsOpen(!isOpen)};
   const closeBtnx = () => {setIsOpen(false)};
 /*
@@ -129,8 +118,8 @@ const Layer = (props) => {
 
   const render_Layermodal = () => {
     if (earth.loaded) {
-      //<LayerContextProvider>
-      return(<LayerModal {...props} laypars={laypars} />); //clocktimes={clocktime.times} />);
+      return(//<LayerContextProvider>
+             <LayerModal {...props} laypars={laypars} />); //</LayerContextProvider>);
     }
     return null;
   };
