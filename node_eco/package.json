@@ -11,7 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "boom": "^7.3.0",
-    "fastify": "^3.9.2",
+    "fastify": "^3.12.0",
     "fastify-plugin": "^3.0.0",
     "fastify-static": "^3.3.0",
     "fs": "^0.0.1-security",
