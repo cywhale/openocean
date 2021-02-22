@@ -4,7 +4,7 @@ import { Router } from 'preact-router';
 //import { createHashHistory } from 'history';
 import Sidebar from 'async!./Sidebar';
 import Earth from 'async!./Earth'; // {csConsumer}
-import UserCookies from 'async!./UserHandler/UserCookies';
+//import UserCookies from 'async!./UserHandler/UserCookies'; //move into UserHandler
 import { UserContextProvider } from "./UserHandler/UserContext";
 import { EarthContextProvider } from "./Earth/EarthContext";
 import style from './style/style_app';
@@ -110,7 +110,7 @@ const App = (props) => { //class App extends Component {
             <Earth ref={ref} />
           </EarthContextProvider>
         </UserContextProvider>
-        <UserCookies />
+        <div id='userCookieContainer' />
       </div>
       </Router>
     </div>

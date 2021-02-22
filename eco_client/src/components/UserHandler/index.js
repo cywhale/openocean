@@ -1,10 +1,12 @@
-//import { render } from 'preact';
+import { render } from 'preact';
 import { useContext, useState, useEffect, useCallback } from 'preact/hooks';
 import { UserContext } from "./UserContext"
 import Cookies from 'universal-cookie';
 import { auth //, googleAuthProvider //, database
        } from './firebase';
 import { nanoid } from 'nanoid';
+import sessionInfo from './sessionInfo';
+import UserCookies from 'async!./UserCookies';
 import SignIn from 'async!./SignIn';
 import style from './style_userhandler';
 const { odbConfig } = require('./.ssologin.js');
@@ -17,6 +19,7 @@ const UserHandler = () => {
 
   const [state, setState] = useState({
     ssostate: '',
+    alerted: false,
     //redirect: '', //move to SignIn
     //popup: false
   });
@@ -58,7 +61,7 @@ const UserHandler = () => {
       return (uc);
   };
 
-  const OdbAuth = useCallback(async (ucstr) => { //gencode=false
+  const OdbAuth = useCallback(async (ucstr, alerted=true) => { //gencode=false
     let ucstrx = ucstr !== undefined? ucstr: ucode.str;
     //if (gencode && ucstrx === '') ucstrx = initUcode();
     const chkurl =  odbConfig.base + odbConfig.check + "?ucode=" + ucstrx;
@@ -68,15 +71,19 @@ const UserHandler = () => {
           if (sso) {
             if (sso.username && sso.username !== "") {
               cookies.set('uauth', 'odb', cookieOpts);
+              sessionInfo('sessioninfo/login', 'logined', ucstr, 'POST',
+                          {action: 'logined', user: sso.username}, !alerted, setUser);
+
               setState((preState) => ({
                 ...preState,
+                alerted: true,
                 ssostate: '',
               }));
 
               return(
                 setUser((preState) => ({
                   ...preState,
-                  logined: true,
+                //logined: true,
                   name: sso.username,
                   photoURL: 'https://ecodata.odb.ntu.edu.tw/pub/icon/favicon_tw.png',
                   auth: 'odb',
@@ -105,7 +112,7 @@ const UserHandler = () => {
     }));
     setUser((preState) => ({
       ...preState,
-      logined: false,
+      //logined: false,
       name: '',
       auth: '',
       photoURL: '',
@@ -131,44 +138,72 @@ const UserHandler = () => {
     );
   };
 
-  useEffect(() => {
-    const waitFireAuth = (ucstr) => {auth.onAuthStateChanged(
+  const waitCookiedivRender = () => {
+      new Promise((resolve) => {//, reject) => {
+      //try {
+        render(<UserCookies userCallback={setUser} />, document.getElementById('userCookieContainer'));
+        resolve();
+      }); //catch (err) { reject(err) }
+  };
+
+  const waitFireAuth = (ucstr) => {auth.onAuthStateChanged(
           currUser => {
             if (currUser) {
               cookies.set('uauth', 'gmail', cookieOpts);
+              //let chktoken =
+              sessionInfo('sessioninfo/login', 'logined', ucstr, 'POST',
+                          {action: 'logined', user: currUser.displayName}, false, setUser);
+              //if (chktoken) {
               return(
-                setUser((preState) => ({
-                  ...preState,
-                  logined: true,
-                  name: currUser.displayName,
-                  photoURL: currUser.photoURL,
-                  auth: 'gmail',
-                  token: ucstr
-                }))
+                  setUser((preState) => ({
+                    ...preState,
+                    //session: 'logined',
+                    //logined: true,
+                    name: currUser.displayName,
+                    photoURL: currUser.photoURL,
+                    auth: 'gmail',
+                    //token: ucstr
+                  }))
               );
             }
             cookies.remove('uauth', { path: '/' });
             return(null);
           }
-    )};
+  )};
 
-    let uc = ucode.str;
-    if (uc === '') {
-      uc = initUcode();
-    } else {
-      const last_auth = checkcookie('uauth');
-      if (user.auth === 'odb' || (state.ssostate != 'ssofail' && // first check ODB SSO fail or success
-          (last_auth === '' || last_auth === 'odb'))) {
-        OdbAuth(uc);//uc, false
-      } else {
-        waitFireAuth(uc);;
-      }
+  useEffect(() => {
+    if (!user.saveAgree && user.session === '') {
+      waitCookiedivRender();
       setUser((preState) => ({
-        ...preState,
-        init: true
+          ...preState,
+          session: 'initCookieSet',
       }));
+    } else if (user.saveAgree) {
+      if (user.session === 'initCookieSet') {
+        //let chktoken =
+        sessionInfo('sessioninfo/init', 'initSession', ucode.str, 'POST',
+                    {action: 'initSession'}, false, setUser);
+      } else if (user.session !== 'logined') {
+        let uc = ucode.str;
+        if (uc === '') {
+          uc = initUcode();
+        } else {
+          const last_auth = checkcookie('uauth');
+          if (user.auth === 'odb' || (state.ssostate != 'ssofail' && // first check ODB SSO fail or success
+              (last_auth === '' || last_auth === 'odb'))) {
+            OdbAuth(uc, state.alerted);//uc, false
+          } else {
+            waitFireAuth(uc);;
+          }
+//        console.log("Now user state is ", user.session);
+/*        setUser((preState) => ({
+            ...preState,
+            session: 'init',
+          })); */
+        }
+      }
     }
-  }, [ucode.str, user.auth, state.ssostate, OdbAuth]);
+  }, [state.ssostate, ucode.str, user.saveAgree, user.auth, user.session, OdbAuth]);
 
   // handleSSOChange={OdbAuth()} in prop cause SignIn recusively update? and continuouly get sso?ucode=...
   return (

@@ -74,7 +74,7 @@ const Layer = (props) => {
   const sitePicker = async () => { //useCallback(
     const {scene} = viewer;
     //const sitePickedLabel = () => {
-    var handler = new ScreenSpaceEventHandler(scene.canvas);
+    let handler = new ScreenSpaceEventHandler(scene.canvas);
     await handler.setInputAction(function (movement) {
         let pickedLabel = scene.pick(movement.endPosition);
         if (defined(pickedLabel)) {
