@@ -3,7 +3,7 @@ node_modules
 build
 **/map/
 **/ssr-build/
-webgl
+**/webgl
 pub
 ver_bak
 coverage
@@ -24,10 +24,12 @@ nohup.out
 **/*.key
 **/*.cert
 yarn.lock
-../.env
+yarn-error.log
+server/.env
+**/.env
 **/.cache
 size-plugin.json
-**/.log
+**/*.log
 .testenv.js
 config/cesium_css_modify.sh
 distdll
