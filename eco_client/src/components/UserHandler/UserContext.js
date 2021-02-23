@@ -16,7 +16,7 @@ const UserContextProvider = (props) => {//,...children
     }
   };*/
   const [user, setUser] = useState({
-    //init: false,
+    init: false,
     //logined: false,
     saveAgree: false,
     session: '', //initSession, logined, ...

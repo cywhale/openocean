@@ -196,10 +196,10 @@ const UserHandler = () => {
             waitFireAuth(uc);;
           }
 //        console.log("Now user state is ", user.session);
-/*        setUser((preState) => ({
+          setUser((preState) => ({
             ...preState,
-            session: 'init',
-          })); */
+            init: true,
+          }));
         }
       }
     }
