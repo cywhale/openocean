@@ -45,13 +45,6 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
       initGlobe();
     } else {
       render(render_basemap(), document.getElementById('rightarea'))
-
-      globe.viewer.geocoder.viewModel.destinationFound = function(viewModel, destination) {
-        //globe.viewer.camera.flyTo({
-        //destination: destination
-        //});
-        console.log("Going to by search: ", viewModel.searchText, destination);
-      };
     }
     //const { loaded: csloaded, viewer: csviewer } = {...globe};
     //csLoader = Object.assign({}, { csloaded, csviewer });

@@ -31,8 +31,8 @@ import { DateContext } from '../Datepicker/DateContext';
 import { SateContext } from '../Satellite/SateContext';
 const { wmsConfig } = require('./.setting.js');
 
-const LayerModal = (props) => {
-  const { viewer, baseName, userBase, laypars} = props; //baseName: from BasemapPicker; userBase: user cookies (not yet)
+const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user cookies (not yet)
+  const { viewer, baseName, userBase, laypars } = props; //, hashstate, hashHandler
   const { imageryLayers } = viewer; //basemapLayerPicker
   const layerctrlRef = useRef(null);
 //const [state, setState] = useState(false);
@@ -239,10 +239,25 @@ const LayerModal = (props) => {
     //console.log("Debug excludedLayer (layt): ", viewModel.excludedLayer, layerprops.layerNoKnock);
     } else if (baseName !== null && baseName !== '') {
       updateBaseLayer();
-    } //else {
-      //console.log("Debug excludedLayer: ", viewModel.excludedLayer);
-    //}
-  }, [viewModel.loaded, baseName]);//, layerprops.layerNoKnock]);
+    }/* else if (hashstate.handling && hashstate.hash === '#search') {
+        let el = document.getElementById("tab-4");
+        //simuClick(el);
+        if (typeof el.click == 'function') {
+          el.click()
+        } else if(typeof el.onclick == 'function') {
+          el.onclick()
+        }
+        let uri = window.location.toString();
+        let clean_uri = uri.substring(0, uri.indexOf("#"));
+        //history.pushState(null, null, '#handling');
+        //window.dispatchEvent(new HashChangeEvent('hashchange'));
+        history.replaceState({}, document.title, clean_uri);
+        hashHandler({
+          handling: false,
+          hash: '',
+        });
+    }*/
+  }, [viewModel.loaded, baseName]);//, layerprops.layerNoKnock, hashstate.handling]);
 
   const updateLayerList = (selBase, baseLayer, excludedLayer=[], init=false) => {
     const nlayers = imageryLayers.length;

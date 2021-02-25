@@ -14,6 +14,7 @@ import SiteCluster from 'async!../SiteCluster';
 import Biodiv from 'async!../Biodiv';
 import Bathymetry from 'async!../Bathymetry';
 import Coast from 'async!./Coast';
+import UserSearch from 'async!../UserSearch';
 import { EarthContext } from "../Earth/EarthContext";
 import { FlowContext } from "../Flows/FlowContext";
 import { ClusterContext } from "../SiteCluster/ClusterContext";
@@ -28,7 +29,7 @@ import '../../style/style_modal_tab.scss'
 
 const Layer = (props) => {
   const { viewer, baseName, userBase } = props;
-  const [ searchLayer, setSearchLayer ] = useState(null);
+//const [ searchLayer, setSearchLayer ] = useState(null);
   const [ isOpen, setIsOpen ] = useState(false);
   const { gpars } = useContext(EarthContext);
   const { earth, setEarth } = gpars;
@@ -44,9 +45,30 @@ const Layer = (props) => {
   const { layerprops, setLayerprops } = laypars;
 //const { tkpars } = useContext(DateContext);
 //const { clocktime, setClocktime } = tkpars;
+  const [hashstate, setHashState] = useState({
+    handling: false,
+    hash: '',
+  //chk1: 'true',
+  //chk4: 'false',
+  });
 
-  const toggleBtnx = () => {setIsOpen(!isOpen)};
-  const closeBtnx = () => {setIsOpen(false)};
+  const clear_uri = () => {
+    let uri = window.location.toString();
+    let clean_uri = uri.substring(0, uri.indexOf("#"));
+    history.replaceState({}, document.title, clean_uri);
+    return(
+      setHashState((prev) => ({
+        ...prev,
+        handling: false,
+        hash: '',
+      }))
+    )
+  };
+  const toggleBtnx = () => {setIsOpen(!isOpen)}
+  const closeBtnx = () => {
+    setIsOpen(false);
+    //clean_uri(true);
+  };
 /*
   const enable_modalToggle = async () => {
     let togglebtn= document.getElementById("toolButn");
@@ -55,21 +77,64 @@ const Layer = (props) => {
     //await closebtn.addEventListener('click', closeBtnx, false);
   }
 */
+/* https://gomakethings.com/how-to-simulate-a-click-event-with-javascript/
+ * Simulate a click event.
+ * @public
+ * @param {Element} elem  the element to simulate a click on
+  const simuClick = (elem) => {
+	// Create our event (with options)
+	var evt = new MouseEvent('click', {
+		bubbles: true,
+		cancelable: true,
+		view: window
+	});
+	// If cancelled, don't dispatch our event
+	var canceled = !elem.dispatchEvent(evt);
+  };*/
   useEffect(() => {
-    //if (!earth.loaded) {
+    if (!earth.loaded) {
       const drag_opts = { dom: "#ctrl", dragArea: '#ctrlheader' };
       draggable_element(drag_opts);
-      //enable_modalToggle();
-      enable_search_listener();
+      document.getElementById('tab-1').checked = true; // give a default
+      //enable_search_listener();
+      window.addEventListener("hashchange", function(e) {
+        setHashState((prev) => ({
+          ...prev,
+          hash: window.location.hash,
+        }))
+      }, false);
+
       sitePicker();
       setEarth((preState) => ({
         ...preState,
         loaded: true,
       }));
-    //} //else {
-      //render_windjs(flow.selgfs);
-    //}
-  },[]); //[earth.loaded]);//, flow.selgfs]);
+    }
+    if (hashstate.hash !== '' && !hashstate.handling) {
+      if (hashstate.hash === "#search") {
+        setIsOpen(true);
+        setHashState((prev) => ({
+          ...prev,
+          handling: true,
+          //chk1: 'false',
+          //chk4: 'true',
+        }));
+      } else { //temporarily not handle other location.hash
+        clear_uri();
+      }
+    } else if (hashstate.handling) {
+        let el = document.getElementById("tab-4");
+        //simuClick(el);
+        if (typeof el.click == 'function') {
+          el.click()
+        } else if(typeof el.onclick == 'function') {
+          el.onclick()
+        }
+        //document.getElementById('tab-1').checked = false;
+        //document.getElementById('tab-4').checked = true;
+        clear_uri(); //false
+    }
+  },[earth.loaded, hashstate]);
 
   const sitePicker = async () => { //useCallback(
     const {scene} = viewer;
@@ -119,33 +184,10 @@ const Layer = (props) => {
   const render_Layermodal = () => {
     if (earth.loaded) {
       return(//<LayerContextProvider>
-             <LayerModal {...props} laypars={laypars} />); //</LayerContextProvider>);
+             <LayerModal {...props} laypars={laypars} />); //hashstate={hashstate} hashHandler={setHashState}
     }
     return null;
   };
-
-  const set_searchingtext= (elem_search, dom, evt) => {
-    let x = elem_search.value;
-    if (x && x.trim() !== "" && x !== dom.dataset.search) {
-      dom.dataset.searchin = x;
-    }
-  };
-
-  const get_searchingtext = (dom, evt) => {
-    //let REGEX_EAST = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f\u3131-\uD79D]/;
-    //if (dom.dataset.search && dom.dataset.search.trim() !== "") { //|| dom.dataset.search.match(REGEX_EAST))
-    setSearchLayer(dom.dataset.searchin);
-    dom.dataset.searchout = dom.dataset.searchin;
-  };
-
-  const enable_search_listener = async () => {
-    let elem_search = document.querySelector(".cesium-geocoder-input");
-    let search_term = document.getElementById("searchx");
-    let butt_search = document.querySelector(".cesium-geocoder-searchButton");
-    await elem_search.addEventListener("change", set_searchingtext.bind(null, elem_search, search_term), false);
-    await elem_search.addEventListener("search",get_searchingtext.bind(null, search_term), false);
-    await butt_search.addEventListener("click", get_searchingtext.bind(null, search_term), false);
-  }
 
   let modalClass;
   if (!isOpen) {
@@ -155,6 +197,8 @@ const Layer = (props) => {
   }
   //console.log("Toggle modal: " + modalClass + " when isOpen is: " + isOpen);
   //<a href="#ctrl" and in css use &:target{display:block} to show modal
+  /*      { <div class="cesium-widget-credits" id="searchxdiv" data-searchin="" data-searchout="" style="display:none">
+           Now searching: {searchLayer}</div> }*/
   return (
     <Fragment>
       <div id="toolToggle" class={style.toolToggle}>
@@ -167,7 +211,7 @@ const Layer = (props) => {
         <div class={style.modal}>
           <div class="nav-tabs">
             <label class="tablab" for="tab-1" tabindex="0" />
-            <input id="tab-1" type="radio" name="tabs" checked="true" aria-hidden="true" />
+            <input id="tab-1" type="radio" name="tabs" aria-hidden="true" />
             <h2 data-toggle="tab">Layers</h2>
               <div class={style.ctrlwrapper}>
                   <section class={style.ctrlsect}>
@@ -208,15 +252,26 @@ const Layer = (props) => {
                     </div>
                   </section>
               </div>
+            <label class="tablab" for="tab-4" tabindex="3" />
+            <input id="tab-4" type="radio" name="tabs" aria-hidden="true" />
+            <h2 data-toggle="tab">Search</h2>
+              <div class={style.ctrlwrapper}>
+                  <section class={style.ctrlsect}>
+                    <div class={style.ctrlcolumn}>
+                      <span style="font-size:0.8em;color:grey">Search Results</span>
+                      <div id="searchxdiv" data-searchin="" data-searchout="" />
+                      <div id="resultxdiv" />
+                    </div>
+                  </section>
+              </div>
           </div>
         </div>
       </div>
+      <UserSearch viewer={viewer} />
       <Flows viewer={viewer} flow={flow} />
       <SiteCluster viewer={viewer} cluster={cluster} />
       <Bathymetry viewer={viewer} terrain={terrain} />
       <Biodiv viewer={viewer} occur={occur} />
-      { <div class="cesium-widget-credits" id="searchx" data-searchin="" data-searchout="" style="display:none">
-           Now searching: {searchLayer}</div> }
     </Fragment>
   );
 };

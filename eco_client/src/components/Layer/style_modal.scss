@@ -42,7 +42,7 @@
    border:1px solid lightgrey;
    border-radius:8px;
    width: auto;
-   min-width: 20.5em;
+   min-width: 24.5em;
    height: auto;
    min-height: 250px;
    left:2%;
@@ -84,7 +84,7 @@
     text-align: center;
     padding-top: 10px;
     .close{
-      background-color:rgba(0,51,102,.75);
+      background: transparent;/*-color:rgba(0,51,102,.75);*/
       color:white;
       font-size:24px;
       padding:1px 5px;
@@ -92,7 +92,20 @@
       right:2px;
       top:2px;
       z-index:1000;
+    }/*
+    .close:before, .close:after {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 20px;
+      transform: rotate(45deg) translate(-50%, -50%);
+      transform-origin: top left;
+      content: '';
     }
+    .close:after {
+      transform: rotate(-45deg) translate(-50%, -50%);
+    }*/
   }
 }
 

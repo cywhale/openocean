@@ -66,20 +66,16 @@ label.tablab + input ~ input {
     left: 0.2em;
 }
 
-.nav-tabs label.tablab:nth-child(5), .nav-tabs h2:nth-child(7) {
+.nav-tabs label.tablab:nth-child(5), .nav-tabs input:nth-child(6), .nav-tabs h2:nth-child(7),  {
     left: 6.2em;
 }
 
-.nav-tabs input:nth-child(6) {
-    left: 6.2em;
-}
-
-.nav-tabs label:nth-child(9), .nav-tabs h2:nth-child(11) {
+.nav-tabs label.tablab:nth-child(9), .nav-tabs input:nth-child(10), .nav-tabs h2:nth-child(11) {
     left: 12.2em;
 }
 
-.nav-tabs input:nth-child(10) {
-    left: 12.2em;
+.nav-tabs label.tablab:nth-child(13), .nav-tabs input:nth-child(14), .nav-tabs h2:nth-child(15) {
+    left: 18.2em;
 }
 
 input[name="tabs"]:focus + h2 {
