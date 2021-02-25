@@ -2,6 +2,7 @@ import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 //import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider'; //Move to Bathymetry/
 //import createWorldTerrain from 'cesium/Source/Core/createWorldTerrain';
 //import Credit from 'cesium/Source/Core/Credit';
+import NavigationHelpButton from 'cesium/Source/Widgets/NavigationHelpButton/NavigationHelpButton';
 import WebMercatorProjection from 'cesium/Source/Core/WebMercatorProjection';
 import { render, Fragment } from 'preact'; //createContext seems can be used only within Parent DOM..
 import { useState, useEffect } from 'preact/hooks'; //useRef, useImperativeHandle
@@ -45,6 +46,9 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
       initGlobe();
     } else {
       render(render_basemap(), document.getElementById('rightarea'))
+      let navigationHelpButton = new NavigationHelpButton({
+         container : 'navigationHelpButtonContainer'
+      });
     }
     //const { loaded: csloaded, viewer: csviewer } = {...globe};
     //csLoader = Object.assign({}, { csloaded, csviewer });
@@ -58,6 +62,7 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
         geocoder: true,
         baseLayerPicker: false, //basemapPicker,
         imageryProvider: false, //sTileImg,
+        navigationHelpButton: false,
         mapProjection : new WebMercatorProjection, //used in 2D/2.5D
         requestRenderMode : true, //https://cesium.com/blog/2018/01/24/cesium-scene-rendering-performance/#handling-simulation-$
         maximumRenderTimeChange : Infinity,
@@ -86,7 +91,10 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
       }));
 
       return (
-        <BasemapPicker scene={scene} basePick={basePick} onchangeBase={setBasePick}/>
+        <Fragment>
+          <BasemapPicker scene={scene} basePick={basePick} onchangeBase={setBasePick}/>
+          <div id="navigationHelpButtonContainer" />
+        </Fragment>
       ); //<Sidebar scene={_scene} />
     }
     return null;

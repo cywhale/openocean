@@ -1,5 +1,5 @@
 //import S from 'fluent-json-schema'
-export const autoPrefix = '/search/layers'
+export const autoPrefix = process.env.NODE_ENV === 'production'? '/search/layers' : '/searchinfo/layers'
 
 export default async function layersearch (fastify, opts, next) {
   const { db } = fastify.mongo.mongo1;

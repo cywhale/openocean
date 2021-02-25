@@ -1,5 +1,6 @@
 import { render, Fragment } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
+import style from './style_usersearch';
 
 const UserSearch = (props) => {
   const { viewer } = props;
@@ -10,6 +11,7 @@ const UserSearch = (props) => {
     geocode_place: '',
     layer: '',
   });
+  const searchx = process.env.NODE_ENV === 'production'? 'search/' : 'searchinfo/';
 
 /* old test code from fastify-preact
   const onLayerSearch = () => {
@@ -47,7 +49,7 @@ const UserSearch = (props) => {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json; charset=utf-8');
     headers.append('Accept', 'application/json');
-    let searchurl = 'search/layers/' + searchtxt;
+    let searchurl = searchx + 'layers/' + searchtxt;
 
     try {
       await fetch(searchurl, {
@@ -110,14 +112,15 @@ const UserSearch = (props) => {
 
   const render_searchresult = (output) => {
       return(
-        render(<div>{ output.geocode !== null &&
-                 <div><button id="toGeocodeBut" onClick={() => {viewer.camera.flyTo({destination: output.geocode})}}>
-                   Fly to {output.geocode_place}
-                 </button></div> }
-                 <div><hr /><br /><br />
+        render(<div>
+                 <div>
                    { output.layer === '' && <p>Not perform searching yet...</p>}
                    { output.layer !== '' && <p>{output.layer}</p>}
                  </div>
+                 { output.geocode !== null &&
+                 <div><hr /><button id="toGeocodeBut" class={style.ctrlbutn} onClick={() => {viewer.camera.flyTo({destination: output.geocode})}}>
+                   Fly to {output.geocode_place}
+                 </button></div> }
                </div>,
                document.getElementById('resultxdiv'))
       )

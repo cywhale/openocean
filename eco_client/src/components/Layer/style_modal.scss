@@ -45,11 +45,12 @@
    min-width: 24.5em;
    height: auto;
    min-height: 250px;
-   left:2%;
+   left:5%;
    position:absolute;
-   top:8%;
+   top:10%;
    overflow:hidden;
-   max-width:66em;
+   max-width:34.5em;
+   word-wrap:break-word;
   -webkit-transition: opacity 400ms ease-in;
   -moz-transition: opacity 400ms ease-in;
   transition: opacity 400ms ease-in;
@@ -133,16 +134,22 @@
     flex-basis: 40%;
     &:nth-last-child(2) {
 	margin-right: 0;
-    }
+    };
     &:last-child {
 	flex-basis: 100%;
 	margin: 0;
-    }
+    };
   }
 }
 @media screen and (max-width: 680px) {
+    .modalOverlay {
+      min-width: 22em;
+      max-width: 22em;
+    };
     .ctrlsect div {
-	flex-basis: 100%;
-	margin: 0 0 5px 0;
-    }
+      max-width: 100%;
+      font-size: 0.8em;
+      flex-basis: 100%;
+      margin: 0 0 5px 0;
+    };
 }

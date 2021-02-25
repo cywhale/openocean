@@ -21,6 +21,8 @@ const SignIn = (props) => {
     //token: '',
   });
 */
+  const sessionx = process.env.NODE_ENV === 'production'? 'session/' : 'sessioninfo/';
+
   const checkAuth = async () => {
     //console.log("ODB SSO iframe src change");
     return (
@@ -62,7 +64,7 @@ const SignIn = (props) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
       // var token = result.credential.accessToken; //We not use this token currently.
       // The signed-in user info. //var user = result.user;
-      sessionInfo('sessioninfo/login', 'logined', ucode, 'POST',
+      sessionInfo(sessionx + 'login', 'logined', ucode, 'POST',
                   {action: 'logined', user: result.user.displayName},
                   true, setUser);
 

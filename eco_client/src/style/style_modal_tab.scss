@@ -4,13 +4,10 @@
   position: relative;
 }
 
-
-label.tablab {
-    max-width: 5.5em;
-    width: 5.5em;
-}
-
-.nav-tabs > h2 {
+:root {  
+  --base-tab-width: 5.9em;
+  --bias-a: 0.1em;
+  --bias-b: 0.2em;
 }
 
 .nav-tabs > h2 {
@@ -23,8 +20,8 @@ label.tablab {
     font-weight: 600;
     text-decoration: none;
     text-align: center;
-    max-width: 5.5em;
-    width: 5.5em;
+    max-width: calc(var(--base-tab-width) + var(--bias-a));
+    width: calc(var(--base-tab-width) + var(--biias-a));
 }
 
 .nav-tabs:hover > h2 {
@@ -32,6 +29,8 @@ label.tablab {
 }
 
 label.tablab {
+    max-width: var(--base-tab-width);
+    width: var(--base-tab-width);
     position: absolute;
     padding: 24px 20px;
     border-radius: 10px;
@@ -49,7 +48,7 @@ label.tablab ~ label.tablab {
 
 input[name="tabs"] {
     opacity: 0;
-    width: 6em;
+    width: var(--base-tab-width);
 }
 
 label.tablab + input ~ input {
@@ -63,19 +62,31 @@ label.tablab + input ~ input {
 }
 
 .nav-tabs label.tablab:nth-child(1), .nav-tabs input:nth-child(2), .nav-tabs h2:nth-child(3) {
-    left: 0.2em;
+    left: var(--bias-b);
 }
 
-.nav-tabs label.tablab:nth-child(5), .nav-tabs input:nth-child(6), .nav-tabs h2:nth-child(7),  {
-    left: 6.2em;
+.nav-tabs label.tablab:nth-child(5), .nav-tabs input:nth-child(6)  {
+    left: calc(var(--base-tab-width) + var(--bias-b));
 }
 
-.nav-tabs label.tablab:nth-child(9), .nav-tabs input:nth-child(10), .nav-tabs h2:nth-child(11) {
-    left: 12.2em;
+.nav-tabs h2:nth-child(7)  {
+    left: calc(var(--base-tab-width) + var(--bias-a) + var(--bias-b));
 }
 
-.nav-tabs label.tablab:nth-child(13), .nav-tabs input:nth-child(14), .nav-tabs h2:nth-child(15) {
-    left: 18.2em;
+.nav-tabs label.tablab:nth-child(9), .nav-tabs input:nth-child(10) {
+    left: calc(var(--base-tab-width) * 2 + var(--bias-b));
+}
+
+.nav-tabs h2:nth-child(11) {
+    left: calc((var(--base-tab-width) + var(--bias-a)) * 2 + var(--bias-b));
+}
+
+.nav-tabs label.tablab:nth-child(13), .nav-tabs input:nth-child(14) {
+    left: calc(var(--base-tab-width) * 3 + var(--bias-b));
+}
+
+.nav-tabs h2:nth-child(15) {
+    left: calc((var(--base-tab-width) + var(--bias-a)) * 3 + var(--bias-b));
 }
 
 input[name="tabs"]:focus + h2 {
@@ -106,3 +117,17 @@ input:checked + h2 + div {
     width: auto !important;
     min-width: 20.5em !important;
 }
+
+@media screen and (max-width: 680px) {
+  :root {
+    --base-tab-width: 4.95em;
+    --bias-a: 0.75em;
+    --bias-b: 0.1em;
+  }
+
+  .nav-tabs > h2 {
+    font-size: 0.85em;
+    padding: 14px 14px;
+  }
+}
+

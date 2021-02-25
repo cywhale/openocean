@@ -12,7 +12,8 @@ export default async function (fastify, opts) {
     node_env: process.env.NODE_ENV || 'development',
     port: process.env.PORT || 3000,
     devTestPort: 3003,
-    sessiondir: '/sessioninfo'
+    sessiondir: process.env.NODE_ENV === 'production'? '/session' : '/sessioninfo'
+  //searchdir : process.env.NODE_ENV === 'production'? '/search' : '/searchinfo'
   })
 
   fastify.register(Sensible)

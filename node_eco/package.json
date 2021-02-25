@@ -5,7 +5,8 @@
   "type": "module",
   "main": "server.js",
   "scripts": {
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "sessioninfo": "export NODE_ENV=development && export PORT=3003 && node server/server.js"
   },
   "repository": "https://github.com/cywhale/openocean/node_eco",
   "author": "cywhale",

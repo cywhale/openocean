@@ -13,6 +13,7 @@ const { odbConfig } = require('./.ssologin.js');
 
 const UserHandler = () => {
   const cookies = new Cookies();
+  const sessionx = process.env.NODE_ENV === 'production'? 'session/' : 'sessioninfo/';
 //const history = createBrowserHistory();
   const { upars } = useContext(UserContext);
   const { user, setUser } = upars;
@@ -71,7 +72,7 @@ const UserHandler = () => {
           if (sso) {
             if (sso.username && sso.username !== "") {
               cookies.set('uauth', 'odb', cookieOpts);
-              sessionInfo('sessioninfo/login', 'logined', ucstr, 'POST',
+              sessionInfo(sessionx + 'login', 'logined', ucstr, 'POST',
                           {action: 'logined', user: sso.username}, !alerted, setUser);
 
               setState((preState) => ({
@@ -151,7 +152,7 @@ const UserHandler = () => {
             if (currUser) {
               cookies.set('uauth', 'gmail', cookieOpts);
               //let chktoken =
-              sessionInfo('sessioninfo/login', 'logined', ucstr, 'POST',
+              sessionInfo(sessionx + 'login', 'logined', ucstr, 'POST',
                           {action: 'logined', user: currUser.displayName}, false, setUser);
               //if (chktoken) {
               return(
@@ -181,7 +182,7 @@ const UserHandler = () => {
     } else if (user.saveAgree) {
       if (user.session === 'initCookieSet') {
         //let chktoken =
-        sessionInfo('sessioninfo/init', 'initSession', ucode.str, 'POST',
+        sessionInfo(sessionx + 'init', 'initSession', ucode.str, 'POST',
                     {action: 'initSession'}, false, setUser);
       } else if (user.session !== 'logined') {
         let uc = ucode.str;
