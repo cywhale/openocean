@@ -11,6 +11,7 @@ data
 temp
 tmp
 nohup.out
+nohup.out.*
 .vscode
 *.save
 *.bak

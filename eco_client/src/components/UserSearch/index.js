@@ -1,5 +1,6 @@
 import { render, Fragment } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
+import Geocoder from 'cesium/Source/Widgets/Geocoder/Geocoder';
 import style from './style_usersearch';
 
 const UserSearch = (props) => {
@@ -85,8 +86,12 @@ const UserSearch = (props) => {
 
   useEffect(() => {
     if(!state) {
+      let geocoder = new Geocoder({
+            container: 'geocoderContainer',
+	    scene: viewer.scene
+      });
       enable_search_listener();
-      viewer.geocoder.viewModel.destinationFound = function(viewModel, destination) {
+      geocoder.viewModel.destinationFound = function(viewModel, destination) { //viewer.geocoder
         //viewer.camera.flyTo({
         //destination: destination
         //});
@@ -113,6 +118,7 @@ const UserSearch = (props) => {
   const render_searchresult = (output) => {
       return(
         render(<div>
+                 <div id="geocoderContainer" style="position:relative;top:0px;margin:10px;"/>
                  <div>
                    { output.layer === '' && <p>Not perform searching yet...</p>}
                    { output.layer !== '' && <p>{output.layer}</p>}

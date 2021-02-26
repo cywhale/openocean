@@ -258,7 +258,7 @@ const Layer = (props) => {
               <div class={style.ctrlwrapper}>
                   <section class={style.ctrlsect}>
                     <div class={style.ctrlcolumn}>
-                      <span style="font-size:0.8em;color:grey">Search Results</span>
+                      <span style="font-size:0.8em;color:grey">Searching...</span>
                       <div id="searchxdiv" data-searchin="" data-searchout="" />
                       <div id="resultxdiv" />
                     </div>

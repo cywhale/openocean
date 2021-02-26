@@ -12,6 +12,7 @@ data
 temp
 tmp
 nohup.out
+nohup.out.*
 .vscode
 *.save
 *.bak
@@ -27,7 +28,7 @@ yarn.lock
 **/*.log
 ../.env
 **/.cache
-size-plugin.json
+**/size-plugin.json
 **/.log
 .testenv.js
 **/.ssologin.*
