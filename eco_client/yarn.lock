@@ -3781,10 +3781,10 @@ caseless@~0.12.0:
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz"
   integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
 
-cesium@^1.78.0:
-  version "1.78.0"
-  resolved "https://registry.yarnpkg.com/cesium/-/cesium-1.78.0.tgz#e152b1c9e1e1d75ad2880a743e7d2b337b4bfdb1"
-  integrity sha512-ulEILDn0G2czV7CONX0IGMUqcaH3igBkZ/1pXBTQldANw9ntxaWjF3F6IzP1MOY2lZtvEdsroYB30ML9SDRSBg==
+cesium@^1.79.1:
+  version "1.79.1"
+  resolved "https://registry.yarnpkg.com/cesium/-/cesium-1.79.1.tgz#571988bd75093dc01a674db7dadf6222e8499f69"
+  integrity sha512-AgnMm+kWnd8kh90lNa2LGWfZln/YY3MMqcEyP37tX/i76VSR76WCv2ndJHX1MeLnFc5IX5VX4aCpJMUCRslSgQ==
 
 chalk@2.4.1:
   version "2.4.1"
@@ -8760,11 +8760,6 @@ nan@^2.13.2:
   version "2.14.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.1.tgz"
   integrity sha512-isWHgVjnFjh2x2yuJ/tj3JbwoHu3UC2dX5G/88Cm24yB6YopVgxvBObDY7n5xW6ExmFhJpSEQqFPvq9zaXc8Jw==
-
-nanoid@^3.1.16:
-  version "3.1.16"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.16.tgz"
-  integrity sha512-+AK8MN0WHji40lj8AEuwLOvLSbWYApQpre/aFJZD71r43wVRLrOYS4FmJOPQYon1TqB462RzrrxlfA74XRES8w==
 
 nanoid@^3.1.20:
   version "3.1.20"

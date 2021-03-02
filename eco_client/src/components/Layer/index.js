@@ -1,11 +1,11 @@
 import { Fragment } from 'preact'; //render, createContext
 import { useEffect, useState, useContext } from 'preact/hooks';
-import Color from 'cesium/Source/Core/Color.js';
+//import Color from 'cesium/Source/Core/Color.js';
 //import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
-import defined from 'cesium/Source/Core/defined.js';
+//import defined from 'cesium/Source/Core/defined.js';
 //import Rectangle from 'cesium/Source/Core/Rectangle';
-import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
-import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
+//import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
+//import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import Datepicker from 'async!../Datepicker';
 import LayerModal from 'async!./LayerModal';
 import DataCube from 'async!../DataCube'; //Region (old) + MultiSelectSort
@@ -14,6 +14,7 @@ import SiteCluster from 'async!../SiteCluster';
 import Biodiv from 'async!../Biodiv';
 import Bathymetry from 'async!../Bathymetry';
 import Coast from 'async!./Coast';
+import MousePos from 'async!./MousePos';
 import UserSearch from 'async!../UserSearch';
 import { EarthContext } from "../Earth/EarthContext";
 import { FlowContext } from "../Flows/FlowContext";
@@ -104,7 +105,7 @@ const Layer = (props) => {
         }))
       }, false);
 
-      sitePicker();
+    //sitePicker();
       setEarth((preState) => ({
         ...preState,
         loaded: true,
@@ -135,7 +136,7 @@ const Layer = (props) => {
         clear_uri(); //false
     }
   },[earth.loaded, hashstate]);
-
+/*
   const sitePicker = async () => { //useCallback(
     const {scene} = viewer;
     //const sitePickedLabel = () => {
@@ -156,7 +157,7 @@ const Layer = (props) => {
     //await sitePickedLabel();
     //return(<div style="display:none" />);
   };//, []);
-
+*/
 /*<FlowContextProvider>
   const render_flows = () => {
     if (earth.loaded) { // & globe.baseLoaded) {
@@ -185,6 +186,13 @@ const Layer = (props) => {
     if (earth.loaded) {
       return(//<LayerContextProvider>
              <LayerModal {...props} laypars={laypars} />); //hashstate={hashstate} hashHandler={setHashState}
+    }
+    return null;
+  };
+
+  const render_MousePos = () => {
+    if (earth.loaded) {
+      return(<MousePos viewer={viewer} />);
     }
     return null;
   };
@@ -224,6 +232,7 @@ const Layer = (props) => {
                       </div>
                       <div id="ctrllayerbut" style="display:inline-flex;justify-content:center;flex-direction:row;">
                         <div><Coast viewer={viewer} /></div>
+                        <div>{ render_MousePos() }</div>
                       </div>
                     </div>
                   </section>

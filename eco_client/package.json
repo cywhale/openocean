@@ -50,9 +50,9 @@
     "webpack-merge": "^5.0.9"
   },
   "dependencies": {
-    "cesium": "^1.78.0",
+    "cesium": "^1.79.1",
     "firebase": "^8.2.9",
-    "nanoid": "^3.1.16",
+    "nanoid": "^3.1.20",
     "preact": "^10.5.12",
     "preact-router": "^3.2.1",
     "react-dropdown-tree-select": "^2.5.1",
