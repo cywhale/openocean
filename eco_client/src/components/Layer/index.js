@@ -286,6 +286,7 @@ const Layer = (props) => {
       <SiteCluster viewer={viewer} cluster={cluster} />
       <Bathymetry viewer={viewer} terrain={terrain} />
       <Biodiv viewer={viewer} occur={occur} />
+      <div id="dclickPopupdiv" />
     </Fragment>
   );
 };

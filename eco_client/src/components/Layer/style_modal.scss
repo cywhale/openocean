@@ -142,9 +142,11 @@
   }
 }
 @media screen and (max-width: 680px) {
+    .dclickdiv {
+      max-width: 16em;
+    };
     .modalOverlay {
-      min-width: 22em;
-      max-width: 22em;
+      min-width: 18em;
     };
     .ctrlsect div {
       max-width: 100%;

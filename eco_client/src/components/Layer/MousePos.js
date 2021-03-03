@@ -1,4 +1,4 @@
-import { Fragment } from 'preact';
+import { Fragment, render } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Color from 'cesium/Source/Core/Color';
 //import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
@@ -11,15 +11,18 @@ import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler'
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import HorizontalOrigin from 'cesium/Source/Scene/HorizontalOrigin';
 import VerticalOrigin from 'cesium/Source/Scene/VerticalOrigin';
-import style from '../style/style_layerctrl.scss';
+import style from './style_modal';
+import style_ctrl from '../style/style_layerctrl.scss';
 
 const MousePos = (props) => {
   const { viewer, terr_opts } = props;
   const { scene } = viewer;
   const [state, setState] = useState({
     init: false,
-    show: 'none', //'show', 'label', 'none'
-    //posPrint: null,
+    show: 'none', //'show', 'none', 'dclick'
+    dclick: false,// instead of double-click(cannot used on mobile), click button to switch state, then click on canvas
+    dclick_pos: null,
+    posPrint: [],
     posMove: viewer.entities.add({
         position: null,
         label: {
@@ -32,20 +35,24 @@ const MousePos = (props) => {
         }
     }),
     handlerMove: new ScreenSpaceEventHandler(scene.canvas),
+    handlerDclick: new ScreenSpaceEventHandler(scene.canvas),
   });
 
   const showPosPick = () => {
     let showx = '';
     let entity = state.posMove;
-    //if (showx === 'show') {
-    //  showx = 'label'
-    //} else
-    if (state.show === 'show') {
+    if (state.show === 'dclick') {
       showx = 'none';
       state.handlerMove.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       entity.label.show = false;
     } else {
-      showx = 'show'; //'label'
+      if (state.show == 'show') {
+        showx = 'dclick';
+        state.handlerDclick.removeInputAction(ScreenSpaceEventType.LEFT_CLICK);
+        sitePicker(true);
+      } else {
+        showx = 'show';
+      }
       if (terr_opts.enable) {
         posElevPicker(terr_opts.min, terr_opts.max);
       } else {
@@ -81,11 +88,23 @@ const MousePos = (props) => {
     )
   }
 */
-  const sitePicker = async () => { //useCallback(
+  const sitePicker = (dclick=false) => { //useCallback(
     //const {scene} = viewer;
-    let handler = new ScreenSpaceEventHandler(scene.canvas);
+    //let handler = new ScreenSpaceEventHandler(scene.canvas);
+    state.handlerDclick.setInputAction(function (movement) {
+        if (dclick) {
+          let ray = viewer.camera.getPickRay(movement.position);
+          let cartesian = scene.globe.pick(ray, scene);
 
-    await handler.setInputAction(function (movement) {
+          if (defined(cartesian)) {
+            setState((prev) => ({
+              ...prev,
+              dclick: true,
+              dclick_pos: cartesian
+            }))
+          }
+        }
+
         let pickedLabel = scene.pick(movement.endPosition);
         if (defined(pickedLabel)) {
           const ids = pickedLabel.id;
@@ -98,21 +117,13 @@ const MousePos = (props) => {
         scene.requestRender();
     }, ScreenSpaceEventType.LEFT_CLICK);
   }
-/*      if (state.show === 'label') {
-          let ray = viewer.camera.getPickRay(movement.position);
-          let cartesian = scene.globe.pick(ray, scene);
-          if (defined(cartesian)) {
-            if (state.posPrint !== null) {
-              viewer.entities.remove(state.posPrint);
-            }
-            labelCoordinates(cartesian);
-          }
-        }*/
 
-  const labelPosition = (cartesian, enable_elev=false, min=null, max=null) => {
+  const labelPosition = (cartesian, enable_elev=false, min=null, max=null, return_pos=false) => {
           let cartographic = Cartographic.fromCartesian(cartesian);
-          let longitudeString = CesiumMath.toDegrees(cartographic.longitude).toFixed(4);
-          let latitudeString = CesiumMath.toDegrees(cartographic.latitude).toFixed(4);
+          let lon = CesiumMath.toDegrees(cartographic.longitude);
+          let lat = CesiumMath.toDegrees(cartographic.latitude);
+          let longitudeString = Number(lon).toFixed(4);
+          let latitudeString = Number(lat).toFixed(4);
 
           let ltext =
             "Lon: " +
@@ -123,16 +134,21 @@ const MousePos = (props) => {
             "\u00B0";
           if (enable_elev) {
             let elevation = viewer.scene.globe.getHeight(cartographic)
-            let eleString = Number(elevation).toFixed(2) + " m";
+            let eleString = Number(elevation).toFixed(2) + "m";
             if (min !== null) {
-              if (elevation < min) eleString = Number(min).toFixed(2) + " m (minimum)"
+              if (elevation < min) eleString = Number(min).toFixed(2) + "m (minimum)"
             }
             if (max !== null) {
-              if (elevation > max) eleString = Number(max).toFixed(2) + " m (maximum)"
+              if (elevation > max) eleString = Number(max).toFixed(2) + "m (maximum)"
             }
             ltext = ltext + "\nElevation: " + eleString;
           }
-          return(ltext);
+
+          if (!return_pos) {
+            return(ltext)
+          } else {
+            return({lon: lon, lat: lat, label: ltext})
+          }
   }
 
   const posPicker = () => {
@@ -146,7 +162,6 @@ const MousePos = (props) => {
           movement.endPosition,
           scene.globe.ellipsoid
         );
-
         if (cartesian) {
           entity.position = cartesian;
           entity.label.show = true;
@@ -183,6 +198,7 @@ const MousePos = (props) => {
   useEffect(() => {
     if (!state.init) {
       sitePicker();
+      //dclickPicker();
       setState((prev) => ({
          ...prev,
          init: true,
@@ -203,10 +219,70 @@ const MousePos = (props) => {
     }
   }, [terr_opts.enable])
 
+/* Double_click to set point and set home // But cannot used on mobile
+  const dclickPicker = () => {
+    state.handlerDclick.setInputAction(function (movement) {
+        let ray = viewer.camera.getPickRay(movement.position);
+        let cartesian = scene.globe.pick(ray, scene);
+
+        if (defined(cartesian)) {
+          setState((prev) => ({
+            ...prev,
+            dclick: true,
+            dclick_pos: cartesian
+          }))
+        }
+      //scene.requestRender();
+    }, ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+  };
+*/
+  const closeDclickBtnx = () => {
+      setState((prev) => ({
+         ...prev,
+         dclick: false,
+      }))
+  };
+
+  const render_popupModal = () => {
+    let posx;
+    if (state.dclick_pos === null) {
+      console.log("Warning: not received double_click position");
+    } else {
+      if (terr_opts.enable) {
+        posx = labelPosition(state.dclick_pos, true, terr_opts.min, terr_opts.max, true);
+      } else {
+        posx = labelPosition(state.dclick_pos, false, null, null, true);
+      }
+    }
+    return(
+      render(
+      <Fragment>
+      { state.dclick &&
+        <div class={style.dclickdiv} style="width:auto;max-width:18em;top:15%;left:18%;position:absolute;">
+        <div id="dclick" class={style.modalOverlay}>
+          <div class={style.modalHeader} id="dclickHeader" style="width:98%;min-width:98%">
+            <a id="dclickClose" class={style.close} onClick={()=>{closeDclickBtnx()}}>&times;</a>
+          </div>
+          <div class={style.modal} style="width:98%;min-width:98%">
+            <div class={style.ctrlwrapper}>
+              <section class={style.ctrlsect}>
+                <div class={style.ctrlcolumn}>
+                  <span>Location: {posx.label}</span>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div></div>
+      }
+      </Fragment>, document.getElementById("dclickPopupdiv"))
+    );
+  };
+
   return (
       <Fragment>
-            <button class={style.ctrlbutn} id="pospickbutn" onClick={showPosPick}>
-               {state.show === 'none'? 'Show position' : 'Position off'}</button>
+          <button class={style_ctrl.ctrlbutn} id="pospickbutn" onClick={showPosPick}>
+            {state.show === 'none'? 'Show position' : state.show === 'show'? 'Set position' : 'Position off'}</button>
+          { render_popupModal() }
       </Fragment>
   )
 };
