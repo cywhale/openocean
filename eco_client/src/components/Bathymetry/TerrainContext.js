@@ -5,6 +5,8 @@ const TerrainContext = createContext();
 const TerrainContextProvider = (props) => {
   const [terrain, setTerrain] = useState({
     selwreck: false,
+    wreck_min: -83.0,
+    wreck_max: 0.0,
   });
 
   const terrpars = useMemo(() => ({ terrain, setTerrain }), [terrain]);

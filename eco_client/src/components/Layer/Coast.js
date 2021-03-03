@@ -1,7 +1,7 @@
 import { Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import WebFeatureServiceImageryProvider from './WebFeatureServiceImageryProvider';
-import style from './style_coast.scss';
+import style from '../style/style_layerctrl.scss';
 const { wfsConfig } = require('./.setting.js');
 
 const Coast = (props) => {
@@ -94,9 +94,9 @@ const Coast = (props) => {
 //<div class={style.smalltd} style="display:inline-flex;justify-content:center;flex-direction:row;">
   return (
       <Fragment>
-            <button class={style.coastbutn} id="hidecoastbutn" onClick={showCoastline}>
+            <button class={style.ctrlbutn} id="hidecoastbutn" onClick={showCoastline}>
                {coast.hide? 'Show coastline': 'Hide coastline'}</button>
-            <button style="display:none;" class={style.coastbutn} id="stopwfsbutn" onClick={stopWFSlisten}>
+            <button style="display:none;" class={style.ctrlbutn} id="stopwfsbutn" onClick={stopWFSlisten}>
                {coast.forcestop? 'Remain WFS': 'Stop WFS'}</button>
       </Fragment>
   )

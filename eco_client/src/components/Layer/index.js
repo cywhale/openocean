@@ -191,8 +191,13 @@ const Layer = (props) => {
   };
 
   const render_MousePos = () => {
+    let terr_opts = {
+      enable: terrain.selwreck,
+      min: terrain.wreck_min, //tiff->terrain with missing value (e.g. -9999) cause undesired interpolated values?
+      max: terrain.wreck_max,
+    };
     if (earth.loaded) {
-      return(<MousePos viewer={viewer} />);
+      return(<MousePos viewer={viewer} terr_opts={terr_opts} />);
     }
     return null;
   };
