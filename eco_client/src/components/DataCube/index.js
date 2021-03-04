@@ -174,11 +174,11 @@ const DataCube = (props) => {
                 return(state);
               });
               */
-              setLoaded((preState) => ({
-                  ...preState,
-                  value: [...loaded.value, selected.val[i]],
-                  shown: [...loaded.shown, 1],
-                  index: [...loaded.index, loaded.value.length], //leng, but cannot be leng. dataSources.length != loaded.value.length
+              setLoaded((prev) => ({
+                  ...prev,
+                  value: [...prev.value, selected.val[i]],
+                  shown: [...prev.shown, 1],
+                  index: [...prev.index, loaded.value.length], //leng, but cannot be leng. dataSources.length != loaded.value.length
               }))
             })
             .otherwise(err => console.log("Fetching region got load err: ", err));
@@ -216,11 +216,11 @@ const DataCube = (props) => {
                 cube: dataSource, //layername can use __seriesToDisplay,
           }));
 
-          setLoaded((preState) => ({
-                  ...preState,
-                  value: [...loaded.value, selected.val[i]],
-                  shown: [...loaded.shown, 1],
-                  index: [...loaded.index, loaded.value.length],
+          setLoaded((prev) => ({
+                  ...prev,
+                  value: [...prev.value, selected.val[i]],
+                  shown: [...prev.shown, 1],
+                  index: [...prev.index, loaded.value.length],
           }));
       };
 
@@ -289,11 +289,11 @@ const DataCube = (props) => {
               }));
             }
             // These source are NOT in cesium's dataSources
-            setLoaded((preState) => ({
-              ...preState,
-              value: [...loaded.value, selected.val[i]],
-              shown: [...loaded.shown, 1],
-              index: [...loaded.index, loaded.value.length], //leng
+            setLoaded((prev) => ({
+              ...prev,
+              value: [...prev.value, selected.val[i]],
+              shown: [...prev.shown, 1],
+              index: [...prev.index, loaded.value.length], //leng
             }));
           }
         } else { // already loaded, just show
@@ -310,9 +310,9 @@ const DataCube = (props) => {
                 dataSources.getByName(didx)[0].show = true;
               }
               //let tmps = loaded.shown.splice(vidx, 1, 1); //splice() return only removed items!!
-              setLoaded((preState) => ({
-                  ...preState,
-                  shown: [...loaded.shown.slice(0, vidx), 1, ...loaded.shown.slice(vidx+1, loaded.shown.length)],
+              setLoaded((prev) => ({
+                  ...prev,
+                  shown: [...prev.shown.slice(0, vidx), 1, ...prev.shown.slice(vidx+1, loaded.shown.length)],
                 //index: [...loaded.index.slice(0, vidx), leng, ...loaded.index.slice(vidx+1, loaded.index.lengt$
               }));
             } else {
@@ -347,9 +347,9 @@ const DataCube = (props) => {
                 dataSources.getByName(didx)[0].show = true;
               }
               //let tmps = loaded.shown.splice(vidx, 1, 1);
-              setLoaded((preState) => ({
-                  ...preState,
-                  shown: [...loaded.shown.slice(0, vidx), 1, ...loaded.shown.slice(vidx+1, loaded.shown.length)],
+              setLoaded((prev) => ({
+                  ...prev,
+                  shown: [...prev.shown.slice(0, vidx), 1, ...prev.shown.slice(vidx+1, loaded.shown.length)],
               }));
             }
           }
@@ -422,14 +422,14 @@ const DataCube = (props) => {
                     showCluster: false,
                   }));
                 } else {
-                  didx = loaded.value[chkidx] //loaded.index[chkidx]; //loaded.index !== index in dataSources
+                  //didx = loaded.value[chkidx] //loaded.index[chkidx]; //loaded.index !== index in dataSources
                   //dataSources._dataSources[didx].show = false;
-                  dataSources.getByName(didx)[0].show = false;
+                  dataSources.getByName(noselx[j])[0].show = false;
                 }
                 //let tmps = loaded.shown.splice(chkidx, 1, 0);
-                setLoaded((preState) => ({
-                    ...preState,
-                    shown: [...loaded.shown.slice(0, chkidx), 0, ...loaded.shown.slice(chkidx+1, loaded.shown.length)],
+                setLoaded((prev) => ({
+                    ...prev,
+                    shown: [...prev.shown.slice(0, chkidx), 0, ...prev.shown.slice(chkidx+1, loaded.shown.length)],
                 }));
               }
             }

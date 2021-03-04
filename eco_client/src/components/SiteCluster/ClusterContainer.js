@@ -1,6 +1,6 @@
 //import proj4 from 'proj4'
 //import { lazy } form 'preact/compat';
-import { render } from 'preact';
+import { Fragment, render } from 'preact';
 import { useState, useEffect, useCallback, useContext } from 'preact/hooks';
 import Color from 'cesium/Source/Core/Color.js';
 import GeoJsonDataSource from 'cesium/Source/DataSources/GeoJsonDataSource.js';
@@ -167,24 +167,24 @@ const ClusterContainer = (props) => {
               removeListener = undefined; //toggle: disable listener
           } else { //toggle: enable listener
               removeListener = dataSource.clustering.clusterEvent.addEventListener(
-                function (clusteredEntities, cluster) {
-                  cluster.label.show = false;
-                  cluster.billboard.show = true;
-                  cluster.billboard.id = cluster.label.id;
-                  cluster.billboard.verticalOrigin = VerticalOrigin.BOTTOM;
+                function (clusteredEntities, clus) {
+                  clus.label.show = false;
+                  clus.billboard.show = true;
+                  clus.billboard.id = clus.label.id;
+                  clus.billboard.verticalOrigin = VerticalOrigin.BOTTOM;
 
                   if (clusteredEntities.length >= 50) {
-                      cluster.billboard.image = Pins.pin50;
+                      clus.billboard.image = Pins.pin50;
                   } else if (clusteredEntities.length >= 40) {
-                      cluster.billboard.image = Pins.pin40;
+                      clus.billboard.image = Pins.pin40;
                   } else if (clusteredEntities.length >= 30) {
-                      cluster.billboard.image = Pins.pin30;
+                      clus.billboard.image = Pins.pin30;
                   } else if (clusteredEntities.length >= 20) {
-                      cluster.billboard.image = Pins.pin20;
+                      clus.billboard.image = Pins.pin20;
                   } else if (clusteredEntities.length >= 10) {
-                      cluster.billboard.image = Pins.pin10;
+                      clus.billboard.image = Pins.pin10;
                   } else {
-                      cluster.billboard.image = Pins.singleDigitPins[clusteredEntities.length-2];
+                      clus.billboard.image = Pins.singleDigitPins[clusteredEntities.length-2];
                   }
                 } // function for listener
               );// listener
@@ -207,17 +207,19 @@ const ClusterContainer = (props) => {
         });
 
         //let resolve; //https://codesandbox.io/s/resolve-unmounted-suspense-ppfgc?file=/src/index.js:142-267
-        const waitCtrlRender = () => {//lazy(() => {
+/*      const waitCtrlRender = () => {//lazy(() => {
           //const ctrlModalPromise =
           new Promise((resolve) => {//, reject) => {
             //try {
-            render(<CtrlModal scene={scene} dataSource={dataSource} />, document.getElementById('ctrlsectdiv1'));
-                    /*{ async () => { // Cannot work when stylingButn is null even render CtrlModal
-                      let stybutn = await this.base.querySelector('#stylingButn');
-                      await render(<button data-bind="submit: siteClusterStyling()">Custom styling</button>,
-                                   stybutn); //document.getElementById('stylingButn'));
-                    } }
-                </CtrlModal>, document.getElementById('ctrlsect')); */
+            render(//<Fragment>{ cluster.showCluster &&
+                   <CtrlModal scene={scene} dataSource={dataSource} />, //{...props} //}</Fragment>,
+                   document.getElementById('ctrlsectdiv1'));
+                    //{ async () => { // Cannot work when stylingButn is null even render CtrlModal
+                    //let stybutn = await this.base.querySelector('#stylingButn');
+                    //await render(<button data-bind="submit: siteClusterStyling()">Custom styling</button>,
+                    //              stybutn); //document.getElementById('stylingButn'));
+                    //} }
+                //</CtrlModal>, document.getElementById('ctrlsect'));
             resolve();
             //} catch (err) {
             //    reject(err)
@@ -226,8 +228,8 @@ const ClusterContainer = (props) => {
         //ctrlModalPromise.then(component => {
         }
         //const waitBindStyling = async () => {
-        waitCtrlRender(); //await
-          /*await render(
+        waitCtrlRender(); */
+        /*await render(
             <div>
               <table style="color:antiquewhite;">
               <tbody>
@@ -245,6 +247,18 @@ const ClusterContainer = (props) => {
     .otherwise(err => console.log("Fetching site cluster got load err: ", err))
     //}/* has viewer &&  dataurl */
   }; // End of dataLoader
+
+  const render_ctrlmodal = () => {
+    if (!state.isLoading) {
+      return(
+        render(<Fragment>{ cluster.showCluster &&
+                 <CtrlModal scene={scene} dataSource={out.dataSource} /> }
+               </Fragment>,document.getElementById('ctrlsectdiv1'))
+      )
+    } else {
+      return null
+    }
+  };
 /*
   let svgClass;
   if (!enable) {
@@ -263,7 +277,10 @@ const ClusterContainer = (props) => {
 //{ console.log("Now site cluster loading is: " + isLoading) }
 //<div class={svgClass} isLoading={state.isLoading}>
   return (
-    <SvgLoading enable = {cluster.showCluster} isLoading = {state.isLoading} />
+    <Fragment>
+      <SvgLoading enable = {cluster.showCluster} isLoading = {state.isLoading} />
+      { render_ctrlmodal() }
+    </Fragment>
   );
 };
 export default ClusterContainer;

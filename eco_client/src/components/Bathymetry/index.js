@@ -61,9 +61,10 @@ const Bathymetry = (props) => {
 
   const render_terrainctrl = () => {
     //if (terrain.selwreck) {
-    //return(
-        render(<TerrainViewModel scene={viewer.scene} />, document.getElementById('ctrlsectdiv1_terr'))
-    //)
+    return(
+        render(<Fragment>{ terrain.selwreck && <TerrainViewModel scene={viewer.scene} /> }
+               </Fragment>, document.getElementById('ctrlsectdiv1_terr'))
+    )
     //} else {
     //  return null;
     //}
@@ -99,7 +100,7 @@ const Bathymetry = (props) => {
 
   return (
     <Fragment>
-      { terrain.selwreck && render_terrainctrl() }
+      { render_terrainctrl() }
     </Fragment>
   );
 };

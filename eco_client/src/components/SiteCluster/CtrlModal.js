@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'preact/hooks';
+//import { Fragment } from 'preact';
 //import defined from 'cesium/Source/Core/defined.js';
 //import VerticalOrigin from 'cesium/Source/Scene/VerticalOrigin.js';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
@@ -10,7 +11,8 @@ import style from './style_ctrlmodal';
 //import {Checkbox} from '@rmwc/checkbox';
 
 const CtrlModal = (props) => {
-  const {scene, dataSource} = props; //Pins, removeListener, siteClusterStyling
+  const { scene, dataSource } = props; //Pins, removeListener, siteClusterStyling
+//const { scene } = viewer;
   const ctrlRef = useRef(null);
   const [state, setState] = useState(false);
   const [viewModel, setViewModel] = useState({
