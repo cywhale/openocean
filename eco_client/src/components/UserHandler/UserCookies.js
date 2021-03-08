@@ -26,11 +26,8 @@ const UserCookies = (props) => {
   const cookieRef = useRef(null);
 
   const setCookie = (c) => {
-    //console.log('setcookies before:', cookies); //document.cookie);
-    let cookie = c.split('=');//document.cookie;
-    //document.cookie = cookies + ';' + c;
+    let cookie = c.split('=');//document.cookie = cookies + ';' + c;
     cookies.set(cookie[0], cookie[1], cookieOpts);
-    //console.log('setcookies after:', cookies.get(cookie[0], { doNotParse: true }));
   };
 
   const CookiePopup = () => {
@@ -39,12 +36,8 @@ const UserCookies = (props) => {
     });
 
     const clickClose = (allow) => {
-      //console.log('click close');
       const d = document.getElementById('useCookies');
-      //if (!state.close) {
-      if (allow) {
-        setCookie('useragree=true'); // + ((allow)? 'true' : 'false'));
-      }
+      setCookie('useragree=' + ((allow)? 'true' : 'false'));
       render(<Nothing />, d, root);
       setShown(true);
       return(
@@ -56,11 +49,9 @@ const UserCookies = (props) => {
     };
 
     const clickDetails = () => {
-      //console.log('click details');
-      setPopup( { details: true }) //this.
+      setPopup( { details: true })
     };
 
-    //render(props, state) {
     const details = popup.details;
     return(
         <div class={details? 'details':''}><p>
@@ -98,7 +89,6 @@ const UserCookies = (props) => {
   };
 
   useEffect(() => {
-    //if (root === null) {
     initCookies();
   }, []);
 

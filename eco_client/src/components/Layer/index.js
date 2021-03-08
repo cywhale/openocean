@@ -112,7 +112,7 @@ const Layer = (props) => {
       }));
     }
     if (hashstate.hash !== '' && !hashstate.handling) {
-      if (hashstate.hash === "#search") {
+      if (hashstate.hash === "#search" || hashstate.hash === "#details" || hashstate.hash === "#close") {
         setIsOpen(true);
         setHashState((prev) => ({
           ...prev,
@@ -124,16 +124,25 @@ const Layer = (props) => {
         clear_uri();
       }
     } else if (hashstate.handling) {
-        let el = document.getElementById("tab-4");
+      let el;
+      if (hashstate.hash === "#search") {
+        el = document.getElementById("tab-4");
+      } else if (hashstate.hash === "#details") {
+        el = document.getElementById("tab-3");
+      }
+      if (el) {
         //simuClick(el);
         if (typeof el.click == 'function') {
           el.click()
         } else if(typeof el.onclick == 'function') {
           el.onclick()
         }
-        //document.getElementById('tab-1').checked = false;
-        //document.getElementById('tab-4').checked = true;
-        clear_uri(); //false
+      } else if (hashstate.hash === "#close") {
+        setIsOpen(false)
+      }
+      //document.getElementById('tab-1').checked = false;
+      //document.getElementById('tab-4').checked = true;
+      clear_uri(); //false
     }
   },[earth.loaded, hashstate]);
 /*
@@ -236,8 +245,8 @@ const Layer = (props) => {
                         {render_Layermodal()}
                       </div>
                       <div id="ctrllayerbut" style="display:inline-flex;justify-content:center;flex-direction:row;">
-                        <div><Coast viewer={viewer} /></div>
                         <div>{ render_MousePos() }</div>
+                        <div><Coast viewer={viewer} /></div>
                       </div>
                     </div>
                   </section>
@@ -259,6 +268,7 @@ const Layer = (props) => {
               <div class={style.ctrlwrapper}>
                   <section class={style.ctrlsect}>
                     <div class={style.ctrlcolumn}>
+                      <div id="dclickPopupdiv" />
                     { cluster.showCluster && <span style="font-size:0.8em;color:grey">Clustering</span> }
                       <div id="ctrlsectdiv1" />
                     { terrain.selwreck && <span style="font-size:0.8em;color:grey">3D-Terrain view</span> }
@@ -286,7 +296,6 @@ const Layer = (props) => {
       <SiteCluster viewer={viewer} cluster={cluster} />
       <Bathymetry viewer={viewer} terrain={terrain} />
       <Biodiv viewer={viewer} occur={occur} />
-      <div id="dclickPopupdiv" />
     </Fragment>
   );
 };

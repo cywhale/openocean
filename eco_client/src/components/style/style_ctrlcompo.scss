@@ -1,0 +1,19 @@
+.ctrlbutn {
+  padding:6px 6px;
+  margin:6px;
+  font-size:0.8em;
+}
+
+.flexpspan {
+  display:flex;
+  flex-wrap:wrap;
+  span {
+    font-size:0.9em;
+  }
+  input {
+    font-size:0.9em;
+  }
+  textarea {
+    font-size:0.9em;
+  }
+}

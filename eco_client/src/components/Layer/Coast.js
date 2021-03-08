@@ -1,7 +1,7 @@
 import { Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import WebFeatureServiceImageryProvider from './WebFeatureServiceImageryProvider';
-import style from '../style/style_layerctrl.scss';
+import style from '../style/style_ctrlcompo.scss';
 const { wfsConfig } = require('./.setting.js');
 
 const Coast = (props) => {

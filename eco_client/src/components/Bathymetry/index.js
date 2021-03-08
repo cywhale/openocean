@@ -38,6 +38,8 @@ const Bathymetry = (props) => {
       viewer.scene.globe.translucency.rectangle = Rectangle.fromDegrees(
           120.393319, 22.34583600000001, 120.399052, 22.351569
       );
+      history.pushState(null, null, '#details');
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
 
   const resetUnderwaterTerrain = () => {

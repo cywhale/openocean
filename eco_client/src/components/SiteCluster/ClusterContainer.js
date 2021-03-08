@@ -65,8 +65,12 @@ const ClusterContainer = (props) => {
     console.log("Fetch site data...")
     if (cluster.showCluster && cluster.siteurl !== '' && (out.dataURL !== cluster.siteurl || out.dataSource === null)) {
       waitData(cluster.siteurl, defOpts);
+      history.pushState(null, null, '#details');
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
     } else if (cluster.showCluster && out.dataSource !== null) {
       out.dataSource.show = true;
+      history.pushState(null, null, '#details');
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
     } else if (!cluster.showCluster && out.dataSource !== null) {
       out.dataSource.show = false;
       // Move into promise then for use customStyilng function

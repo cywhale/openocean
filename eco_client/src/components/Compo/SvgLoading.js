@@ -20,7 +20,7 @@ const SvgLoading = (props) => { //async(dom) =>
         svgClass=`${style.Redo}`
       }
     }
-    console.log("Toggle svgClasss: " + svgClass + " when isLoaing is: " + isLoading);
+  //console.log("Toggle svgClasss: " + svgClass + " when isLoaing is: " + isLoading);
     return(svgClass);
 //  setSvg({ class: svgClass });
   };//, [enable, isLoading]);

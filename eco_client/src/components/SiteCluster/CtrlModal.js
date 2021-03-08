@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'preact/hooks';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
 //import siteClusterStyling from './siteClusterStyling';
 import bubble_labeler from '../Compo/bubble_labeler';
-import style from './style_ctrlmodal';
+import style from '../style/style_ctrlmodal';
 //import '../style/style_bubblelabel.scss';
 //import '../style/style_arialabel.scss';
 //import {Checkbox} from '@rmwc/checkbox';

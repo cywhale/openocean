@@ -3,7 +3,7 @@ import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
 import gibsGeographicTilingScheme from './gibs';
 //import { LayerContext } from '../Layer/LayerContext'; //Note WmtsLayer is under LayerModel and cannot directly modify LayerContext
-import style from './style_wmtslayer.scss';
+import style from '../style/style_ctrlcompo.scss';
 
 const WmtsLayer = (props) => {
   const { viewer, clocktime, satellite, layerprops, addLayer, updateLayer} = props;

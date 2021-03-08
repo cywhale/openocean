@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'preact/hooks';
 //import NearFarScalar from 'cesium/Source/Core/NearFarScalar';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
 import bubble_labeler from '../Compo/bubble_labeler';
-import style from './style_terrainviewmodal';
+import style from '../style/style_ctrlmodal';
 
 const TerrainViewModal = (props) => {
   const {scene} = props;

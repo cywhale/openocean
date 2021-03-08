@@ -1,7 +1,7 @@
 import { render, Fragment } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Geocoder from 'cesium/Source/Widgets/Geocoder/Geocoder';
-import style from '../style/style_layerctrl';
+import style from '../style/style_ctrlcompo';
 
 const UserSearch = (props) => {
   const { viewer } = props;
