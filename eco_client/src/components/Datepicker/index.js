@@ -7,6 +7,7 @@ import JulianDate from 'cesium/Source/Core/JulianDate';
 //import TimeInterval from 'cesium/Source/Core/TimeInterval';
 import TimeIntervalCollection from 'cesium/Source/Core/TimeIntervalCollection';
 import { useState, useEffect, useRef, useContext } from 'preact/hooks';
+import { Fragment } from 'preact';
 //import "react-datetime/css/react-datetime.css";
 //import Datetime from "react-datetime";
 //import DateTime from "@nateradebaugh/react-datetime";
@@ -214,7 +215,7 @@ const Datepicker = (props) => {
           myrenderView(mode, renderDefault)
         } onChange={(val) => {setEnd(val)}} />*/
   return(
-    <div style="display:block;">
+    <Fragment>
       <div class={style.dtimepick} ref={starttimeRef}>
         <label>Start time◷</label>
         <input id="startdate" name="startdate" type="date" value={datetime.startdate}
@@ -249,7 +250,7 @@ const Datepicker = (props) => {
           <span style="font-size:small">Time-interval animation</span>
         </label>
       </div>
-    </div>
+    </Fragment>
   );
 };
 export default Datepicker;

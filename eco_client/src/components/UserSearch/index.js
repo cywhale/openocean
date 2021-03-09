@@ -117,17 +117,14 @@ const UserSearch = (props) => {
 
   const render_searchresult = (output) => {
       return(
-        render(<div>
+        render(<Fragment>
                  <div id="geocoderContainer" style="position:relative;top:0px;margin:10px;"/>
-                 <div>
                    { output.layer === '' && <p>Not perform searching yet...</p>}
                    { output.layer !== '' && <p>{output.layer}</p>}
-                 </div>
-                 { output.geocode !== null &&
-                 <div><hr /><button id="toGeocodeBut" class={style.ctrlbutn} onClick={() => {viewer.camera.flyTo({destination: output.geocode})}}>
-                   Fly to {output.geocode_place}
-                 </button></div> }
-               </div>,
+                   { output.geocode !== null &&
+                     <p><hr /><button id="toGeocodeBut" class={style.ctrlbutn} onClick={() => {viewer.camera.flyTo({destination: output.geocode})}}>
+                         Fly to {output.geocode_place}</button></p> }
+               </Fragment>,
                document.getElementById('resultxdiv'))
       )
   };

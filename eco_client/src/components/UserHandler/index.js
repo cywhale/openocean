@@ -210,9 +210,7 @@ const UserHandler = () => {
   return (
     <section class={style.flex}>
       { user.name === '' &&
-        <div>
         <SignIn ucode={ucode.str} rurl={odbConfig.base + odbConfig.login} />
-        </div>
       }
       { user.name !== '' && <div style="display:flex">
         <CurrUser /></div>

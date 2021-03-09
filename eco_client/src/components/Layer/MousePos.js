@@ -1,5 +1,5 @@
 import { Fragment, render } from 'preact';
-import { useState, useEffect } from 'preact/hooks';
+import { useState, useEffect, useCallback } from 'preact/hooks';
 import Color from 'cesium/Source/Core/Color';
 //import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import defined from 'cesium/Source/Core/defined';
@@ -12,18 +12,21 @@ import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler'
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
 import HorizontalOrigin from 'cesium/Source/Scene/HorizontalOrigin';
 import VerticalOrigin from 'cesium/Source/Scene/VerticalOrigin';
+import Dialog from '../Compo/Dialog';
 import style from './style_modal';
 import style_ctrl from '../style/style_ctrlcompo.scss';
 
 const MousePos = (props) => {
   const { viewer, terr_opts } = props;
   const { scene } = viewer;
+  const [homepopup, setHomepopup] = useState(false);
   const [state, setState] = useState({
     init: false,
     show: 'none', //'show', 'none', 'dclick'
     dclick: 0,// instead of double-click(cannot used on mobile), click button to switch state, then click on canvas
     dclick_chk_dialog: false,
     dclick_pos: null,
+    prefer_home_chk: false,
     posHome: null,
     posPrint: [],
     posMove: viewer.entities.add({
@@ -47,14 +50,14 @@ const MousePos = (props) => {
     if (state.show === 'dclick') {
       showx = 'none';
       state.handlerDclick.removeInputAction(ScreenSpaceEventType.LEFT_DOWN);
-      sitePicker(false);
+      sitePicker(false, state.dclick_chk_dialog, terr_opts.enable);
       state.handlerMove.removeInputAction(ScreenSpaceEventType.MOUSE_MOVE);
       entity.label.show = false;
     } else {
       if (state.show == 'show') {
         showx = 'dclick';
         state.handlerDclick.removeInputAction(ScreenSpaceEventType.LEFT_DOWN);
-        sitePicker(true);
+        sitePicker(true, state.dclick_chk_dialog, terr_opts.enable);
       } else {
         showx = 'show';
       }
@@ -72,7 +75,7 @@ const MousePos = (props) => {
     )
   }
 
-  const sitePicker = (dclick=false) => { //useCallback(
+  const sitePicker = (dclick=false, checked=false, terr_enable=false) => {
     //const {scene} = viewer;
     //let handler = new ScreenSpaceEventHandler(scene.canvas);
     state.handlerDclick.setInputAction(function (movement) {
@@ -87,11 +90,11 @@ const MousePos = (props) => {
               dclick_pos: cartesian
             }))
 
-            if (!state.dclick_chk_dialog) { //auto open dialog to see point position
+            if (!checked) { //auto open dialog to see point position
               history.pushState(null, null, '#details');
               window.dispatchEvent(new HashChangeEvent('hashchange'));
             }
-            getDclickPos(cartesian);
+            getDclickPos(cartesian, terr_enable);
           }
         }
 
@@ -124,7 +127,7 @@ const MousePos = (props) => {
 
           let elevation = null;
           if (enable_elev) {
-            elevation = viewer.scene.globe.getHeight(cartographic)
+            elevation = viewer.scene.globe.getHeight(cartographic);
             let eleString = Number(elevation).toFixed(2) + "m";
             if (min !== null) {
               if (elevation < min) eleString = Number(min).toFixed(2) + "m (minimum)"
@@ -186,7 +189,7 @@ const MousePos = (props) => {
 
   useEffect(() => {
     if (!state.init) {
-      sitePicker();
+      sitePicker(false, false, false);
       //dclickPicker();
       setState((prev) => ({
          ...prev,
@@ -238,17 +241,25 @@ const MousePos = (props) => {
       window.dispatchEvent(new HashChangeEvent('hashchange'));
   };
 
-  const getDclickPos = (cartesian) => {
+  const chkDclickDialog = (e) => {
+    e.preventDefault();
+    let checked = !state.dclick_chk_dialog;
+    state.handlerDclick.removeInputAction(ScreenSpaceEventType.LEFT_DOWN);
+    sitePicker(true, checked, terr_opts.enable);
+
+    setState((prev) => ({
+      ...prev,
+      dclick_chk_dialog: checked,
+    }))
+  };
+
+  const getDclickPos = (cartesian, terr_enable) => {
     let posx;
-  //let cartesian = state.dclick_pos;
-  //if (state.dclick_pos === null) {
-  //} else {
-      if (terr_opts.enable) {
+    if (terr_enable) {
         posx = labelPosition(cartesian, true, terr_opts.min, terr_opts.max, true);
       } else {
         posx = labelPosition(cartesian, false, null, null, true);
       }
-  //}
     if (posx.lon && posx.lat) {
       document.getElementById("lontxt").value=Number(posx.lon).toFixed(4);
       document.getElementById("lattxt").value=Number(posx.lat).toFixed(4);
@@ -257,13 +268,59 @@ const MousePos = (props) => {
     }
   };
 
+  const onLonInput = (e) => {
+    let ltext =
+        "Lon: " +
+        ("   " + e.target.value).slice(-9) +
+        "\u00B0";
+    let latx = document.getElementById("lattxt").value;
+    if (latx !== "") {
+        ltext = ltext + "\nLat: " + ("   " + latx).slice(-9) + "\u00B0";
+    }
+    let elex = document.getElementById("eletxt").value;
+    if (elex !== "") {
+        ltext = ltext + "\nElevation: " + elex + "m";
+    }
+    document.getElementById("labeltxt").value = ltext;
+  }
+
+  const onLatInput = (e) => {
+    let ltext = "";
+    let lonx = document.getElementById("lontxt").value;
+    if (lonx !== "") {
+        ltext = "Lon: " + ("   " + lonx).slice(-9) + "\u00B0";
+    }
+    ltext = ltext +
+        "\nLat: " +
+        ("   " + e.target.value).slice(-9) +
+        "\u00B0";
+    let elex = document.getElementById("eletxt").value;
+    if (elex !== "") {
+        ltext = ltext + "\nElevation: " + elex + "m";
+    }
+    document.getElementById("labeltxt").value = ltext;
+  }
+
+  const onEleInput = (e) => {
+    let ltext = "";
+    let lonx = document.getElementById("lontxt").value;
+    if (lonx !== "") {
+        ltext = "Lon: " + ("   " + lonx).slice(-9) + "\u00B0";
+    }
+    let latx = document.getElementById("lattxt").value;
+    if (latx !== "") {
+        ltext = ltext + "\nLat: " + ("   " + latx).slice(-9) + "\u00B0";
+    }
+    ltext = ltext + "\nElevation: " + e.target.value + "m";
+
+    document.getElementById("labeltxt").value = ltext;
+  }
+
   const getInputPos = () => {
     let lon = parseFloat(document.getElementById("lontxt").value);
     let lat = parseFloat(document.getElementById("lattxt").value);
     let ele = parseFloat(document.getElementById("eletxt").value);
     let elex= isNaN(ele)? 1000000.0 : ele;
-    console.log("Debug set elevation: ", elex);
-
 
     if (isNaN(lon) || isNaN(lat) || lon > 180.0 || lon < -180.0 || lat > 90.0 || lat < -90.0) {
       alert("Wrong format of decimal longitude/latitude. Check it!\n" +
@@ -274,6 +331,21 @@ const MousePos = (props) => {
   };
 
   const labelBtnx = () => {
+    if (state.show !== 'dclick') {
+      if (state.show === 'none') {
+        if (terr_opts.enable) {
+          posElevPicker(terr_opts.min, terr_opts.max);
+        } else {
+          posPicker();
+        }
+      }
+      setState((sta) => {
+        sta.show = 'dclick'
+        return(sta);
+      });
+      state.handlerDclick.removeInputAction(ScreenSpaceEventType.LEFT_DOWN);
+      sitePicker(true, state.dclick_chk_dialog, terr_opts.enable);
+    }
     let ltext = document.getElementById("labeltxt").value;
     let namex = (state.dclick + 1).toString();
     let posx = getInputPos();
@@ -288,6 +360,7 @@ const MousePos = (props) => {
             font: "12px monospace",
           }
       });
+    //flyToBtnx(posx);
       return (
         setState((prev) => ({
           ...prev,
@@ -311,8 +384,13 @@ const MousePos = (props) => {
     )
   };
 
-  const flyToBtnx = () => {
-    let posx = getInputPos();
+  const flyToBtnx = (position) => {
+    let posx;
+    if (position !== undefined) {
+      posx = position
+    } else {
+      posx = getInputPos();
+    }
     if (posx !== null) {
       viewer.camera.flyTo({
         destination: posx,
@@ -329,54 +407,85 @@ const MousePos = (props) => {
     viewer.homeButton.viewModel.command.beforeExecute.addEventListener(
       function(e) {
         e.cancel = true;
-        console.log("Debug fly home: ", position);
         viewer.camera.flyTo({destination: position});
     });
 
   }
-  const asHomeBtnx = async (position) => {
+  const asHomeBtnx = (position) => {
     if (position && position !== null) {
       let entity = viewer.entities.add({
           position: position,
       });
-      console.log("Debug set home: ", entity.position);
       entity.show = false;
 
       if (state.posHome !== null) {
         viewer.entities.remove(state.posHome);
         viewer.homeButton.viewModel.command.beforeExecute.removeEventListener(onHomex, viewer);
       }
-      setState((prev) => ({
+      onHomex(position);
+    //flyToBtnx(position);
+      showHomepopup();
+      return(
+        setState((prev) => ({
           ...prev,
           posHome: entity,
-      }))
-      onHomex(position);
+        }))
+      )
     }
   };
 
-  const render_popupModal = () => {
-/*    { state.dclick &&
-      <div class={style.dclickdiv} style="width:auto;max-width:18em;top:15%;left:18%;position:absolute;">
-        <div id="dclick" class={style.modalOverlay}>
-          <div class={style.modalHeader} id="dclickHeader" style="width:98%;min-width:98%">
-            <a id="dclickClose" class={style.close} onClick={()=>{closeDclickBtnx()}}>&times;</a>
+  const showHomepopup = useCallback(() => setHomepopup(true), []);
+  const closeHomepopup = useCallback(() => setHomepopup(false), []);
+
+  const resetHomeBtnx = () => {
+    console.log("Reset default home");
+  };
+
+  const chkPreferHome = () => {
+    console.log("Set as default home");
+  };
+
+  const render_homePopup = () => {
+    return(
+/*  render(
+      <Fragment>
+      { state.homePopup &&
+        <div style="width:auto;max-width:18em;top:15%;left:18%;position:absolute;">
+          <div id="homepopup" class={style.modalOverlay}>
+            <div class={style.modalHeader} id="homepopupHeader" style="width:98%;min-width:98%">
+              <a id="homepopupClose" class={style.close} onClick={()=>{closeHomePopupBtnx()}}>&times;</a>
+            </div>
+            <div class={style.ctrlwrapper}>
+              <section class={style.ctrlsect}>
+              </section>
+            </div>
           </div>
-        </div></div> }
-          {Array.from({ length: this.state.periods }, (_, index) => (
-            <PeriodButtonContainer key={index} />
-          ))}*/
+        </div> }
+      </Fragment>, document.getElementById("homePopupdiv"))*/
+      <Dialog onCloseClick={closeHomepopup} isOpen={homepopup}>
+              <span>Now you set Home in a new location, and can use Home Button in topright corner to fly-to.</span>
+              <p class={style_ctrl.flexpspan}><span>More operations:&nbsp;</span>
+                <span><input id="preferhomechk" style="width:auto;" type="checkbox" checked={state.prefer_home_chk}
+                       onChange={chkPreferHome} aria-label='As a preference (need cookie permission) 設為偏好，但須允許客戶端儲存' />Set as default</span>
+                <button id="resetHomebutn" class={style_ctrl.ctrlbutn} onClick={()=>{resetHomeBtnx()}}>Reset Home</button>
+              </p>
+      </Dialog>
+    )
+  };
+
+  const render_posCtrl = () => {
     return(
       render(
       <Fragment>
-          <div class={style.modal} style="width:98%;min-width:98%">
+          <div class={style.modal} style="width:98%;min-width:98%;min-height:auto;">
             <div class={style.ctrlwrapper}>
               <section class={style.ctrlsect}>
                 <div class={style.ctrlcolumn}>
                   <p class={style_ctrl.flexpspan}>
                     <span>Lon/Lat/Elevation:&nbsp;
-                           <input id="lontxt" type="text" size="9" style="max-width:63px;" />°&nbsp;
-                           <input id="lattxt" type="text" size="9" style="max-width:63px;" />°&nbsp;
-                           <input id="eletxt" type="text" size="9" style="max-width:63px;" />(m)</span>
+                      <input id="lontxt" type="text" size="9" style="max-width:63px;" onInput={onLonInput} />°&nbsp;
+                      <input id="lattxt" type="text" size="9" style="max-width:63px;" onInput={onLatInput} />°&nbsp;
+                      <input id="eletxt" type="text" size="9" style="max-width:63px;" onInput={onEleInput} />(m)</span>
                   </p>
                   <p class={style_ctrl.flexpspan}>
                     <span>Label:&nbsp;<textarea id="labeltxt" style="max-width:130px;height:auto" /></span>
@@ -395,14 +504,8 @@ const MousePos = (props) => {
                               asHomeBtnx(position);
                             }}>Set as home</button>
                     <button id="dclickClose" class={style_ctrl.ctrlbutn} onClick={()=>{closeDclickBtnx()}}>Ok</button>
-                    <span><input id="manopenchk" style="width:auto;" type="checkbox"
-                        onClick={() => {
-                          setState((prev) => ({
-                            ...prev,
-                            dclick_chk_dialog: !prev.dclick_chk_dialog,
-                          }))
-                        }}
-                        aria-label='Manually open dialog 手動開啟對話窗' />Manually open dialog</span>
+                    <span><input id="manopenchk" style="width:auto;" type="checkbox" checked={state.dclick_chk_dialog}
+                        onChange={chkDclickDialog} aria-label='Manually open dialog 手動開啟對話窗' />Manually open dialog</span>
                 </div>
                 </div>
               </section>
@@ -416,7 +519,8 @@ const MousePos = (props) => {
       <Fragment>
           <button class={style_ctrl.ctrlbutn} id="pospickbutn" onClick={showPosPick}>
             {state.show === 'none'? 'Show position' : state.show === 'show'? 'Set position' : 'Position off'}</button>
-          { render_popupModal() }
+          { render_posCtrl() }
+          { render_homePopup() }
       </Fragment>
   )
 };
