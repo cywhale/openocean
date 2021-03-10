@@ -16,6 +16,7 @@ const UserCookies = (props) => {
   const cookieOpts = {
     path: "/",
     //expires: new Date(2020, 10, 20, 14, 20, 0, 30),
+    sameSite: "lax",
     secure: true
   };
   /*const ucodelen = 32;

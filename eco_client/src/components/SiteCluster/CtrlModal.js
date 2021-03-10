@@ -61,16 +61,16 @@ const CtrlModal = (props) => {
          <tr>
           <td>Clustering Range</td>
           <td><span class="ctrlrange-wrap">
-            <input type="range" class="range" style="height:20px;" min="1" max="200" step="1" data-bind="value: pixelRange, valueUpdate: 'input'" />
-            <output class="bubble" style="font-size:9px;position:relative;top:-6px;" />
+            <input type="range" class="range" min="1" max="200" step="1" data-bind="value: pixelRange, valueUpdate: 'input'" />
+            <output class="bubble" style="font-size:9px;position:relative;top:0px;" />
             </span>
           </td>
          </tr>
          <tr>
           <td>Minimum Cluster Size</td>
           <td><span class="ctrlrange-wrap">
-            <input type="range" class="range" style="height:20px;" min="2" max="20" step="1" data-bind="value: minimumClusterSize, valueUpdate: 'input'" />
-            <output class="bubble" style="font-size:9px;position:relative;top:-6px;" />
+            <input type="range" class="range" min="2" max="20" step="1" data-bind="value: minimumClusterSize, valueUpdate: 'input'" />
+            <output class="bubble" style="font-size:9px;position:relative;top:0px;" />
             </span>
           </td>
          </tr>

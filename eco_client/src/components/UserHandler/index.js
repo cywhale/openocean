@@ -32,9 +32,9 @@ const UserHandler = () => {
 
   const cookieOpts = {
     path: "/",
-    expires: new Date(2020, 11, 3, 15, 20, 0, 30),
-    sameSite: true,
-    //secure: true
+    //expires: new Date(2020, 11, 3, 15, 20, 0, 30),
+    sameSite: "lax",
+    secure: true
   };
 
   const checkcookie = (cookiename, codelen=0) => {
@@ -180,7 +180,7 @@ const UserHandler = () => {
           session: 'initCookieSet',
       }));
     } else if (user.saveAgree) {
-      if (user.session === 'initCookieSet') {
+      if (user.session === 'initCookieSet' && ucode.str !== '') {
         //let chktoken =
         sessionInfo(sessionx + 'init', 'initSession', ucode.str, 'POST',
                     {action: 'initSession'}, false, setUser);

@@ -403,13 +403,20 @@ const MousePos = (props) => {
     }
   };
 
-  const onHomex = (position) => {
-    viewer.homeButton.viewModel.command.beforeExecute.addEventListener(
-      function(e) {
-        e.cancel = true;
-        viewer.camera.flyTo({destination: position});
-    });
-
+  const onHomex = (position, reset=false) => {
+    if (reset) {
+      viewer.homeButton.viewModel.command.beforeExecute.addEventListener(
+        function(e) {
+          e.cancel = true;
+          viewer.camera.flyHome();
+      });
+    } else {
+      viewer.homeButton.viewModel.command.beforeExecute.addEventListener(
+        function(e) {
+          e.cancel = true;
+          viewer.camera.flyTo({destination: position});
+      });
+   }
   }
   const asHomeBtnx = (position) => {
     if (position && position !== null) {
@@ -438,7 +445,16 @@ const MousePos = (props) => {
   const closeHomepopup = useCallback(() => setHomepopup(false), []);
 
   const resetHomeBtnx = () => {
-    console.log("Reset default home");
+    viewer.entities.remove(state.posHome);
+    viewer.homeButton.viewModel.command.beforeExecute.removeEventListener(onHomex, viewer);
+  //viewer.homeButton.viewModel.command();
+    onHomex(null, true);
+    return(
+        setState((prev) => ({
+          ...prev,
+          posHome: null,
+        }))
+    )
   };
 
   const chkPreferHome = () => {
@@ -465,8 +481,10 @@ const MousePos = (props) => {
       <Dialog onCloseClick={closeHomepopup} isOpen={homepopup}>
               <span>Now you set Home in a new location, and can use Home Button in topright corner to fly-to.</span>
               <p class={style_ctrl.flexpspan}><span>More operations:&nbsp;</span>
-                <span><input id="preferhomechk" style="width:auto;" type="checkbox" checked={state.prefer_home_chk}
-                       onChange={chkPreferHome} aria-label='As a preference (need cookie permission) 設為偏好，但須允許客戶端儲存' />Set as default</span>
+                <span><input id="preferhomechk" style="width:auto;" type="checkbox"
+                       checked={state.prefer_home_chk} onChange={chkPreferHome}
+                       aria-label='As preference (need cookie permission) 設為偏好，但須允許客戶端儲存' />Set as default
+                </span>
                 <button id="resetHomebutn" class={style_ctrl.ctrlbutn} onClick={()=>{resetHomeBtnx()}}>Reset Home</button>
               </p>
       </Dialog>

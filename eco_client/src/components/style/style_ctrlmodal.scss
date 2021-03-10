@@ -1,7 +1,10 @@
 .ctrlEnDiv { 
-  > input {
+  input {
     width: 30px;
     margin-top: 10px;
+  }
+  input[type="checkbox"] {
+    box-shadow: none;
   }
 }
 .thinx {

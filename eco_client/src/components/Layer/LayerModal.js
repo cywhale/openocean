@@ -57,8 +57,8 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
     //selectedTerrain: null,
     upLayer: null,
     downLayer: null,
-    onLayerChange: function (init=false, excludedLayer=[]) {
-      updateLayerList(this.selbase, this.baselayer, excludedLayer, init)
+    onLayerChange: function (init=false, excludedLayer=[], bubble=true) {
+      updateLayerList(this.selbase, this.baselayer, excludedLayer, init, bubble);
     },
     isSelectableLayer: function (layer) {
         return this.sImg.indexOf(layer.imageryProvider) >= 0;
@@ -213,9 +213,11 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
       viewer.scene.globe.baseColor = Color.BLACK;
 
       setupLayers();
-      viewModel.onLayerChange(true);
+      viewModel.onLayerChange(true, [], false);
+      //updateLayerList(viewModel.selbase, viewModel.baselayer, [], true)
       render_kocomp();
       knockout.applyBindings(viewModel, layerctrlRef.current);
+      bubble_labeler(".ctrlrange-wrap2");
 
       setLayerprops((preMdl) => ({ //dynamically add/remove layer from WMTS & set base name correctly when update
           ...preMdl,
@@ -259,7 +261,7 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
     }*/
   }, [viewModel.loaded, baseName]);//, layerprops.layerNoKnock, hashstate.handling]);
 
-  const updateLayerList = (selBase, baseLayer, excludedLayer=[], init=false) => {
+  const updateLayerList = (selBase, baseLayer, excludedLayer=[], init=false, bubble=true) => {
     const nlayers = imageryLayers.length;
     let vlay = viewModel.layers;
     let blay, bidx;
@@ -284,11 +286,13 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
         }
       }
     }
-    setModel((preMdl) => ({
+    if (bubble) { bubble_labeler(".ctrlrange-wrap2"); }
+    return(
+      setModel((preMdl) => ({
         ...preMdl,
         layers: vlay,
-    }));
-    bubble_labeler(".ctrlrange-wrap2");
+      }))
+    );
   }
 
   const bindSelLayer = () => {
@@ -645,7 +649,8 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
 /*Note that if Biodiv here, cannot render async after Satellite/WmtsLayer, that cause some asyn_load problem
   { render_gbifoccur() }, then { render_satellite() } */
   const render_kocomp = () => {
-    return render(
+  //if (layerctrlRef.current) {
+      return render(
       <table class={style.thinx}>
         <tbody data-bind="foreach: layers">
           <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
@@ -655,8 +660,8 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
               <select class={style.simgsel} data-bind="visible: $parent.isSelectableLayer($data), options: $parent.sImg, optionsText: 'name', value: $parent.selectedLayer"></select>
             </td>
             <td class={style.mediumtd}><span class="ctrlrange-wrap2">
-              <input type="range" class="range" style="height:20px;" min="0.0" max="1.0" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
-              <output class="bubble" style="font-size:9px;position:relative;top:-6px;" /></span>
+              <input type="range" class="range" min="0.0" max="1.0" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
+              <output class="bubble" style="font-size:9px;position:relative;top:0px;" /></span>
             </td>
             <td class={style.smalltd}>
               <button type="button" class={style.modalbutton} data-bind="click: function() { $parent.raise($data, $index()); }, visible: $parent.canRaise($index())">
@@ -670,8 +675,9 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
             </td>
           </tr>
         </tbody>
-      </table>,
-    layerctrlRef.current);
+      </table>, layerctrlRef.current);
+  //}
+  //return null;
   }
 
   return (

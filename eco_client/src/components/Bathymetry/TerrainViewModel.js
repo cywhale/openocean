@@ -66,8 +66,8 @@ const TerrainViewModal = (props) => {
          <tr>
           <td>Far distance</td>
           <td><span class="terrviewrange-wrap">
-            <input type="range" class="range" style="height:20px;" min="100000.0" max="3000000.0" step="1.0" data-bind="value: far, valueUpdate: 'input'" />
-            <output class="bubble" style="font-size:9px;position:relative;top:-6px;" /></span>
+            <input type="range" class="range" min="100000.0" max="3000000.0" step="1.0" data-bind="value: far, valueUpdate: 'input'" />
+            <output class="bubble" style="font-size:9px;position:relative;top:0px;" /></span>
           </td>
           <td>
             <input type="text" size="5" data-bind="value: far" />
@@ -76,8 +76,8 @@ const TerrainViewModal = (props) => {
          <tr>
           <td>Near alpha</td>
           <td><span class="terrviewrange-wrap">
-            <input type="range" class="range" style="height:20px;" min="0.0" max="1.0" step="0.01" data-bind="value: nearValue, valueUpdate: 'input'" />
-            <output class="bubble" style="font-size:9px;position:relative;top:-6px;" /></span>
+            <input type="range" class="range" min="0.0" max="1.0" step="0.01" data-bind="value: nearValue, valueUpdate: 'input'" />
+            <output class="bubble" style="font-size:9px;position:relative;top:0px;" /></span>
           </td>
           <td>
             <input type="text" size="5" data-bind="value: nearValue" />
@@ -86,8 +86,8 @@ const TerrainViewModal = (props) => {
          <tr>
           <td>Far alpha</td>
           <td><span class="terrviewrange-wrap">
-            <input type="range" class="range" style="height:20px;" min="0.0" max="1.0" step="0.01" data-bind="value: farValue, valueUpdate: 'input'" />
-            <output class="bubble" style="font-size:9px;position:relative;top:-6px;" /></span>
+            <input type="range" class="range" min="0.0" max="1.0" step="0.01" data-bind="value: farValue, valueUpdate: 'input'" />
+            <output class="bubble" style="font-size:9px;position:relative;top:0px;" /></span>
           </td>
           <td>
             <input type="text" size="5" data-bind="value: farValue" />

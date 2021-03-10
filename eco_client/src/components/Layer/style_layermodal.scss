@@ -35,12 +35,13 @@
 .laychkbox {
   margin-left: -10px;
   width: 25px;
-}
+  box-shadow: none;
+}/*
 .coastbutn {
   padding:6px 6px;
   margin:6px;
   font-size:0.8em;
-}
+}*/
 
 @media screen and (max-width: 400px) { 
   .smalltd { max-width: 90px; font-size:11px} 
