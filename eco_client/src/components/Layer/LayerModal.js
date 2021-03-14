@@ -24,7 +24,9 @@ import WmtsLayer from 'async!../Satellite/WmtsLayer';
 // follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
 import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
-import '../../style/style_layerctrl.scss';
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       '../../style/style_layerctrl.scss');
 //import '../style/style_bubblelabel.scss';
 //import { LayerContext } from './LayerContext';
 import { DateContext } from '../Datepicker/DateContext';
@@ -366,12 +368,13 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
     //add_gbloverlay('ftp://ftp.sos.noaa.gov/sosrt/rt/noaa/sat/linear/raw/linear_rgb_cyl_20201114_1440.jpg',
     //               'Clouds Earth, NOAA', 0.5, false, grect);
     //'https://ecodata.odb.ntu.edu.tw/pub/img/chla_neo_202004.png'
+/* TRY to move to Geoserver Cloud Imagery...
     add_gbloverlay('https://neo.sci.gsfc.nasa.gov/servlet/RenderData?si=1787328&cs=rgb&format=PNG&width=3600&height=1800',
                    'NASA_NEO_Chla_origin', 0.5, false, grect, 'NASA Earth Observations (NEO)');
 
     add_gbloverlay('https://ecodata.odb.ntu.edu.tw/pub/img/neo_AQUA_MODIS_20200628.png',
                    'NASA_false_color', 0.5, false, grect, 'NASA Earth Observations (NEO)');
-
+*/
     /* Create the additional layers
     addAdditionalLayerOption(
       "United States GOES Infrared",

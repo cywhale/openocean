@@ -26,7 +26,9 @@ import { LayerContext, LayerContextProvider } from "./LayerContext";
 //import { DateContext } from "../Datepicker/DateContext"; //move into LayerModal, otherwise choose date'll update panel
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
-import '../../style/style_modal_tab.scss'
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       '../../style/style_modal_tab.scss');
 
 const Layer = (props) => {
   const { viewer, baseName, userBase } = props;

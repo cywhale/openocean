@@ -1,7 +1,9 @@
 import { render, Fragment } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Geocoder from 'cesium/Source/Widgets/Geocoder/Geocoder';
-import style from '../style/style_ctrlcompo';
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       '../../style/style_ctrlcompo');
 
 const UserSearch = (props) => {
   const { viewer } = props;
@@ -122,7 +124,7 @@ const UserSearch = (props) => {
                    { output.layer === '' && <p>Not perform searching yet...</p>}
                    { output.layer !== '' && <p>{output.layer}</p>}
                    { output.geocode !== null &&
-                     <p><hr /><button id="toGeocodeBut" class={style.ctrlbutn} onClick={() => {viewer.camera.flyTo({destination: output.geocode})}}>
+                     <p><hr /><button id="toGeocodeBut" class="ctrlbutn" onClick={() => {viewer.camera.flyTo({destination: output.geocode})}}>
                          Fly to {output.geocode_place}</button></p> }
                </Fragment>,
                document.getElementById('resultxdiv'))

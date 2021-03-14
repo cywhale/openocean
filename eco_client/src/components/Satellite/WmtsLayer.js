@@ -3,7 +3,9 @@ import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
 import gibsGeographicTilingScheme from './gibs';
 //import { LayerContext } from '../Layer/LayerContext'; //Note WmtsLayer is under LayerModel and cannot directly modify LayerContext
-import style from '../style/style_ctrlcompo.scss';
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       '../../style/style_ctrlcompo.scss');
 
 const WmtsLayer = (props) => {
   const { viewer, clocktime, satellite, layerprops, addLayer, updateLayer} = props;
@@ -195,7 +197,7 @@ const WmtsLayer = (props) => {
   return (
     <Fragment>
       { satellite.selmodis_truecolor &&
-        <button class={style.ctrlbutn} id="applyclocktime" onClick={applyClocktime}>
+        <button class="ctrlbutn" id="applyclocktime" onClick={applyClocktime}>
           Apply time setting to satellite layers</button> }
     </Fragment>
   );

@@ -42,13 +42,13 @@
     content: '';
     pointer-events: none;
     height: 6px;
-    border-radius: 10px 0 0 10px;
+    border-radius: 10px;
   }
 
   &::-ms-track {
     background: transparent;
     border-color: transparent;
-    border-radius: 10px 0 0 10px;
+    border-radius: 10px;
     color: transparent;
     height: 6px;
   }

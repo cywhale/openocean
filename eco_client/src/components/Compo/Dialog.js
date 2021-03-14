@@ -4,8 +4,9 @@ import { useState, useEffect } from 'preact/hooks';
 import { createPortal, memo } from 'preact/compat';
 
 import style from '../Layer/style_modal';
-import style_ctrl from '../style/style_ctrlcompo';
-import style_dialog from './style_dialog';
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       '../../style/style_dialog');
 
 const Dialog = ({children, onCloseClick, isOpen}) => {
   const [open, setOpen] = useState(isOpen);
@@ -16,7 +17,7 @@ const Dialog = ({children, onCloseClick, isOpen}) => {
 
 //<div style="width:auto;max-width:18em;top:15%;left:18%;position:absolute;">
   const Wrapper = ({ children }) => ( //children;
-    <div class={style_dialog.dialogwrapper}>
+    <div class="dialogwrapper">
       {children}
     </div>
   );

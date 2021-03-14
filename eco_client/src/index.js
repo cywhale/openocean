@@ -1,6 +1,9 @@
-import './style';
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */'./style');
 import App from './components/app';
-import "cesium/Source/Widgets/widgets.css";
+import (/* webpackPrefetch: true */
+        /* webpackPreload: true */
+        "cesium/Source/Widgets/widgets.css");
 
 import buildModuleUrl from "cesium/Source/Core/buildModuleUrl";
 //console.log("CESIUM_BASE_URL: ", CESIUM_BASE_URL);

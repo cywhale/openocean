@@ -4,7 +4,7 @@ import path from 'path';
 // new release: https://github.com/CesiumGS/cesium-webpack-example/blob/master/webpack.release.config.js
 // https://cesium.com/docs/tutorials/cesium-and-webpack/
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-//const ExtractTextPlugin = require('extract-text-webpack-plugin');
+//const ExtractTextPlugin = require('extract-text-webpack-plugin'); //deprecated, not support more
 //const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 //const autoprefixer = require('autoprefixer');
 const { merge } = require('webpack-merge');
@@ -19,6 +19,10 @@ const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack
 //const BrotliGzipPlugin = require('brotli-gzip-webpack-plugin');
 //https://github.com/webpack-contrib/compression-webpack-plugin
 const CompressionPlugin = require('compression-webpack-plugin');
+//const OptimizeCssAssetsPlugin= require('optimize-css-assets-webpack-plugin'); //seems CssMinimizerWebpackPlugin replace it
+//const PreloadWebpackPlugin = require('@vue/preload-webpack-plugin');
+//const Critters = require('critters-webpack-plugin');
+//const HtmlCriticalWebpackPlugin = require("html-critical-webpack-plugin");
 //const zlib = require('zlib');
 
 const tryOptimize = false;
@@ -69,11 +73,22 @@ const cesium_other_config = (config, env) => {
              parallel: true,
              sourceMap: true,
              terserOptions: {
+                //ecma: 9,
                 compress: { drop_console: true },
                 output: { comments: false }
              },
              extractComments: false
-           })
+           })//,
+           //new OptimizeCSSAssetsPlugin({
+           /*cssProcessorOptions: {
+             //Fix keyframes in different CSS chunks minifying to colliding names:
+               reduceIdents: false,
+               safe: true,
+               discardComments: {
+                 removeAll: true
+               }
+             }*/
+           //})
         ]
       }
     }
@@ -172,7 +187,7 @@ const cesium_other_config = (config, env) => {
     },
     resolve: {
       fallback: path.resolve(__dirname, '..', 'src'),
-      extensions: ['.js', '.json', '.jsx', ''],
+      extensions: ['.js', '.jsx'], //'.json', ''
       mainFields: ['module', 'main'],
       alias: {
         cesium: path.resolve(__dirname, cesiumSource),
@@ -192,27 +207,40 @@ const cesium_other_config = (config, env) => {
             exclude: [/bower_components/, /node_modules/, /styles/],
 	    loader: 'babel-loader',
 	    //include: path.resolve(__dirname, '../../src')
-        },
+        }, /*{
+            test: /\.json$/i,
+            exclude: /node_modules/,
+            use: ['raw-loader'],
+            //type: 'javascript/auto',
+            //loader: 'json-loader'
+        },*/
+        {
+            test: /\.(png|gif|jpg|jpeg|svg|xml|json)$/, //|json
+            use: [ 'url-loader' ],
+            //name: 'static/media/[name].[hash:8].[ext]'
+        }, /*{
+            test: /\.(css|scss)$/,
+            exclude: /(node_modules)/,
+            use: { loader: MiniCssExtractPlugin.loader }
+        },*/
         {
             test: /\.(css|scss)$/,
-            use: [//{
-                //loader: MiniCssExtractPlugin.loader,
-              //},//ExtractTextPlugin.extract(
-              //'style-loader',
+            use: [
+              //ExtractTextPlugin.extract({ use:['style-loader', 'css-loader', 'sass-loader'] }),
               //'css?importLoaders=1!postcss',
-                { loader: 'style-loader' },
-                { loader: 'css-loader' },
-                { loader: 'sass-loader' }
-              //{ loader: 'css-loader' }
+              //MiniCssExtractPlugin.loader, 'style-loader', 'css-loader', 'sass-loader'
+              { loader: 'style-loader' },
+              { loader: 'css-loader',
+                options: {
+                   minimize: true
+                }
+              },
+              { loader: 'sass-loader' }
             ],
             include: /node_modules[/\\]react-dropdown-tree-select/,
             sideEffects: true
             // extractTextPluginOptions
             // )
-        }, {
-            test: /\.(png|gif|jpg|jpeg|svg|xml|json)$/,
-            use: [ 'url-loader' ],
-            //name: 'static/media/[name].[hash:8].[ext]'
         }, /*{
             test: /\.js$/, //\.worker\
             use: {
@@ -321,7 +349,7 @@ const cesium_other_config = (config, env) => {
 }
 
 //module exports = {
-const baseConfig = (config, env) => {
+const baseConfig = (config, env, helpers) => {
   if (!config.plugins) {
         config.plugins = [];
   }
@@ -375,6 +403,8 @@ const baseConfig = (config, env) => {
       config.plugins.push(
         new HtmlWebpackPlugin({
            template: 'template.html',
+           filename: 'index.html',
+           preload: true,
            production : true,
            inject: true,
           minify: {
@@ -392,6 +422,68 @@ const baseConfig = (config, env) => {
         })
       );
     }
+
+    const critters = helpers.getPluginsByName(config, 'Critters')[0];
+    if (critters) {
+        console.log("Have Critters option: ", critters.plugin.options.preload);
+        // The default strategy in Preact CLI is "media",
+        // but there are 6 different loading techniques:
+        // https://github.com/GoogleChromeLabs/critters#preloadstrategy
+        critters.plugin.options.preload = 'swap';
+    }
+
+    //const optCssAsset = helpers.getPluginsByName(config, 'CssMinimizerPlugin')[0]; //'OptimizeCssAssetsWebpack'
+    //if (optCssAsset) {
+    //  console.log("Have OptimizeCSS Plugin option: ", optCssAsset.plugin.options.processorOptions); //cssProcessorOptions
+    //optCssAsset.plugin.options.cssProcessorOptions = {
+    /*config.plugins.push(
+      //new OptimizeCssAssetsPlugin({
+        //cssProcessorOptions: {
+	// Fix keyframes in different CSS chunks minifying to colliding names:
+	  reduceIdents: false,
+          safe: true,
+          discardComments: {
+            removeAll: true
+          }
+          //map: { //https://www.programmersought.com/article/32411244994/
+          //          // Does not generate inline mapping, so the configuration will generate a source-map file
+          //          inline: false,
+          //          // Add source-map path comments to the css file
+          //          // If there is no such compressed css will remove the source-map path comment
+          //          annotation: true
+          //}
+      }
+      //})
+    //);*/
+    //};
+/*
+    config.plugins.push(
+      new MiniCssExtractPlugin({
+        filename: 'assets/css/[name].[hash].css',
+        chunkFilename: "assets/css/[name].[id].[hash].css", //'css/[id].[contenthash].css',
+      })
+    );
+    console.log("HTML crtical webpack plugin...");
+    config.plugins.push(
+      new HtmlCriticalWebpackPlugin({
+        base: path.resolve(__dirname, 'src'),
+        src: 'template.html',
+        dest: '../build/index.html',
+        inline: true,
+        minify: true,
+        extract: true,
+        penthouse: {
+          blockJSRequests: false,
+        }
+      })
+    );
+    config.plugins.push(
+      new Critters({
+        preload: 'swap',
+        preloadFonts: true
+      })
+    );
+*/
 
 // see https://github.com/webpack-contrib/compression-webpack-plugin
 // can replace BrotliPlugin and BrotliGzipPlugin
@@ -422,20 +514,36 @@ const baseConfig = (config, env) => {
     );
 
 // https://blog.isquaredsoftware.com/2017/03/declarative-earth-part-1-cesium-webpack/
-/*
-    config.plugins.push(
+/* config.plugins.push(
       new webpack.DllReferencePlugin({
         context : cesiumSource, //paths.cesiumSourceFolder,
         manifest: require(path.join(__dirname, "..", "distdll/cesiumDll-manifest.json")),
       })
     );
+
+    config.plugins.push(new PreloadWebpackPlugin({
+      rel: 'preload',
+      include: 'all', // or 'initial'
+      chunks: ['Cesium', 'chunk-vendors']
+    }));
+    config.plugin('preload').tap(options => {
+      options[0].include = {
+        type: 'allChunks',
+        chunks: ['Cesium', 'chunk-vendors']
+      };
+      return options;
+    });
 */
-    config.plugins.push( new webpack.optimize.OccurrenceOrderPlugin() );
+    config.plugins.push(new webpack.optimize.OccurrenceOrderPlugin() );
     config.plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
     config.plugins.push(new webpack.NoEmitOnErrorsPlugin());
     // Try to dedupe duplicated modules, if any:
     config.plugins.push( new DuplicatePackageCheckerPlugin() );
-    //config.plugins.push( new ExtractTextPlugin(cssFilename) );
+  /*config.plugins.push( new ExtractTextPlugin(
+      "assets/css/[name].[chunkhash:8].css", {
+          allChunks: true
+      })
+    );*/
     //config.plugins.push( new ManifestPlugin({
     //  fileName: 'asset-manifest.json'
     //}));
@@ -469,9 +577,9 @@ const baseConfig = (config, env) => {
 };
 
 //module exports = {
-export default (config, env) => {
+export default (config, env, helpers) => {
   return merge(
-    baseConfig(config, env),
+    baseConfig(config, env, helpers),
     cesium_other_config(config, env)
   );
 };

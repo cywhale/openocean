@@ -2,7 +2,10 @@
 // ref https://stackoverflow.com/questions/60994423/want-to-show-external-link-page-on-popup-in-react
 // import React from "react";
 import React from "preact/compat";
-import "../../style/style_popup.scss";
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
+       /* webpackPreload: true */
+       "../../style/style_popup.scss");
 
 class Popup extends React.Component {
 /*constructor() {

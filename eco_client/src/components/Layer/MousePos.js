@@ -14,7 +14,9 @@ import HorizontalOrigin from 'cesium/Source/Scene/HorizontalOrigin';
 import VerticalOrigin from 'cesium/Source/Scene/VerticalOrigin';
 import Dialog from '../Compo/Dialog';
 import style from './style_modal';
-import style_ctrl from '../style/style_ctrlcompo.scss';
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       '../../style/style_ctrlcompo.scss');
 
 const MousePos = (props) => {
   const { viewer, terr_opts } = props;
@@ -480,12 +482,12 @@ const MousePos = (props) => {
       </Fragment>, document.getElementById("homePopupdiv"))*/
       <Dialog onCloseClick={closeHomepopup} isOpen={homepopup}>
               <span>Now you set Home in a new location, and can use Home Button in topright corner to fly-to.</span>
-              <p class={style_ctrl.flexpspan}><span>More operations:&nbsp;</span>
+              <p class="flexpspan"><span>More operations:&nbsp;</span>
                 <span><input id="preferhomechk" style="width:auto;" type="checkbox"
                        checked={state.prefer_home_chk} onChange={chkPreferHome}
                        aria-label='As preference (need cookie permission) 設為偏好，但須允許客戶端儲存' />Set as default
                 </span>
-                <button id="resetHomebutn" class={style_ctrl.ctrlbutn} onClick={()=>{resetHomeBtnx()}}>Reset Home</button>
+                <button id="resetHomebutn" class="ctrlbutn" onClick={()=>{resetHomeBtnx()}}>Reset Home</button>
               </p>
       </Dialog>
     )
@@ -499,29 +501,29 @@ const MousePos = (props) => {
             <div class={style.ctrlwrapper}>
               <section class={style.ctrlsect}>
                 <div class={style.ctrlcolumn}>
-                  <p class={style_ctrl.flexpspan}>
+                  <p class="flexpspan">
                     <span>Lon/Lat/Elevation:&nbsp;
                       <input id="lontxt" type="text" size="9" style="max-width:63px;" onInput={onLonInput} />°&nbsp;
                       <input id="lattxt" type="text" size="9" style="max-width:63px;" onInput={onLatInput} />°&nbsp;
                       <input id="eletxt" type="text" size="9" style="max-width:63px;" onInput={onEleInput} />(m)</span>
                   </p>
-                  <p class={style_ctrl.flexpspan}>
-                    <span>Label:&nbsp;<textarea id="labeltxt" style="max-width:130px;height:auto" /></span>
-                    <span><button id="labelbutn" class={style_ctrl.ctrlbutn} onClick={()=>{labelBtnx()}}>Label position</button></span>
+                  <p class="flexpspan">
+                    <span>Label:&nbsp;<textarea id="labeltxt" style="max-width:130px;height:auto;border-radius:6px;" /></span>
+                    <span><button id="labelbutn" class="ctrlbutn" onClick={()=>{labelBtnx()}}>Label position</button></span>
                   </p><hr/>
-                  <div class={style_ctrl.flexpspan}>
+                  <div class="flexpspan">
                     {Array.from({ length: state.posPrint.length }, (_, index) => (
-                        <button key={index} class={style_ctrl.ctrlbutn}
+                        <button key={index} class="ctrlbutn"
                                 onClick={()=>{delLabelBtnx(index)}}>Delete {state.posPrint[index].name}
                         </button>
                     ))}
-                    <button id="flytobutn" class={style_ctrl.ctrlbutn} onClick={()=>{flyToBtnx()}}>Flyto position</button>
-                    <button id="ashomebutn" class={style_ctrl.ctrlbutn}
+                    <button id="flytobutn" class="ctrlbutn" onClick={()=>{flyToBtnx()}}>Flyto position</button>
+                    <button id="ashomebutn" class="ctrlbutn"
                             onClick={()=>{
                               let position = getInputPos();
                               asHomeBtnx(position);
                             }}>Set as home</button>
-                    <button id="dclickClose" class={style_ctrl.ctrlbutn} onClick={()=>{closeDclickBtnx()}}>Ok</button>
+                    <button id="dclickClose" class="ctrlbutn" onClick={()=>{closeDclickBtnx()}}>Ok</button>
                     <span><input id="manopenchk" style="width:auto;" type="checkbox" checked={state.dclick_chk_dialog}
                         onChange={chkDclickDialog} aria-label='Manually open dialog 手動開啟對話窗' />Manually open dialog</span>
                 </div>
@@ -535,7 +537,7 @@ const MousePos = (props) => {
 
   return (
       <Fragment>
-          <button class={style_ctrl.ctrlbutn} id="pospickbutn" onClick={showPosPick}>
+          <button class="ctrlbutn" id="pospickbutn" onClick={showPosPick}>
             {state.show === 'none'? 'Show position' : state.show === 'show'? 'Set position' : 'Position off'}</button>
           { render_posCtrl() }
           { render_homePopup() }

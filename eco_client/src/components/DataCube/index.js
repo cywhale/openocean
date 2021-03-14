@@ -13,8 +13,12 @@ import { SateContext } from "../Satellite/SateContext";
 import { MultiSelectContainer } from './MultiSelectContainer';
 import WebGLGlobeDataSource from './WebGLGlobeDataSource';
 
-import 'react-dropdown-tree-select/dist/styles.css'
-import '../../style/style_dropdown.scss';
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       'react-dropdown-tree-select/dist/styles.css');
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       '../../style/style_dropdown.scss');
 import data from './data.json';
 const { layerConfig } = require('../Layer/.setting.js');
 
