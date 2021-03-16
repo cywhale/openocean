@@ -26,6 +26,7 @@ import { LayerContext, LayerContextProvider } from "./LayerContext";
 //import { DateContext } from "../Datepicker/DateContext"; //move into LayerModal, otherwise choose date'll update panel
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
+// webpackChunkName: 'lay' <-- become lay.chunk.hash.js /.css
 import(/* webpackPrefetch: true */
        /* webpackPreload: true */
        '../../style/style_modal_tab.scss');

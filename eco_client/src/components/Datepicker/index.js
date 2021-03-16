@@ -14,7 +14,9 @@ import { Fragment } from 'preact';
 //import "@nateradebaugh/react-datetime/scss/styles.scss";
 //import moment from "moment";
 import { DateContext } from "./DateContext";
-import style from './style';
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       '../../style/style_datepicker');
 
 const Datepicker = (props) => {
   const { viewer } = props;
@@ -216,7 +218,7 @@ const Datepicker = (props) => {
         } onChange={(val) => {setEnd(val)}} />*/
   return(
     <Fragment>
-      <div class={style.dtimepick} ref={starttimeRef}>
+      <div class="dtimepick" ref={starttimeRef}>
         <label>Start time◷</label>
         <input id="startdate" name="startdate" type="date" value={datetime.startdate}
                onChange={(e) => {setDatetime((preState) => ({
@@ -230,7 +232,7 @@ const Datepicker = (props) => {
                  starttime: e.target.value,
                }))}} />
       </div>
-      <div class={style.dtimepick} ref={endtimeRef}>
+      <div class="dtimepick" ref={endtimeRef}>
         <label>End time◵</label>
         <input id="enddate" name="enddate" type="date" value={datetime.enddate}
                onChange={(e) => {setDatetime((preState) => ({
