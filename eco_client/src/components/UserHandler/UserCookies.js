@@ -4,8 +4,7 @@ import { render } from 'preact'; //Fragment
 import { useState, useEffect, useRef } from 'preact/hooks'; //useCallback
 import Cookies from 'universal-cookie';
 //import { nanoid } from 'nanoid';
-import(/* webpackMode: "lazy" */
-       /* webpackPrefetch: true */
+import(/* webpackPrefetch: true */
        /* webpackPreload: true */
        "../../style/style_usercookies.css");
 import style from "./style_cookiediv";
@@ -19,6 +18,7 @@ const UserCookies = (props) => {
   const cookieOpts = {
     path: "/",
     //expires: new Date(2020, 10, 20, 14, 20, 0, 30),
+    maxAge: 31536000,
     sameSite: "lax",
     secure: true
   };

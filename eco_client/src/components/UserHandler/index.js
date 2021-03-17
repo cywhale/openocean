@@ -33,6 +33,7 @@ const UserHandler = () => {
   const cookieOpts = {
     path: "/",
     //expires: new Date(2020, 11, 3, 15, 20, 0, 30),
+    maxAge: 31536000,
     sameSite: "lax",
     secure: true
   };

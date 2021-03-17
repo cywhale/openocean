@@ -67,7 +67,7 @@ const BasemapPicker = (props) => {
 //https://noaa.maps.arcgis.com/home/item.html?id=89dbb3a8eb294652adae4e8a7c92ad24
         imgModels.push(new ProviderViewModel({
            name : 'NOAA ETOPO\u00a0I', //https://ecodata.odb.ntu.edu.tw/pub/icon/etopo1_64x64.png
-           iconUrl : buildModuleUrl('https://noaa.maps.arcgis.com/sharing/rest/content/items/89dbb3a8eb294652adae4e8a7c92ad24/info/thumbnail/etopo1_hillshade.png'),
+           iconUrl : buildModuleUrl('../../assets/img/etopo1_hillshade_s1.png'), //'https://noaa.maps.arcgis.com/sharing/rest/content/items/89dbb3a8eb294652adae4e8a7c92ad24/info/thumbnail/etopo1_hillshade.png'),
             tooltip : 'NOAA Etopo',
             category: "Other",
             creationFunction : function() {
@@ -81,7 +81,7 @@ const BasemapPicker = (props) => {
 
         imgModels.push(new ProviderViewModel({
            name : 'Esri Firefly',
-           iconUrl : buildModuleUrl('https://www.arcgis.com/sharing/rest/content/items/a66bfb7dd3b14228bf7ba42b138fe2ea/info/thumbnail/thumbnail1578354023212.jpeg'),
+           iconUrl : buildModuleUrl('../../assets/img/esri_firefly.jpeg'), //'https://www.arcgis.com/sharing/rest/content/items/a66bfb7dd3b14228bf7ba42b138fe2ea/info/thumbnail/thumbnail1578354023212.jpeg'),
             tooltip : 'Esri World Imagery (Firefly)',
             category: 'Other', //'Cesium ion'
             creationFunction : function() {
@@ -96,7 +96,7 @@ const BasemapPicker = (props) => {
 //https://noaa.maps.arcgis.com/home/item.html?id=e11ebaeb19544bb18c2afe440f063062
         imgModels.push(new ProviderViewModel({
            name : 'NOAA DEM Global',
-           iconUrl : buildModuleUrl('https://noaa.maps.arcgis.com/sharing/rest/content/items/e11ebaeb19544bb18c2afe440f063062/info/thumbnail/thumbnail1599599541626.png'),
+           iconUrl : buildModuleUrl('../../assets/img/noaa_dem_global_s1.png'), //'https://noaa.maps.arcgis.com/sharing/rest/content/items/e11ebaeb19544bb18c2afe440f063062/info/thumbnail/thumbnail1599599541626.png'),
             tooltip : 'DEM Global Mosaic (Color Shaded Relief)',
             category: 'Other', //'Cesium ion'
             creationFunction : function() {
@@ -111,7 +111,7 @@ const BasemapPicker = (props) => {
 //https://tiles.arcgis.com/tiles/C8EMgrsFcRFL6LrL/arcgis/rest/services/GEBCO_grayscale_basemap_NCEI/MapServer?cacheKey=986e87178fc31c54
         imgModels.push(new ProviderViewModel({
            name : 'GEBCO 2020 Grayscale',
-           iconUrl : buildModuleUrl('https://noaa.maps.arcgis.com/sharing/rest/content/items/766fe2c6985e43d7a86fc39134b4f0f6/info/thumbnail/thumbnail1596833199248.png'),
+           iconUrl : buildModuleUrl('../../assets/img/gebco2020_grey_s1.png'), //'https://noaa.maps.arcgis.com/sharing/rest/content/items/766fe2c6985e43d7a86fc39134b4f0f6/info/thumbnail/thumbnail1596833199248.png'),
             tooltip : 'GEBCO_2020 Grayscale Basemap',
             category: 'Other', //'Cesium ion'
             creationFunction : function() {
@@ -129,7 +129,7 @@ const BasemapPicker = (props) => {
 
         imgModels.push(new ProviderViewModel({
            name : 'GMRT',
-           iconUrl : buildModuleUrl('https://www.gmrt.org/apple-touch-icon.png'),
+           iconUrl : buildModuleUrl('../../assets/img/gmrt_icon_s1.png'), //'https://www.gmrt.org/apple-touch-icon.png'),
             tooltip : 'Global Multi-Resolution Topography (GMRT)',
             category: "Other",
             creationFunction : function() {

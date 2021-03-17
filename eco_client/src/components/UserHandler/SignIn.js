@@ -92,7 +92,7 @@ const SignIn = (props) => {
              referrerpolicy="no-referrer"
                      class={style.signInImg}
                      src="../../assets/icons/favicon.png"
-                     width="128" />
+                     width="60" />
         { user.saveAgree &&
           <div style="display:inline-block;">
             <button class={style.button} onClick={renderRedirect}>ODB</button>
