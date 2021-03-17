@@ -233,7 +233,7 @@ const cesium_other_config = (config, env) => {
                 },
               },*/
               //'css-loader', 'sass-loader' //, 'style-loader'
-              //{ loader: 'style-loader' },
+              { loader: 'style-loader' },
               { loader: 'css-loader',
                 options: {
                    minimize: true
