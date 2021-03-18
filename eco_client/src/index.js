@@ -4,6 +4,9 @@ import App from './components/app';
 import (/* webpackPrefetch: true */
         /* webpackPreload: true */
         "cesium/Source/Widgets/widgets.css");
+import(/* webpackPrefetch: true */
+       /* webpackPreload: true */
+       'style/style_earth.css');
 
 import buildModuleUrl from "cesium/Source/Core/buildModuleUrl";
 //console.log("CESIUM_BASE_URL: ", CESIUM_BASE_URL);

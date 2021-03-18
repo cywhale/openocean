@@ -19,10 +19,10 @@ import { LayerContextProvider } from "../Layer/LayerContext";
 //import { UserContext } from '../UserHandler/UserContext';
 import style from './style';
 //import 'cesium/Source/Widgets/widgets.css'; //move to ../../index.js
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+/*import(// webpackPrefetch: true //move to index.js
+       // webpackPreload: true
        '../../style/style_earth.css');
-
+*/
 //var csLoader = { csloaded: false, csviewer: null };
 //export const csLoader = createContext({
 //  csloaded: false,

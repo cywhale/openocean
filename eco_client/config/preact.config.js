@@ -94,7 +94,7 @@ const cesium_other_config = (config, env) => {
          new TerserPlugin({
              cache: true,
              parallel: true,
-             sourceMap: true,
+            sourceMap: true,
              terserOptions: {
                 compress: { drop_console: true },
                 output: { comments: false }
@@ -144,7 +144,7 @@ const cesium_other_config = (config, env) => {
     console.log("Node env in development...");
 
     entryx = [
-      'webpack-dev-server/client?https://0.0.0.0:3000/',
+      'webpack-dev-server/client?https://0.0.0.0/',
       //https://github.com/webpack/webpack-dev-server/issues/416
       //'webpack-dev-server/client?https://' + require("ip").address() + ':3000/',
       './src/index.js'
@@ -209,15 +209,17 @@ const cesium_other_config = (config, env) => {
             exclude: /node_modules/, //[/bower_components/, /styles/]
 	    loader: 'babel-loader',
 	    //include: path.resolve(__dirname, '../../src')
-        }, /*{
+        },{ /*
             test: /\.json$/i,
             exclude: /node_modules/,
             use: ['raw-loader'],
-        },*/
-        {
+        },
+          test: /200.html$/,
+          use: [ 'file-loader' ]
+        }, {*/
             test: /\.(png|gif|jpg|jpeg|svg|xml|json)$/,
             use: [ 'url-loader' ],
-            //name: 'static/media/[name].[hash:8].[ext]'
+            //name: 'assets/[name].[hash:8].[ext]'
         },
         {
             test: /\.(css|scss)$/,
@@ -233,7 +235,7 @@ const cesium_other_config = (config, env) => {
                 },
               },*/
               //'css-loader', 'sass-loader' //, 'style-loader'
-              { loader: 'style-loader' },
+              //{ loader: 'style-loader' },
               { loader: 'css-loader',
                 options: {
                    minimize: true
@@ -277,13 +279,6 @@ const cesium_other_config = (config, env) => {
       host : '0.0.0.0',
       //host: 'localhost',
       port: 3000,
-      proxy: {
-	'**': {
-          target: 'https://0.0.0.0:3000/',
-          // context: () => true, //https://webpack.js.org/configuration/dev-server/#devserverproxy
-          changeOrigin: true
-        }
-      },
       hot: true,
       //sockjsPrefix: '/assets',
       headers: {
@@ -293,12 +288,27 @@ const cesium_other_config = (config, env) => {
       historyApiFallback: {
         disableDotRule: true
       },
-      public : 'eco.odb.ntu.edu.tw',
+      //public : 'eco.odb.ntu.edu.tw',
       publicPath: '/',
       disableHostCheck: true,
       quiet: true,
       inline: true,
-      compress: true
+      compress: true,
+      sockHost: '0.0.0.0',
+      sockPort: 3004,
+      sockPath: '/serve/sockjs-node',
+      proxy: {
+        "/serve": {
+            target: "https://eco.odb.ntu.edu.tw/",
+            pathRewrite: { "^/serve": "/sockjs-node" },
+            changeOrigin: true,
+        },
+        '**': {
+          target: 'https://0.0.0.0/',
+          // context: () => true, //https://webpack.js.org/configuration/dev-server/#devserverproxy
+          changeOrigin: true
+        }
+      }
     }, /* https://bit.ly/3fkiypj
     postcss: function() {
       return [
@@ -315,30 +325,36 @@ const cesium_other_config = (config, env) => {
 //https://github.com/CesiumGS/cesium-webpack-example/issues/7
     optimization: {
       ...optzx,
+      runtimeChunk: true, //{
+        //name: 'runtime'
+      //},
       splitChunks: {
         //name: 'vendors',
         chunks: "all",
+        minSize: 5000,
         maxInitialRequests: Infinity,
-	//minSize: 0,
+        reuseExistingChunk: true,
+        enforceSizeThreshold: 30000,
         cacheGroups: {
+          cesium: {
+            name: 'cesium',
+            test: /[\\/]node_modules[\\/]cesium/,
+            chunks: 'all',
+            priority: 2,
+            minChunks: 2, //module => module.context && module.context.indexOf('cesium') !== -1
+            enforce: true
+          },
           vendors: {
             test: /[\\/]node_modules[\\/]/,
             priority: -10,
-            chunks: 'initial',
-            name: `chunk-vendors` //(module) {
-              // get the name. E.g. node_modules/packageName/not/this/part.js
-              // or node_modules/packageName
-              //const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
-              // npm package names are URL-safe, but some servers don't like @ symbols
-              //return `npm.${packageName.replace('@', '')}`;
-            //},
+            chunks: 'all',
+            minChunks: 2,
+            name: 'chunk-vendors'
           },// https://blog.logrocket.com/guide-performance-optimization-webpack/
           commons: {
-            name: 'Cesium',
-            test: /[\\/]node_modules[\\/]cesium/,
-            //minSize: 10000,
-            //maxSize: 300000,
-            chunks: 'all'
+            chunks: 'all',
+            minChunks: 2,
+            priority: 1
           }
         }
       }
@@ -391,6 +407,32 @@ const baseConfig = (config, env, helpers) => {
 
   if (testenv.NODE_ENV === "production") {
 
+    const htmlplug = helpers.getPluginsByName(config, 'HtmlWebpackPlugin')[0];
+    if (htmlplug) {
+      //console.log("Have htmlPlugin inject: ", htmlplug.plugin.options.inject);
+      console.log("Have htmlPlugin preload: ", htmlplug.plugin.options.preload);
+      console.log("Have htmlPlugin production: ", htmlplug.plugin.options.production);
+      //console.log("Have htmlPlugin template: ", htmlplug.plugin.options.template);
+      //console.log("Have htmlPlugin minify: ", htmlplug.plugin.options.minify);
+      htmlplug.plugin.options.production = true;
+      htmlplug.plugin.options.preload = true;
+      //htmlplug.plugin.options.template = 'template.html';
+      //htmlplug.plugin.options.filename = 'index.html';
+      /*htmlplug.plugin.options.minify = {
+            removeComments: true,
+            collapseWhitespace: true,
+            removeRedundantAttributes: true,
+            useShortDoctype: true,
+            removeEmptyAttributes: true,
+            removeStyleLinkTypeAttributes: true,
+            keepClosingSlash: true,
+            minifyJS: true,
+            minifyCSS: true,
+            minifyURLs: true
+          };*/
+      console.log("After, have htmlPlugin production: ", htmlplug.plugin.options.production);
+    }
+
     if (tryOptimize) {
       console.log("!!Use LESS html-webpack-plugin args!!");
       config.plugins.push(
@@ -408,6 +450,7 @@ const baseConfig = (config, env, helpers) => {
         new HtmlWebpackPlugin({
            template: 'template.html',
            filename: 'index.html',
+           cache: true,
            preload: true,
            production : true,
            inject: true,

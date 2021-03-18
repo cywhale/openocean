@@ -87,7 +87,7 @@ const UserHandler = () => {
                   ...preState,
                 //logined: true,
                   name: sso.username,
-                  photoURL: 'https://ecodata.odb.ntu.edu.tw/pub/icon/favicon_tw.png',
+                  photoURL: '../../assets/icons/favicon_tw.png', //'https://ecodata.odb.ntu.edu.tw/pub/icon/favicon_tw.png',
                   auth: 'odb',
                   token: ucstrx
                 }))
