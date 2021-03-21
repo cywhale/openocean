@@ -1,8 +1,8 @@
 import { Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import WebFeatureServiceImageryProvider from './WebFeatureServiceImageryProvider';
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
        '../../style/style_ctrlcompo.scss'); //webpackMode: "lazy-once"
 const { wfsConfig } = require('./.setting.js');
 

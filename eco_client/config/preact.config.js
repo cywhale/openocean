@@ -1,5 +1,5 @@
 import webpack from 'webpack';
-import path from 'path';
+import path, {join} from 'path';
 // Plugins for webpack
 // new release: https://github.com/CesiumGS/cesium-webpack-example/blob/master/webpack.release.config.js
 // https://cesium.com/docs/tutorials/cesium-and-webpack/
@@ -9,6 +9,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 //const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 //const autoprefixer = require('autoprefixer');
 const { merge } = require('webpack-merge');
+//const terser = require("terser");
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 //const ManifestPlugin = require('webpack-manifest-plugin');
@@ -25,6 +26,14 @@ const CompressionPlugin = require('compression-webpack-plugin');
 //const Critters = require('critters-webpack-plugin');
 //const HtmlCriticalWebpackPlugin = require("html-critical-webpack-plugin");
 //const zlib = require('zlib');
+const svgToMiniDataURI = require('mini-svg-data-uri');
+//const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+const ImageminPlugin = require('imagemin-webpack-plugin').default
+//const jsonminify= require('jsonminify');
+//const UnusedFilesPlugin = require('unused-files-webpack-plugin').default;
+//const preactCliSwPrecachePlugin = require('preact-cli-sw-precache'); //not work anymore? https://github.com/preactjs/preact-cli/pull/674
+//const {InjectManifest} = require('workbox-webpack-plugin');
+//const { injectManifest } = require('preact-cli-workbox-plugin');
 
 const tryOptimize = false;
 const OptimizePlugin = require('optimize-plugin'); //cannot work with copy-webpack-plugin
@@ -65,6 +74,7 @@ const cesium_other_config = (config, env) => {
        runtimeChunk: true, //'single'
        concatenateModules: true,
     }
+
     if (testenv.NODE_ENV !== "production") {
       optzx = {
          ...optzx,
@@ -85,18 +95,23 @@ const cesium_other_config = (config, env) => {
       }
     }
   } else {
+    console.log("Use production optimization...");
     var optzx = {
        usedExports: true,
-       runtimeChunk: true, //'single'
+       //https://wanago.io/2018/08/13/webpack-4-course-part-seven-decreasing-the-bundle-size-with-tree-shaking/
+       //sideEffects: true, //tell Webpack don't ignore package.json sideEffect = false settings
+       runtimeChunk: true, //{
+         //name: 'runtime'
+       //},
        concatenateModules: true,
        minimizer:
        [
          new TerserPlugin({
              cache: true,
              parallel: true,
-            sourceMap: true,
+             sourceMap: true,
              terserOptions: {
-                compress: { drop_console: true },
+                compress: { dead_code: true, drop_console: true, passes: 2 },
                 output: { comments: false }
              }, //https://github.com/preactjs/preact-cli/blob/master/packages/cli/lib/lib/webpack/webpack-clien$
              extractComments: false //{
@@ -208,8 +223,34 @@ const cesium_other_config = (config, env) => {
             test: /\.(js|jsx)$/,
             exclude: /node_modules/, //[/bower_components/, /styles/]
 	    loader: 'babel-loader',
+            options: {
+              presets: [
+                ['env', {
+                  modules: false,
+                  useBuiltIns: true,
+                  targets: {
+                    browsers: [
+                      'Chrome >= 60',
+                      'Safari >= 10.1',
+                      'iOS >= 10.3',
+                      'Firefox >= 54',
+                      'Edge >= 15',
+                    ],
+                  },
+                }],
+              ],
+            }
 	    //include: path.resolve(__dirname, '../../src')
-        },{ /*
+        }, {
+          test: /\.svg$/i,
+          use: [{
+            loader: 'url-loader',
+            options: {
+              generator: (content) => svgToMiniDataURI(content.toString()),
+            },
+          }],
+        },
+        { /*
             test: /\.json$/i,
             exclude: /node_modules/,
             use: ['raw-loader'],
@@ -217,10 +258,43 @@ const cesium_other_config = (config, env) => {
           test: /200.html$/,
           use: [ 'file-loader' ]
         }, {*/
-            test: /\.(png|gif|jpg|jpeg|svg|xml|json)$/,
-            use: [ 'url-loader' ],
+            test: /\.(png|gif|jpg|jpeg|xml|json)$/, //|svg
+            use: [{ loader: 'url-loader',
+                    options: { limit: 30 * 1024 }
+            }]
             //name: 'assets/[name].[hash:8].[ext]'
         },
+        {
+          test: /\.(jpe?g|png|gif|svg|webp)$/i,
+          type: 'asset',
+        },
+ /*     {
+          test: /\.(jpe?g|png|gif|svg|webp)$/i,
+          use: [
+            {
+              loader: ImageMinimizerPlugin.loader,
+              include: /\/(assets|node_modules[\\/]cesium[\\/]Source[\\/]Assets[\\/](Textures|SkyBox))/,
+              filter: (source, sourcePath) => {
+                if (source.byteLength < 8192) {
+                  return false;
+                }
+                return true;
+              },
+              options: {
+                severityError: 'warning',
+                minimizerOptions: {
+                  plugins: [
+                    ['jpegtran', { progressive: true }],
+                    ['optipng', { optimizationLevel: 5 }],
+                    ['gifsicle', { interlaced: true, optimizationLevel: 3 }],
+                    ['imagemin-svgo', {plugins: [{removeViewBox: false}] }],
+                    ['imagemin-webp']
+                  ],
+                },
+              },
+            },
+          ],
+        },*/
         {
             test: /\.(css|scss)$/,
             exclude: /(node_modules)/,
@@ -235,7 +309,7 @@ const cesium_other_config = (config, env) => {
                 },
               },*/
               //'css-loader', 'sass-loader' //, 'style-loader'
-              //{ loader: 'style-loader' },
+              { loader: 'style-loader' },
               { loader: 'css-loader',
                 options: {
                    minimize: true
@@ -325,16 +399,15 @@ const cesium_other_config = (config, env) => {
 //https://github.com/CesiumGS/cesium-webpack-example/issues/7
     optimization: {
       ...optzx,
-      runtimeChunk: true, //{
-        //name: 'runtime'
-      //},
       splitChunks: {
-        //name: 'vendors',
+        name: false, //https://medium.com/webpack/webpack-4-code-splitting-chunk-graph-and-the-splitchunks-optimization-be739a861366
         chunks: "all",
-        minSize: 5000,
+        minSize: 100000,
+        //maxSize: 200000,
+        maxAsyncRequests: 20,
         maxInitialRequests: Infinity,
         reuseExistingChunk: true,
-        enforceSizeThreshold: 30000,
+        //enforceSizeThreshold: 30000,
         cacheGroups: {
           cesium: {
             name: 'cesium',
@@ -376,6 +449,11 @@ const baseConfig = (config, env, helpers) => {
 
 // transform https://github.com/webpack-contrib/copy-webpack-plugin/issues/6
   config.plugins.push(
+/*  new UnusedFilesPlugin({
+      failOnUnused: true,
+      patterns: [/\.js$]
+    }),
+*/
     new CopyWebpackPlugin({
       patterns: [
       {
@@ -386,6 +464,13 @@ const baseConfig = (config, env, helpers) => {
         from: path.join(cesiumSource, "Assets"), //__dirname,
         to: "Assets", //path.join(__dirname, "Assets"),
         globOptions: globOptions,
+      /*transform: function(content, path) {
+            let pat = /\.json$/gi;
+            if(pat.test(path)){
+              return jsonminify(content.toString());
+            }
+            return content;
+         }*/
       },
       {
         from: path.join(cesiumSource, "Widgets"), //__dirname,
@@ -393,8 +478,24 @@ const baseConfig = (config, env, helpers) => {
       },
       { from: path.join(cesiumSource, 'ThirdParty'),
         to: 'ThirdParty',
+      //transform: content => terser.minify(content.toString()).code
+      /*transform: function(content, path) {
+            let pat = /\.js$/gi;
+            if(pat.test(path)){
+              return terser.minify(content.toString()).code;
+            }
+            return content;
+        }*/
       }
       ]
+    }),
+    new ImageminPlugin({
+      cacheFolder: path.resolve(__dirname, 'cache'),
+      test: /\.(jpe?g|png|gif|svg)$/i,
+      jpegtran: { progressive: true, arithmetic: true },
+      optipng: { optimizationLevel: 5 },
+      gifsicle: { interlaced: true, optimizationLevel: 3 },
+      svgo: {plugins: [{removeViewBox: false}] },
     })
   );
 
@@ -406,6 +507,12 @@ const baseConfig = (config, env, helpers) => {
   );
 
   if (testenv.NODE_ENV === "production") {
+
+  /*const precache_plug = helpers.getPluginsByName(config, 'SWPrecacheWebpackPlugin')[0];
+    if (precache_plug) {
+      console.log("Have max cache size: ", precache_plug.plugin.options.maximumFileSizeToCacheInBytes);
+      precache_plug.plugin.options.maximumFileSizeToCacheInBytes = 3000000;
+    }*/
 
     const htmlplug = helpers.getPluginsByName(config, 'HtmlWebpackPlugin')[0];
     if (htmlplug) {
@@ -579,11 +686,32 @@ const baseConfig = (config, env, helpers) => {
       //chunks: ['asyncChunks'] //, 'myAsyncPreloadChunk'] //'Cesium', 'chunk-vendors',
     }));
 */
+    config.plugins.push(new webpack.optimize.MinChunkSizePlugin({
+        minChunkSize: 5000, // Minimum number of characters
+    }));
     config.plugins.push(new webpack.optimize.OccurrenceOrderPlugin() );
     config.plugins.push(new webpack.optimize.ModuleConcatenationPlugin());
     config.plugins.push(new webpack.NoEmitOnErrorsPlugin());
     // Try to dedupe duplicated modules, if any:
     config.plugins.push( new DuplicatePackageCheckerPlugin() );
+// cause a multple instances of self.__WB_MANIFEST error if specified in sw.js. If not specified, then none found error. Weird.
+// https://github.com/GoogleChrome/workbox/blob/f2ef9126f36cbf1219e9c27997ac0c4d873a0ca8/packages/workbox-build/src/inject-manifest.js#L152-L153
+/*  config.plugins.push( new InjectManifest({
+        //swSrc: path.resolve(__dirname, '..', 'src/sw.js'),
+        //swDest: 'sw.js',
+        swSrc: path.join(process.cwd(), 'src', 'sw.js'),
+        swDest: 'sw.js',
+        //include: undefined, //https://github.com/GoogleChrome/workbox/issues/2681
+        exclude: [
+          /\.map$/,
+          /manifest$/,
+          /\.htaccess$/,
+          /service-worker\.js$/,
+          /sw\.js$/,
+        ],
+        maximumFileSizeToCacheInBytes: 5*1024*1024,
+      })
+    ); */
   /*config.plugins.push( new ExtractTextPlugin(
       "assets/css/[name].[chunkhash:8].css", {
           allChunks: true
@@ -621,10 +749,46 @@ const baseConfig = (config, env, helpers) => {
   return config;
 };
 
+/*
+const sw_preact_config = (config) => {
+  const precacheConfig = {
+    staticFileGlobs: [
+      'build/** /*.{html,js,css,jpg,jpeg,json,png,svg}',
+      'build/assets/icons/favicon*.png'
+    ],
+    stripPrefix: 'build/',
+    navigateFallback: '/index.html',
+    runtimeCaching: [{
+      urlPattern: /\/(session|search)\//,
+      handler: 'networkOnly'
+    }, {
+      urlPattern: '.*',
+      handler: 'cacheFirst'
+    }],
+    filename: 'sw.js',
+    minify: true,
+    clientsClaim: true,
+    skipWaiting: true,
+    maximumFileSizeToCacheInBytes: 10*1024*1024
+  };
+  return preactCliSwPrecachePlugin(config, precacheConfig);
+}
+// Weird Error. Cannot find sw.js always...
+const worker_preact_config = (config, env, helpers) => {
+  return injectManifest(config, {
+    swSrc: join(__dirname, 'src', 'sw.js'), //path.join(__dirname, '..', 'src/sw.js'), //'./src/sw.js'
+    maximumFileSizeToCacheInBytes: 5*1024*1024,
+  });
+}
+*/
+
 //module exports = {
 export default (config, env, helpers) => {
+  //worker_preact_config(config, env, helpers);
   return merge(
+  //sw_preact_config(config),
     baseConfig(config, env, helpers),
     cesium_other_config(config, env)
+  //worker_preact_config(config, env, helpers)
   );
 };

@@ -4,7 +4,6 @@
 import React from "preact/compat";
 import(/* webpackMode: "lazy" */
        /* webpackPrefetch: true */
-       /* webpackPreload: true */
        "../../style/style_popup.scss");
 
 class Popup extends React.Component {

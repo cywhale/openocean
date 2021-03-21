@@ -27,8 +27,7 @@ import { LayerContext, LayerContextProvider } from "./LayerContext";
 import draggable_element from '../Compo/draggable_element';
 import style from './style_modal';
 // webpackChunkName: 'lay' <-- become lay.chunk.hash.js /.css
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+import(/* webpackPreload: true */
        '../../style/style_modal_tab.scss');
 
 const Layer = (props) => {

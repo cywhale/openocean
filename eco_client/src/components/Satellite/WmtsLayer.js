@@ -3,8 +3,8 @@ import DefaultProxy from 'cesium/Source/Core/DefaultProxy';
 import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServiceImageryProvider';
 import gibsGeographicTilingScheme from './gibs';
 //import { LayerContext } from '../Layer/LayerContext'; //Note WmtsLayer is under LayerModel and cannot directly modify LayerContext
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
        '../../style/style_ctrlcompo.scss');
 
 const WmtsLayer = (props) => {

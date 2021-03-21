@@ -28,6 +28,7 @@ yarn.lock
 **/*.log
 ../.env
 **/.cache
+**/cache
 **/size-plugin.json
 **/.log
 .testenv.js

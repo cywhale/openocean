@@ -24,8 +24,8 @@ import WmtsLayer from 'async!../Satellite/WmtsLayer';
 // follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
 import bubble_labeler from '../Compo/bubble_labeler';
 import style from './style_layermodal.scss';
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
        '../../style/style_layerctrl.scss');
 //import '../style/style_bubblelabel.scss';
 //import { LayerContext } from './LayerContext';

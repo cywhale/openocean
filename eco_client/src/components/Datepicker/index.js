@@ -14,8 +14,8 @@ import { Fragment } from 'preact';
 //import "@nateradebaugh/react-datetime/scss/styles.scss";
 //import moment from "moment";
 import { DateContext } from "./DateContext";
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
        '../../style/style_datepicker');
 
 const Datepicker = (props) => {

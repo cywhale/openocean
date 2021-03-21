@@ -2,7 +2,9 @@
   "env": {
     "test": {
       "presets": [
-        ["preact-cli/babel", { "modules": false }]
+        ["preact-cli/babel", { 
+            "modules": false
+        }]
       ]
     }
   }

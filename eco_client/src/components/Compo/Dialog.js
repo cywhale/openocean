@@ -4,8 +4,8 @@ import { useState, useEffect } from 'preact/hooks';
 import { createPortal, memo } from 'preact/compat';
 
 import style from '../Layer/style_modal';
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
        '../../style/style_dialog');
 
 const Dialog = ({children, onCloseClick, isOpen}) => {

@@ -14,8 +14,8 @@ import HorizontalOrigin from 'cesium/Source/Scene/HorizontalOrigin';
 import VerticalOrigin from 'cesium/Source/Scene/VerticalOrigin';
 import Dialog from '../Compo/Dialog';
 import style from './style_modal';
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
        '../../style/style_ctrlcompo.scss');
 
 const MousePos = (props) => {

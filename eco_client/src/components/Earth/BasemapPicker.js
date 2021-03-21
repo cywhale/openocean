@@ -15,7 +15,8 @@ import WebMapTileServiceImageryProvider from 'cesium/Source/Scene/WebMapTileServ
 import ProviderViewModel from 'cesium/Source/Widgets/BaseLayerPicker/ProviderViewModel';
 import knockout from 'cesium/Source/ThirdParty/knockout.js';
 //import 'cesium/Source/Widgets/widgets.css';
-import style from './style_basemapPicker';
+import(/* webpackPreload: true */
+       '../../style/style_basemapPicker');
 //import './csviewer.css'
 //const imageryViewModels = createDefaultImageryProviderViewModels()[8,10,11,12,14];
 //const terrainModels = createDefaultTerrainProviderViewModels();
@@ -276,7 +277,7 @@ const BasemapPicker = (props) => {
       <div style="display:flex;">
         <div id="baseLayerPickerContainer"
           ref = {baseContainer}
-          class={style.baseContainer} />
+          class="baseContainer" />
       </div>
     );
   }, [state]);

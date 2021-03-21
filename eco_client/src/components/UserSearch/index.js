@@ -1,8 +1,8 @@
 import { render, Fragment } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Geocoder from 'cesium/Source/Widgets/Geocoder/Geocoder';
-import(/* webpackPrefetch: true */
-       /* webpackPreload: true */
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
        '../../style/style_ctrlcompo');
 
 const UserSearch = (props) => {
