@@ -50,13 +50,13 @@ export default async function (fastify, opts) {
       if (req.header('Accept-Encoding').includes('br')) {
         req.url = req.url + '.br';
         console.log(req.header('Accept-Encoding Brotli'));
-        res.set('Content-Encoding', 'br');
-        res.set('Content-Type', 'application/javascript; charset=UTF-8');
+        res.header('Content-Encoding', 'br');
+        res.header('Content-Type', 'application/javascript; charset=UTF-8');
       } else {
         req.url = req.url + '.gz';
         console.log(req.header('Accept-Encoding Gzip'));
-        res.set('Content-Encoding', 'gzip');
-        res.set('Content-Type', 'application/javascript; charset=UTF-8');
+        res.header('Content-Encoding', 'gzip');
+        res.header('Content-Type', 'application/javascript; charset=UTF-8');
       }
       next();
   })
@@ -70,7 +70,9 @@ export default async function (fastify, opts) {
         root: join(import.meta.url, '../..', 'client/build'), //path.join(__dirname, '..', 'client/build'),
         prefix: '/',
         prefixAvoidTrailingSlash: true,
-        list: true
+        list: true,
+        cacheControl: true,
+        maxAge: 31536000000 //in ms 
     })
     /*} catch (err) {
       app.log.info('Try serve ui/build error: ' + err);
