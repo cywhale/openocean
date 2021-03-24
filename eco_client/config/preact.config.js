@@ -32,8 +32,14 @@ const ImageminPlugin = require('imagemin-webpack-plugin').default
 //const jsonminify= require('jsonminify');
 //const UnusedFilesPlugin = require('unused-files-webpack-plugin').default;
 //const preactCliSwPrecachePlugin = require('preact-cli-sw-precache'); //not work anymore? https://github.com/preactjs/preact-cli/pull/674
+//const WorkboxPlugin = require("workbox-webpack-plugin");
 //const {InjectManifest} = require('workbox-webpack-plugin');
-//const { injectManifest } = require('preact-cli-workbox-plugin');
+
+// Q/A here: https://app.slack.com/client/T3NM0NCDC/C3PSVEMM5/thread/C3PSVEMM5-1616340858.005300
+// Workbox configuration options: [maximumFileSizeToCacheInBytes]. This will not have any effect, as it will only modify files that are matched via 'globPatterns'
+// replace files
+// cp ~/backup/openocean/ver_bak/preact-cli-workbox-plugin/replace-default-plugin.js /home/odbadmin/git/openocean/eco_client/node_modules/preact-cli-workbox-plugin/
+//const { injectManifest, swGenerator } = require('preact-cli-workbox-plugin');
 
 const tryOptimize = false;
 const OptimizePlugin = require('optimize-plugin'); //cannot work with copy-webpack-plugin
@@ -308,15 +314,14 @@ const cesium_other_config = (config, env) => {
                   publicPath: '/assets/css/',
                 },
               },*/
-              //'css-loader', 'sass-loader' //, 'style-loader'
               { loader: 'style-loader' },
-              { loader: 'css-loader',
+              { loader: 'css-loader?modules&importLoaders=1', //https://jasonformat.com/how-css-modules-work-today
                 options: {
                    minimize: true
                 }
               },
               { loader: 'sass-loader' }
-            ],
+            ].join('!'),
             include: /node_modules[/\\]react-dropdown-tree-select/,
             sideEffects: true
             // extractTextPluginOptions
@@ -431,7 +436,8 @@ const cesium_other_config = (config, env) => {
           }
         }
       }
-    }
+    },
+    stats: { colors: true }
     // you can add preact-cli plugins here
     //plugins: [
         //https://github.com/preactjs/preact-cli/wiki/Config-Recipes
@@ -508,12 +514,6 @@ const baseConfig = (config, env, helpers) => {
 
   if (testenv.NODE_ENV === "production") {
 
-  /*const precache_plug = helpers.getPluginsByName(config, 'SWPrecacheWebpackPlugin')[0];
-    if (precache_plug) {
-      console.log("Have max cache size: ", precache_plug.plugin.options.maximumFileSizeToCacheInBytes);
-      precache_plug.plugin.options.maximumFileSizeToCacheInBytes = 3000000;
-    }*/
-
     const htmlplug = helpers.getPluginsByName(config, 'HtmlWebpackPlugin')[0];
     if (htmlplug) {
       //console.log("Have htmlPlugin inject: ", htmlplug.plugin.options.inject);
@@ -586,6 +586,15 @@ const baseConfig = (config, env, helpers) => {
         critters.plugin.options.preload = 'swap';
     }
 
+    //https://github.com/prateekbh/preact-cli-workbox-plugin/blob/master/replace-default-plugin.js
+    //const precache_plug = helpers.getPluginsByName(config, 'SWPrecacheWebpackPlugin')[0];
+    const precache_plug = helpers.getPluginsByName(config, 'InjectManifest')[0]; //'WorkboxPlugin'
+    if (precache_plug) {
+        console.log("Have options: ", precache_plug.plugin.config);
+        console.log("Have maximumFileSizeToCacheInBytes: ", precache_plug.plugin.config.maximumFileSizeToCacheInBytes);
+        precache_plug.plugin.config.maximumFileSizeToCacheInBytes= 5*1024*1024;
+        console.log("After maximumFileSizeToCacheInBytes: ", precache_plug.plugin.config);
+    }
     //const optCssAsset = helpers.getPluginsByName(config, 'CssMinimizerPlugin')[0]; //'OptimizeCssAssetsWebpack'
     //if (optCssAsset) {
     //  console.log("Have OptimizeCSS Plugin option: ", optCssAsset.plugin.options.processorOptions); //cssProcessorOptions
@@ -696,10 +705,9 @@ const baseConfig = (config, env, helpers) => {
     config.plugins.push( new DuplicatePackageCheckerPlugin() );
 // cause a multple instances of self.__WB_MANIFEST error if specified in sw.js. If not specified, then none found error. Weird.
 // https://github.com/GoogleChrome/workbox/blob/f2ef9126f36cbf1219e9c27997ac0c4d873a0ca8/packages/workbox-build/src/inject-manifest.js#L152-L153
-/*  config.plugins.push( new InjectManifest({
-        //swSrc: path.resolve(__dirname, '..', 'src/sw.js'),
-        //swDest: 'sw.js',
-        swSrc: path.join(process.cwd(), 'src', 'sw.js'),
+/* config.plugins.push( new WorkboxPlugin.InjectManifest({
+        //swSrc: path.join(process.cwd(), 'src', 'sw.js'), //path.resolve(__dirname, '..', 'src/sw.js'),
+        swSrc: '../src/sw.js',
         swDest: 'sw.js',
         //include: undefined, //https://github.com/GoogleChrome/workbox/issues/2681
         exclude: [
@@ -746,6 +754,7 @@ const baseConfig = (config, env, helpers) => {
       statsOptions: { source: false }
   }));
 */
+//worker_preact_config(config, env, helpers);
   return config;
 };
 
@@ -772,23 +781,26 @@ const sw_preact_config = (config) => {
     maximumFileSizeToCacheInBytes: 10*1024*1024
   };
   return preactCliSwPrecachePlugin(config, precacheConfig);
-}
-// Weird Error. Cannot find sw.js always...
-const worker_preact_config = (config, env, helpers) => {
-  return injectManifest(config, {
-    swSrc: join(__dirname, 'src', 'sw.js'), //path.join(__dirname, '..', 'src/sw.js'), //'./src/sw.js'
-    maximumFileSizeToCacheInBytes: 5*1024*1024,
-  });
-}
-*/
+}*/
+// Workbox configuration options: [maximumFileSizeToCacheInBytes]. This will not have any effect, as it will only modify files that are matched via 'globPatterns'
+//const worker_preact_config = (config, env, helpers) => {
+//console.log(join(__dirname, '..', 'src/sw.js'));
+
+//  return injectManifest(config, helpers, {
+//    swSrc: join(__dirname, '..', 'src/sw.js'),
+//    swDest: 'sw.js',
+//    //include: '**/*.{js,css,html,png,jpg,jpeg,woff2,ttf,eot,svg}',
+//    maximumFileSizeToCacheInBytes: 5*1024*1024,
+//  });
+//}
+
 
 //module exports = {
 export default (config, env, helpers) => {
-  //worker_preact_config(config, env, helpers);
   return merge(
   //sw_preact_config(config),
     baseConfig(config, env, helpers),
+  //worker_preact_config(config, env, helpers),
     cesium_other_config(config, env)
-  //worker_preact_config(config, env, helpers)
   );
 };

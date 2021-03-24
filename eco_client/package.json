@@ -45,7 +45,6 @@
     "optimize-plugin": "^1.0.0",
     "path": "^0.12.7",
     "preact-cli": "^3.0.5",
-    "preact-cli-workbox-plugin": "^1.1.1",
     "preact-render-to-string": "^5.1.16",
     "sass-loader": "10.1.1",
     "sirv": "^1.0.7",
