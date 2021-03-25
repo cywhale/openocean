@@ -4,7 +4,7 @@ import { registerRoute } from 'workbox-routing';
 import { NetworkOnly, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { ExpirationPlugin } from 'workbox-expiration';
-import { precacheAndRoute } from 'workbox-precaching';
+//import { precacheAndRoute } from 'workbox-precaching';
 //import {PrecacheController} from 'workbox-precaching';
 //const precacheController = new PrecacheController();
 //https://github.com/GoogleChrome/workbox/issues/2177
@@ -12,9 +12,9 @@ import { precacheAndRoute } from 'workbox-precaching';
 //import * as core from "workbox-core";
 //core.skipWaiting();
 //core.clientsClaim();
-const manifest = self.__WB_MANIFEST;
-console.log(manifest);
-precacheAndRoute(manifest || []);
+//const manifest = self.__WB_MANIFEST;
+//console.log(manifest);
+//precacheAndRoute(manifest || []);
 
 //if (manifest) {
     //console.log('precached', manifest);

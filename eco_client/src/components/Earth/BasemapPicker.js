@@ -72,8 +72,12 @@ const BasemapPicker = (props) => {
             tooltip : 'NOAA Etopo',
             category: "Other",
             creationFunction : function() {
-              return new UrlTemplateImageryProvider({
-                url : buildModuleUrl('https://gis.ngdc.noaa.gov/arcgis/rest/services/web_mercator/etopo1_hillshade/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
+//            return new UrlTemplateImageryProvider({
+//              url : buildModuleUrl('https://gis.ngdc.noaa.gov/arcgis/rest/services/web_mercator/etopo1_hillshade/MapServer/tile/{z}/{y}/{x}?blankTile=True'),
+              return new WebMapServiceImageryProvider({
+                url : 'https://ecodata.odb.ntu.edu.tw/geoserver/noaa/wms',
+                layers : 'noaa:Etopo1_hillshade',
+                enablePickFeatures: false,
                 credit : 'NOAA etopo1 hillshade', //new Credit('©
                 proxy : new DefaultProxy('/proxy/')
               });
@@ -104,6 +108,7 @@ const BasemapPicker = (props) => {
               return new WebMapServiceImageryProvider({
                 url : 'https://gis.ngdc.noaa.gov/arcgis/services/DEM_mosaics/DEM_global_mosaic_hillshade/ImageServer/WMSServer',
                 layers : 'DEM_global_mosaic_hillshade:ColorHillshade',
+                enablePickFeatures: false,
                 credit : 'NOAA National Centers for Environmental Information (NCEI)',
                 proxy : new DefaultProxy('/proxy/')
               });
@@ -122,6 +127,7 @@ const BasemapPicker = (props) => {
                 style : 'default',
                 format : 'image/png',
                 tileMatrixSetID : 'default028mm',
+                enablePickFeatures: false,
                 credit : 'General Bathymetric Chart of the Oceans (GEBCO); NOAA National Centers for Environmental Information (NCEI)',
                 proxy : new DefaultProxy('/proxy/')
               });
@@ -146,6 +152,7 @@ const BasemapPicker = (props) => {
                 //  width: 749,
                 //  height: 768
                 //},
+                enablePickFeatures: false,
                 credit : 'Bathemetry ©2020 GMRT',
                 proxy : new DefaultProxy('/proxy/')
               });

@@ -1,6 +1,6 @@
 {
-  "name": "ECO_client",
-  "version": "0.0.2",
+  "name": "eco_client",
+  "version": "0.0.3",
   "license": "MIT",
   "sideEffects": false,
   "main": "./src/index.js",
@@ -61,12 +61,11 @@
     "workbox-expiration": "^6.1.2",
     "workbox-precaching": "^6.1.2",
     "workbox-routing": "^6.1.2",
-    "workbox-strategies": "^6.1.2",
-    "workbox-webpack-plugin": "^6.1.2"
+    "workbox-strategies": "^6.1.2"
   },
   "dependencies": {
     "cesium": "^1.79.1",
-    "firebase": "^8.3.0",
+    "firebase": "^8.3.1",
     "nanoid": "^3.1.22",
     "preact": "^10.5.13",
     "preact-router": "^3.2.1",

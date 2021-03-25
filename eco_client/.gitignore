@@ -37,3 +37,10 @@ yarn.lock
 **/*_bak.*
 config/cesium_css_modify.sh
 distdll
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*

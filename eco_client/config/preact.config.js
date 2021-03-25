@@ -1,5 +1,6 @@
 import webpack from 'webpack';
-import path, {join} from 'path';
+import path from 'path';
+// const glob = require('glob');
 // Plugins for webpack
 // new release: https://github.com/CesiumGS/cesium-webpack-example/blob/master/webpack.release.config.js
 // https://cesium.com/docs/tutorials/cesium-and-webpack/
@@ -28,7 +29,8 @@ const CompressionPlugin = require('compression-webpack-plugin');
 //const zlib = require('zlib');
 const svgToMiniDataURI = require('mini-svg-data-uri');
 //const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
-const ImageminPlugin = require('imagemin-webpack-plugin').default
+const ImageminPlugin = require('imagemin-webpack-plugin').default;
+//const PurgecssPlugin = require('purgecss-webpack-plugin');
 //const jsonminify= require('jsonminify');
 //const UnusedFilesPlugin = require('unused-files-webpack-plugin').default;
 //const preactCliSwPrecachePlugin = require('preact-cli-sw-precache'); //not work anymore? https://github.com/preactjs/preact-cli/pull/674
@@ -55,6 +57,9 @@ const publicUrl = publicPath.slice(0, -1);
 
 //const cssFilename = '[name].[contenthash:8].css'; //'static/css/'
 //const extractTextPluginOptions = { publicPath: Array(cssFilename.split('/').length).join('../') }
+//const PATHS = {
+//  src: path.join(__dirname, 'src')
+//};
 
 const globOptions = {};
         //nodir : true,
@@ -422,15 +427,16 @@ const cesium_other_config = (config, env) => {
             minChunks: 2, //module => module.context && module.context.indexOf('cesium') !== -1
             enforce: true
           },
-          vendors: {
+        /* vendors: {
             test: /[\\/]node_modules[\\/]/,
             priority: -10,
             chunks: 'all',
             minChunks: 2,
             name: 'chunk-vendors'
-          },// https://blog.logrocket.com/guide-performance-optimization-webpack/
+          },*/ //https://twitter.com/iamakulov/status/1275812676212600833
+          // https://blog.logrocket.com/guide-performance-optimization-webpack/
           commons: {
-            chunks: 'all',
+            chunks: 'initial',
             minChunks: 2,
             priority: 1
           }
@@ -619,6 +625,11 @@ const baseConfig = (config, env, helpers) => {
       //})
     //);*/
     //};
+//  config.plugins.push(
+//      new PurgecssPlugin({
+//        paths: glob.sync(`${PATHS.src}/**/*`,  { nodir: true }),
+//      })
+//    );
 /*  config.plugins.push(
       new ExtractCssChunks({
         filename: 'assets/css/[name].[hash].css',
@@ -652,7 +663,6 @@ const baseConfig = (config, env, helpers) => {
       })
     );
 */
-
 // see https://github.com/webpack-contrib/compression-webpack-plugin
 // can replace BrotliPlugin and BrotliGzipPlugin
     config.plugins.push(
@@ -755,6 +765,14 @@ const baseConfig = (config, env, helpers) => {
   }));
 */
 //worker_preact_config(config, env, helpers);
+//https://github.com/wub/preact-cli-plugin-typescript/issues/3
+/*  config.resolve.alias = {
+        react: "preact/compat",
+        "react-dom": "preact/compat",
+        "preact-cli-entrypoint": path.resolve(__dirname, 'src', 'index.js'),
+        //"ssr-bundle": path.resolve(__dirname, 'src', 'index.js'),
+        ...config.resolve.alias,
+  };*/
   return config;
 };
 

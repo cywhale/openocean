@@ -100,7 +100,7 @@ const MousePos = (props) => {
           }
         }
 
-        let pickedLabel = scene.pick(movement.endPosition);
+        let pickedLabel = scene.pick(movement.position); //endPosition
         if (defined(pickedLabel)) {
           const ids = pickedLabel.id;
           if (Array.isArray(ids)) {
