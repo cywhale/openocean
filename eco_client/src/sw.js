@@ -1,7 +1,7 @@
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 import { registerRoute } from 'workbox-routing';
-import { NetworkOnly, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import { NetworkFirst, NetworkOnly, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 import { ExpirationPlugin } from 'workbox-expiration';
 //import { precacheAndRoute } from 'workbox-precaching';
@@ -20,10 +20,13 @@ import { ExpirationPlugin } from 'workbox-expiration';
     //console.log('precached', manifest);
     //precacheController.addToCacheList(self.__WB_MANIFEST);
 //}
+
 const bgSyncPlugin = new BackgroundSyncPlugin('apiRequests', {
     maxRetentionTime: 60  // retry for up to one hour (in minutes)
 });
 
+// Detect and register any fetch calls using 'https://' and use the Network First Strategy by Workbox
+registerRoute(/(?:https:\/\/.*)/, new NetworkFirst());
 
 registerRoute(
     ({request}) => request.destination === 'script' ||

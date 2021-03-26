@@ -23,7 +23,10 @@ import knockout from 'cesium/Source/ThirdParty/knockout.js';
 import WmtsLayer from 'async!../Satellite/WmtsLayer';
 // follow SiteCluster/CtrlModal.js knouout code, also ref cesium ex: https://bit.ly/3hMA5bJ
 import bubble_labeler from '../Compo/bubble_labeler';
-import style from './style_layermodal.scss';
+//import style from './style_layermodal.scss';
+import(/* webpackMode: "lazy" */
+       /* webpackPrefetch: true */
+       '../../style/style_layermodal.scss');
 import(/* webpackMode: "lazy" */
        /* webpackPrefetch: true */
        '../../style/style_layerctrl.scss');
@@ -654,25 +657,25 @@ const LayerModal = (props) => { //baseName: from BasemapPicker; userBase: user c
   const render_kocomp = () => {
   //if (layerctrlRef.current) {
       return render(
-      <table class={style.thinx}>
+      <table class="thinx">
         <tbody data-bind="foreach: layers">
           <tr data-bind="css: { up: $parent.upLayer === $data, down: $parent.downLayer === $data }">
-            <td class={style.smalltd}><input class={style.laychkbox} type="checkbox" data-bind="checked: show" /></td>
-            <td class={style.smalltd}>
+            <td class="smalltd"><input class="laychkbox" type="checkbox" data-bind="checked: show" /></td>
+            <td class="smalltd">
               <span data-bind="text: name, visible: !$parent.isSelectableLayer($data)"></span>
-              <select class={style.simgsel} data-bind="visible: $parent.isSelectableLayer($data), options: $parent.sImg, optionsText: 'name', value: $parent.selectedLayer"></select>
+              <select class="simgsel" data-bind="visible: $parent.isSelectableLayer($data), options: $parent.sImg, optionsText: 'name', value: $parent.selectedLayer"></select>
             </td>
-            <td class={style.mediumtd}><span class="ctrlrange-wrap2">
+            <td class="mediumtd"><span class="ctrlrange-wrap2">
               <input type="range" class="range" min="0.0" max="1.0" step="0.01" data-bind="value: alpha, valueUpdate: 'input'" />
               <output class="bubble" style="font-size:9px;position:relative;top:0px;" /></span>
             </td>
-            <td class={style.smalltd}>
-              <button type="button" class={style.modalbutton} data-bind="click: function() { $parent.raise($data, $index()); }, visible: $parent.canRaise($index())">
+            <td class="smalltd">
+              <button type="button" class="modalbutton" data-bind="click: function() { $parent.raise($data, $index()); }, visible: $parent.canRaise($index())">
                 ▲
               </button>
             </td>
-            <td class={style.smalltd}>
-              <button type="button" class={style.modalbutton} data-bind="click: function() { $parent.lower($data, $index()); }, visible: $parent.canLower($index())">
+            <td class="smalltd">
+              <button type="button" class="modalbutton" data-bind="click: function() { $parent.lower($data, $index()); }, visible: $parent.canLower($index())">
                 ▼
               </button>
             </td>

@@ -589,7 +589,7 @@ const baseConfig = (config, env, helpers) => {
         // The default strategy in Preact CLI is "media",
         // but there are 6 different loading techniques:
         // https://github.com/GoogleChromeLabs/critters#preloadstrategy
-        critters.plugin.options.preload = 'swap';
+        critters.plugin.options.preload = 'js'; //'swap';
     }
 
     //https://github.com/prateekbh/preact-cli-workbox-plugin/blob/master/replace-default-plugin.js
