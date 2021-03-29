@@ -65,7 +65,7 @@ export default async function (fastify, opts) {
 //fastify.get(url, opts={schema:{...}}, handler) ==> fastify.route({method:, url:, schemal:, handler:...})
 //https://web.dev/codelab-text-compression-brotli
 //try { await
-  fastify.get('*.js', (req, res, next) => {
+  fastify.get('*.(js|json)', (req, res, next) => {
       if (req.header('Accept-Encoding').includes('br')) {
         req.url = req.url + '.br';
       //console.log(req.header('Accept-Encoding Brotli'));

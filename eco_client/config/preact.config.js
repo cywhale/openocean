@@ -230,6 +230,26 @@ const cesium_other_config = (config, env) => {
         unknownContextRegExp: /\/cesium\/cesium\/Source\/Core\/buildModuleUrl\.js/,
         rules: [
         //{ test: /cesium\.js$/, loader: 'script' },
+      /*{
+          test: /\.worker\.js$/i,
+          exclude: /node_modules/,
+          use: [
+          {
+            loader: 'workerize-loader',
+            options: {
+              chunkFilename: '[name].[chunkhash:8].js', //"[id].[contenthash].worker.js",
+              //name: "[name].[contenthash].worker.js",
+              //publicPath: (pathData, assetInfo) => {
+              //  return '/assets/workers/';
+              //},
+              publicPath:'/',
+              //import:true,
+              ready: true,
+              //inline: 'fallback',
+              esModule: false,
+            }
+          }],
+        },*/
         { //https://github.com/storybookjs/storybook/issues/1493
             test: /\.(js|jsx)$/,
             exclude: /node_modules/, //[/bower_components/, /styles/]
@@ -370,6 +390,7 @@ const cesium_other_config = (config, env) => {
         'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
       },
       historyApiFallback: {
+        index: '/',
         disableDotRule: true
       },
       //public : 'eco.odb.ntu.edu.tw',
@@ -517,6 +538,17 @@ const baseConfig = (config, env, helpers) => {
        CESIUM_BASE_URL: JSON.stringify('')
     })
   );
+//https://github.com/CesiumGS/cesium/issues/8401#issuecomment-631739077
+  config.plugins.push(new webpack.ContextReplacementPlugin(/cesium\/Source\/Core/, ctx => {
+    // Suppress warnings "require function is used in a way in which dependencies cannot be statically extracted"
+    // in cesium/Source/Core/buildModuleUrl.js
+      const { resource, context, dependencies } = ctx;
+      if (resource === context) {
+        dependencies.forEach(dependency => dependency.critical = false);
+      }
+      return ctx;
+  }));
+
 
   if (testenv.NODE_ENV === "production") {
 
@@ -598,8 +630,11 @@ const baseConfig = (config, env, helpers) => {
     if (precache_plug) {
         console.log("Have options: ", precache_plug.plugin.config);
         console.log("Have maximumFileSizeToCacheInBytes: ", precache_plug.plugin.config.maximumFileSizeToCacheInBytes);
+        console.log("Have exclude: ", precache_plug.plugin.config.exclude);
         precache_plug.plugin.config.maximumFileSizeToCacheInBytes= 5*1024*1024;
-        console.log("After maximumFileSizeToCacheInBytes: ", precache_plug.plugin.config);
+        precache_plug.plugin.config.exclude= [...precache_plug.plugin.config.exclude, "200.html"];
+        precache_plug.plugin.config.mode= "production",
+        console.log("After, InjectManifest: ", precache_plug.plugin.config, precache_plug.plugin.config.exclude, precache_plug.plugin.config.mode);
     }
     //const optCssAsset = helpers.getPluginsByName(config, 'CssMinimizerPlugin')[0]; //'OptimizeCssAssetsWebpack'
     //if (optCssAsset) {
@@ -671,7 +706,7 @@ const baseConfig = (config, env, helpers) => {
 	  filename: '[path][base].br', //asset: '[path].br[query]'
           algorithm: 'brotliCompress', //for CompressionPlugin
           deleteOriginalAssets: false, //for CompressionPlugin
-	  test: /\.(js|css|html|svg)$/,
+	  test: /\.(js|css|html|svg|json)$/,
           compressionOptions: {
             // zlib’s `level` option matches Brotli’s `BROTLI_PARAM_QUALITY` option.
             level: 11,
@@ -685,7 +720,7 @@ const baseConfig = (config, env, helpers) => {
         new CompressionPlugin({
           filename: '[path][base].gz', //asset: '[path].gz[query]'
           algorithm: 'gzip',
-          test: /\.(js|css|html|svg)$/,
+          test: /\.(js|css|html|svg|json)$/,
           threshold: 10240,
           minRatio: 0.8
         })
@@ -815,10 +850,12 @@ const sw_preact_config = (config) => {
 
 //module exports = {
 export default (config, env, helpers) => {
-  return merge(
+  merge(
   //sw_preact_config(config),
     baseConfig(config, env, helpers),
   //worker_preact_config(config, env, helpers),
     cesium_other_config(config, env)
   );
+  //config.output.globalObject= 'self';//need preact build --no-prerender
+  return config;
 };

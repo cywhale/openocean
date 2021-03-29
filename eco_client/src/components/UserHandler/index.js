@@ -3,7 +3,7 @@ import { useContext, useState, useEffect, useCallback } from 'preact/hooks';
 import { UserContext } from "./UserContext"
 import Cookies from 'universal-cookie';
 import { auth //, googleAuthProvider //, database
-       } from './firebase';
+       } from './firebase'; //'./FireWorker';
 import { nanoid } from 'nanoid';
 import sessionInfo from './sessionInfo';
 import UserCookies from 'async!./UserCookies';

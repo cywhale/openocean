@@ -1,6 +1,6 @@
 import { createRef } from 'preact'; // h, Component, render, toChildArray
 import { Router } from 'preact-router';
-//import { useRef } from 'preact/hooks'; //useContext
+//import { useEffect } from 'preact/hooks'; //useContext, useRef
 //import { createHashHistory } from 'history';
 import Sidebar from 'async!./Sidebar';
 import Earth from 'async!./Earth'; // {csConsumer}
@@ -63,10 +63,9 @@ const App = (props) => { //class App extends Component {
 //    };
 //    wait_until_viewer();
   }, [ref]);
-  useEffect(() => {
-      waitCS();
-  }, []); //ref, waitCS()
 */
+//useEffect(() => {
+//}, []);
 
 //const {_scene} = viewer.viewer._cesiumWidget;
 /*const render_basemap = (eRef) => {

@@ -15,4 +15,21 @@ console.log("process.env.NODE_ENV: ", process.env.NODE_ENV);
 //BuildModuleUrl.setBaseUrl('./');
 buildModuleUrl.setBaseUrl('./');
 
+//https://web.dev/offline-fallback-page/
+window.addEventListener("load", () => {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: './' })
+        .then((registration) => {
+         console.log("service worker registration successful", registration);
+        })
+        .catch((err) => {
+         console.log("service worker registration failed", err);
+        });
+      }
+});
+
+window.addEventListener('online', () => {
+      window.location.reload();
+});
+
 export default App;

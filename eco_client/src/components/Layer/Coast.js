@@ -1,6 +1,9 @@
+//import 'subworkers'; //https://stackoverflow.com/questions/33990712/uncaught-referenceerror-worker-is-not-defined-while-trying-to-create-a-worker-w
 import { Fragment } from 'preact';
 import { useState } from 'preact/hooks';
 import WebFeatureServiceImageryProvider from './WebFeatureServiceImageryProvider';
+//import WebFeatureServiceImageryProvider from 'workerize-loader?ready!././WebFeatureServiceImageryProvider.worker'
+
 import(/* webpackMode: "lazy" */
        /* webpackPrefetch: true */
        '../../style/style_ctrlcompo.scss'); //webpackMode: "lazy-once"

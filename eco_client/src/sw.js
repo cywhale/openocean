@@ -1,3 +1,13 @@
+/*
+const { getFiles, setupPrecaching, setupRouting } = require('preact-cli/sw');
+const { BackgroundSyncPlugin } = require('workbox-background-sync');
+const { registerRoute } = require('workbox-routing');
+const { NetworkFirst, NetworkOnly, CacheFirst, StaleWhileRevalidate } = require('workbox-strategies');
+const { CacheableResponsePlugin } = require('workbox-cacheable-response');
+const { ExpirationPlugin } = require('workbox-expiration');
+const { precacheAndRoute } = require('workbox-precaching');
+const { skipWaiting, clientsClaim } = require('workbox-core');
+*/
 import { getFiles, setupPrecaching, setupRouting } from 'preact-cli/sw';
 import { BackgroundSyncPlugin } from 'workbox-background-sync';
 import { registerRoute } from 'workbox-routing';
@@ -9,9 +19,10 @@ import { ExpirationPlugin } from 'workbox-expiration';
 //const precacheController = new PrecacheController();
 //https://github.com/GoogleChrome/workbox/issues/2177
 //import * as precaching from 'workbox-precaching';
-//import * as core from "workbox-core";
-//core.skipWaiting();
-//core.clientsClaim();
+import { skipWaiting, clientsClaim } from 'workbox-core';
+
+skipWaiting();
+clientsClaim();
 //const manifest = self.__WB_MANIFEST;
 //console.log(manifest);
 //precacheAndRoute(manifest || []);
