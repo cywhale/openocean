@@ -10,7 +10,7 @@ export default async function (fastify, opts) {
     //csrfProtection //for onRequest, that every route being protected by our authorization logic
   } = fastify
 
-  const options = {
+  const fopts = {
     schema: {
       response: {
         200: {
@@ -65,7 +65,7 @@ export default async function (fastify, opts) {
 //fastify.get(url, opts={schema:{...}}, handler) ==> fastify.route({method:, url:, schemal:, handler:...})
 //https://web.dev/codelab-text-compression-brotli
 //try { await
-  fastify.get('*.(js|json)', (req, res, next) => {
+  fastify.get('*.(js|json)', fopts, (req, res, next) => {
       if (req.header('Accept-Encoding').includes('br')) {
         req.url = req.url + '.br';
       //console.log(req.header('Accept-Encoding Brotli'));
@@ -99,7 +99,7 @@ export default async function (fastify, opts) {
   }
 
   //try { await
-  fastify.post(fastify.conf.sessiondir + '/init', async (req, res) => {
+  fastify.post(fastify.conf.sessiondir + '/init', fopts, async (req, res) => {
       if (req.cookies.token) {
         let verifyInit = verifyToken(req, res, fastify.config.COOKIE_SECRET, 'initSession');
         if (verifyInit) {
@@ -122,7 +122,7 @@ export default async function (fastify, opts) {
   }*/
 
   //try { await
-  fastify.post(fastify.conf.sessiondir + '/login', async (req, res) => {
+  fastify.post(fastify.conf.sessiondir + '/login', fopts, async (req, res) => {
       if (req.cookies.token) {
         let verifyLogin = verifyToken(req, res, fastify.config.COOKIE_SECRET, 'initSession');
 
@@ -136,6 +136,21 @@ export default async function (fastify, opts) {
           res.code(400).send({fail: 'Token failed when login verified after init'});
         }
 
+      } else {
+        res.code(400).send({fail: 'Need token in payload'})//);
+      }
+  })
+
+
+  fastify.post(fastify.conf.sessiondir + '/verify', fopts, async (req, res) => {
+      if (req.cookies.token) {
+        let verifyLogin = verifyToken(req, res, fastify.config.COOKIE_SECRET, 'initSession');
+
+        if (verifyLogin) {
+          res.code(200).send({success: 'Verified with token.'});
+        } else {
+          res.code(400).send({fail: 'Token failed'});
+        }
       } else {
         res.code(400).send({fail: 'Need token in payload'})//);
       }
