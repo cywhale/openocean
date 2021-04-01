@@ -41,12 +41,12 @@ const Earth = (props, ref) => { //forwardRef((props, ref) => {
   const [basePick, setBasePick] = useState({ name: "" });
 
   useEffect(() => {
-    console.log('Initialize Viewer after appstate'); // + appstate);
     if (!globe.loaded) {
       //setUserScene({ baseLayer: "Esri Firefly" });
       setUserScene({ baseLayer: "NOAA ETOPO\u00a0I" });
       initGlobe();
     } else {
+      console.log('Initialize Viewer after appstate'); // + appstate);
       render(render_basemap(), document.getElementById('rightarea'))
     /*let navigationHelpButton = new NavigationHelpButton({
          container : 'navigationHelpButtonContainer'

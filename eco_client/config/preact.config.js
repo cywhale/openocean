@@ -13,6 +13,8 @@ const { merge } = require('webpack-merge');
 //const terser = require("terser");
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlMinimizerPlugin = require("html-minimizer-webpack-plugin");
+const JsonMinimizerPlugin = require("json-minimizer-webpack-plugin");
 //const ManifestPlugin = require('webpack-manifest-plugin');
 const DuplicatePackageCheckerPlugin = require("duplicate-package-checker-webpack-plugin");
 //const AssetsPlugin = require('assets-webpack-plugin'); //dev
@@ -130,7 +132,11 @@ const cesium_other_config = (config, env) => {
                //  return `${fileData.filename}.OTHER.LICENSE.txt${fileData.query}`;
                //}
              //}
-         })/*,
+         }),
+         new HtmlMinimizerPlugin({
+           parallel: 4,
+         }),
+         new JsonMinimizerPlugin()/*,
          new OptimizeCssAssetsPlugin({
            cssProcessorOptions: {
              //Fix keyframes in different CSS chunks minifying to colliding names:
