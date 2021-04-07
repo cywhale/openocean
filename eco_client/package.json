@@ -66,8 +66,8 @@
     "workbox-strategies": "^6.1.2"
   },
   "dependencies": {
-    "cesium": "^1.79.1",
-    "firebase": "^8.3.1",
+    "cesium": "^1.80.0",
+    "firebase": "^8.3.2",
     "nanoid": "^3.1.22",
     "preact": "^10.5.13",
     "preact-router": "^3.2.1",
