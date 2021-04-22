@@ -264,15 +264,19 @@ const cesium_other_config = (config, env) => {
               presets: [
                 ['env', {
                   modules: false,
-                  useBuiltIns: true,
+                  useBuiltIns: "usage",
+                  corejs: 3,
+                  bugfixes: true,
                   targets: {
                     browsers: [
-                      'Chrome >= 60',
-                      'Safari >= 10.1',
-                      'iOS >= 10.3',
-                      'Firefox >= 54',
-                      'Edge >= 15',
+                      //'Chrome >= 60',
+                      //'Safari >= 10.1',
+                      //'iOS >= 10.3',
+                      //'Firefox >= 54',
+                      //'Edge >= 15',
+                      ">0.25%, not dead"
                     ],
+                    "node": "current"
                   },
                 }],
               ],
