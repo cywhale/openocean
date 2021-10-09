@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from 'preact/hooks'; //useCallback
 import Cookies from 'universal-cookie';
 //import { nanoid } from 'nanoid';
 import(/* webpackPreload: true */
-       "../../style/style_usercookies.css");
+       "../../style/style_usercookies.scss");
 import style from "./style_cookiediv";
 
 const UserCookies = (props) => {

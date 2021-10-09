@@ -3,10 +3,10 @@ import(/* webpackPrefetch: true */
 import App from './components/app';
 import (/* webpackPrefetch: true */
         /* webpackPreload: true */
-        "cesium/Source/Widgets/widgets.css");
+        "cesium/Source/Widgets/widgets.scss");
 import(/* webpackPrefetch: true */
        /* webpackPreload: true */
-       'style/style_earth.css');
+       'style/style_earth.scss');
 import sw_register from './sw_register';
 
 import buildModuleUrl from "cesium/Source/Core/buildModuleUrl";

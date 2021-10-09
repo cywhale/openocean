@@ -1,6 +1,7 @@
 import { useContext, useState, useCallback } from "preact/hooks";
 import { UserContext } from "./UserContext"
 import { auth, googleAuthProvider } from './firebase'; //'./FireWorker';
+import { signInWithPopup } from "firebase/auth"; //firebase version 9
 import Popup from 'async!../Compo/Popup';
 import sessionInfo from './sessionInfo';
 import style from './style_signin';
@@ -60,7 +61,8 @@ const SignIn = (props) => {
   }, [ucode]);
 
   const renderFirePopup = useCallback((fireauth, fireprovider) => {
-    fireauth.signInWithPopup(fireprovider).then((result) => {
+    //ver8.6.7: fireauth.signInWithPopup(fireprovider).then((result) => {
+    signInWithPopup(fireauth, fireprovider).then((result) => {
       // This gives you a Google Access Token. You can use it to access the Google API.
       // var token = result.credential.accessToken; //We not use this token currently.
       // The signed-in user info. //var user = result.user;

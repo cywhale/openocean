@@ -4,6 +4,8 @@ import { UserContext } from "./UserContext"
 import Cookies from 'universal-cookie';
 import { auth //, googleAuthProvider //, database
        } from './firebase'; //'./FireWorker';
+//firebase version 9 //https://firebase.google.cn/docs/auth/web/google-signin?hl=en
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { nanoid } from 'nanoid';
 import sessionInfo from './sessionInfo';
 import UserCookies from 'async!./UserCookies';
@@ -105,7 +107,7 @@ const UserHandler = () => {
   }, []);
 
   const SignOut = () => {
-    if (user.auth === 'gmail') { auth.signOut() };
+    if (user.auth === 'gmail') { signOut(auth) }; //.then(() => {...} //ver8.6.7: auth.signOut() };
     cookies.remove('ucode', { path: '/' });
     cookies.remove('uauth', { path: '/' });
     setUcode((preState) => ({
@@ -148,7 +150,7 @@ const UserHandler = () => {
       }); //catch (err) { reject(err) }
   };
 
-  const waitFireAuth = (ucstr) => {auth.onAuthStateChanged(
+  const waitFireAuth = (ucstr) => {onAuthStateChanged(auth, //ver8.6.7: auth.onAuthStateChanged(
           currUser => {
             if (currUser) {
               cookies.set('uauth', 'gmail', cookieOpts);
