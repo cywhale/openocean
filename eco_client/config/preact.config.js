@@ -38,6 +38,7 @@ const ImageminPlugin = require('imagemin-webpack-plugin').default;
 //const preactCliSwPrecachePlugin = require('preact-cli-sw-precache'); //not work anymore? https://github.com/preactjs/preact-cli/pull/674
 //const WorkboxPlugin = require("workbox-webpack-plugin");
 //const {InjectManifest} = require('workbox-webpack-plugin');
+const UnusedWebpackPlugin = require('unused-webpack-plugin'); // not work to delete unused code found by dev tools, can be uninstalled
 
 // Q/A here: https://app.slack.com/client/T3NM0NCDC/C3PSVEMM5/thread/C3PSVEMM5-1616340858.005300
 // Workbox configuration options: [maximumFileSizeToCacheInBytes]. This will not have any effect, as it will only modify files that are matched via 'globPatterns'
@@ -46,7 +47,7 @@ const ImageminPlugin = require('imagemin-webpack-plugin').default;
 //const { injectManifest, swGenerator } = require('preact-cli-workbox-plugin');
 
 const tryOptimize = false;
-const OptimizePlugin = require('optimize-plugin'); //cannot work with copy-webpack-plugin
+//const OptimizePlugin = require('optimize-plugin'); //cannot work with copy-webpack-plugin
 
 // Cesium
 const cesiumSource = "../node_modules/cesium/Source";
@@ -117,6 +118,8 @@ const cesium_other_config = (config, env) => {
          //name: 'runtime'
        //},
        concatenateModules: true,
+       mode: 'production',
+       minimize: true,
        minimizer:
        [
          new TerserPlugin({
@@ -204,7 +207,6 @@ const cesium_other_config = (config, env) => {
         sourcePrefix: ''
     },*/
     //https://blog.isquaredsoftware.com/2017/03/declarative-earth-part-1-cesium-webpack/#including-cesium-in-production
-    unknownContextCritical : false,
     amd: {
       // Enable webpack-friendly use of require in Cesium
       toUrlUndefined: true
@@ -489,6 +491,14 @@ const baseConfig = (config, env, helpers) => {
   if (!config.plugins) {
         config.plugins = [];
   }
+
+  config.plugins.push(
+      new UnusedWebpackPlugin({
+      directories: [path.join(__dirname, '../node_modules/cesium')],
+      root: __dirname,
+      remove: true,
+    }),
+  );
 
 // transform https://github.com/webpack-contrib/copy-webpack-plugin/issues/6
   config.plugins.push(
