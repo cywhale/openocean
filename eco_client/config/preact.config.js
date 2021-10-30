@@ -38,7 +38,7 @@ const ImageminPlugin = require('imagemin-webpack-plugin').default;
 //const preactCliSwPrecachePlugin = require('preact-cli-sw-precache'); //not work anymore? https://github.com/preactjs/preact-cli/pull/674
 //const WorkboxPlugin = require("workbox-webpack-plugin");
 //const {InjectManifest} = require('workbox-webpack-plugin');
-const UnusedWebpackPlugin = require('unused-webpack-plugin'); // not work to delete unused code found by dev tools, can be uninstalled
+//const UnusedWebpackPlugin = require('unused-webpack-plugin'); // not work to delete unused code found by dev tools, can be uninstalled
 
 // Q/A here: https://app.slack.com/client/T3NM0NCDC/C3PSVEMM5/thread/C3PSVEMM5-1616340858.005300
 // Workbox configuration options: [maximumFileSizeToCacheInBytes]. This will not have any effect, as it will only modify files that are matched via 'globPatterns'
@@ -112,6 +112,7 @@ const cesium_other_config = (config, env) => {
     console.log("Use production optimization...");
     var optzx = {
        usedExports: true,
+       sideEffects: true,
        //https://wanago.io/2018/08/13/webpack-4-course-part-seven-decreasing-the-bundle-size-with-tree-shaking/
        //sideEffects: true, //tell Webpack don't ignore package.json sideEffect = false settings
        runtimeChunk: true, //{
@@ -219,7 +220,7 @@ const cesium_other_config = (config, env) => {
       Buffer: false,
       http: "empty",
       https: "empty",
-      //zlib: "empty"
+      zlib: "empty"
     },
     resolve: {
       fallback: path.resolve(__dirname, '..', 'src'),
@@ -491,7 +492,7 @@ const baseConfig = (config, env, helpers) => {
   if (!config.plugins) {
         config.plugins = [];
   }
-
+/*
   config.plugins.push(
       new UnusedWebpackPlugin({
       directories: [path.join(__dirname, '../node_modules/cesium')],
@@ -499,7 +500,7 @@ const baseConfig = (config, env, helpers) => {
       remove: true,
     }),
   );
-
+*/
 // transform https://github.com/webpack-contrib/copy-webpack-plugin/issues/6
   config.plugins.push(
 /*  new UnusedFilesPlugin({

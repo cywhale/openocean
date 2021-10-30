@@ -14,7 +14,7 @@
   "dependencies": {
     "desm": "^1.1.0",
     "fast-jwt": "^1.2.0",
-    "fastify": "^3.22.0",
+    "fastify": "^3.22.1",
     "fastify-autoload": "^3.9.0",
     "fastify-cookie": "^5.3.1",
     "fastify-cors": "6.0.2",
@@ -23,14 +23,14 @@
     "fastify-mongodb": "^4.1.1",
     "fastify-plugin": "^3.0.0",
     "fastify-sensible": "^3.1.1",
-    "fastify-static": "4.4.0",
+    "fastify-static": "^4.4.2",
     "fluent-json-schema": "3.0.1",
     "fs": "^0.0.1-security",
     "under-pressure": "5.8.0"
   },
   "devDependencies": {
     "eslint": "^7.1.0",
-    "nodemon": "^2.0.7",
+    "nodemon": "^2.0.13",
     "tap": "^12.5.3"
   }
 }
