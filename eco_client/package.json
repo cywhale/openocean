@@ -45,7 +45,7 @@
     "jest-preset-preact": "^4.0.2",
     "json-minimizer-webpack-plugin": "2.1.0",
     "mini-svg-data-uri": "1.2.3",
-    "node-sass": "5.0.0",
+    "node-sass": "7.0.0",
     "optimize-plugin": "^1.0.0",
     "path": "^0.12.7",
     "preact-cli": "3.3.0",
