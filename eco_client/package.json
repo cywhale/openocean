@@ -58,7 +58,7 @@
     "terser-webpack-plugin": "4.2.3",
     "unused-webpack-plugin": "^2.4.0",
     "url-loader": "4.1.1",
-    "webpack": "4.46.0",
+    "webpack": "5.94.0",
     "webpack-bundle-analyzer": "4.4.0",
     "webpack-merge": "5.7.3",
     "workbox-background-sync": "6.3.0",
